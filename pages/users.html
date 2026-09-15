@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User Management &middot; PATVEP Hostel &amp; Canteen</title>
+<link rel="icon" type="image/png" href="../assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page">
+
+    <div class="page__head">
+      <div>
+        <h1>User Management</h1>
+        <div class="page__meta" id="pageMeta"></div>
+      </div>
+      <div class="page__actions"></div>
+    </div>
+
+    <div id="notice"></div>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div class="toolbar__search">
+          <label class="sr-only" for="q">Search users</label>
+          <span data-icon="search"></span>
+          <input class="input input--sm" id="q" type="search" placeholder="Search name, username or department">
+        </div>
+        <label class="sr-only" for="fRole">Filter by role</label>
+        <select class="select select--sm" id="fRole">
+          <option value="all">All roles</option>
+          <option value="ADMIN">Administrator</option>
+          <option value="STAFF_HOSTEL">Hostel Staff</option>
+          <option value="STAFF_CANTEEN">Canteen Staff</option>
+          <option value="GUEST">Guest</option>
+        </select>
+        <span class="toolbar__count" id="count"></span>
+      </div>
+      <div id="rows"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/queries.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script src="../assets/js/pages/users.js"></script>
+</body>
+</html>

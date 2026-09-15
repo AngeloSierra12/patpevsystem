@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canteen Inventory &middot; PATVEP Hostel &amp; Canteen</title>
+<link rel="icon" type="image/png" href="../assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page">
+
+    <div class="page__head">
+      <div>
+        <h1>Canteen Inventory</h1>
+        <div class="page__meta" id="pageMeta"></div>
+      </div>
+      <div class="page__actions"></div>
+    </div>
+
+    <section class="metrics" id="metrics"></section>
+
+    <section class="panel">
+      <div class="panel__head"><span class="panel__title">Items</span></div>
+      <div class="panel__body panel__body--flush" id="list"></div>
+    </section>
+
+    <div style="height:14px"></div>
+
+    <section class="panel">
+      <div class="panel__head"><span class="panel__title">Stock movement, suppliers and deliveries</span></div>
+      <div class="panel__body" id="pending"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/queries.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script src="../assets/js/pages/inventory.js"></script>
+</body>
+</html>

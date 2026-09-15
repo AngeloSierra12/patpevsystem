@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard &middot; PATVEP Hostel &amp; Canteen</title>
+<link rel="icon" type="image/png" href="assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page">
+
+    <div class="page__head">
+      <div>
+        <h1>Dashboard</h1>
+        <div class="page__meta" id="pageMeta"></div>
+      </div>
+      <div class="page__actions"><button class="btn" id="btnRefresh" data-icon="clock">Refresh</button></div>
+    </div>
+
+    <section class="metrics" id="metrics"></section>
+
+    <div class="grid grid--side">
+      <div class="stack">
+        <section class="panel">
+          <div class="panel__head"><span class="panel__title">Room occupancy, next 7 days</span></div>
+          <div class="panel__body" id="occupancy"></div>
+        </section>
+        <section class="panel">
+          <div class="panel__head"><span class="panel__title">Canteen stock levels</span></div>
+          <div class="panel__body" id="stock"></div>
+        </section>
+      </div>
+      <div class="stack">
+        <section class="panel">
+          <div class="panel__head"><span class="panel__title">Quick actions</span></div>
+          <div class="panel__body panel__body--flush" id="quick"></div>
+        </section>
+        <section class="panel">
+          <div class="panel__head"><span class="panel__title">Low stock alerts</span></div>
+          <div class="panel__body panel__body--flush" id="alerts"></div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/queries.js"></script>
+<script src="assets/js/shell.js"></script>
+<script src="assets/js/pages/dashboard.js"></script>
+</body>
+</html>

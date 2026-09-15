@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User Management &middot; PATVEP Hostel &amp; Canteen System</title>
+<link rel="icon" type="image/png" href="../assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page-body">
+
+    <div class="page-head">
+      <div class="page-head__text">
+        <h1>User Management</h1>
+        <div class="page-meta" id="pageMeta"></div>
+      </div>
+      <div class="page-head__actions">
+        <button class="btn" id="btnMatrix" data-icon="grid">Permission matrix</button>
+        <button class="btn btn--primary" id="btnNew" data-perm="users.create"
+                data-icon="plus">Add user account</button>
+      </div>
+    </div>
+
+    <div id="roleNotice"></div>
+
+    <!-- role summary -->
+    <section class="metricbar" id="roleCards" aria-label="Roles"></section>
+
+    <!-- user list -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <div class="card__title">User accounts</div>
+          
+        </div>
+        
+      </div>
+
+      <div class="filterbar">
+        <div class="filterbar__search">
+          <label class="sr-only" for="search">Search users</label>
+          <span data-icon-slot="search"></span>
+          <input class="input input--sm" id="search" type="search"
+                 placeholder="Search name, username, email or department">
+        </div>
+
+        <label class="sr-only" for="filterRole">Filter by role</label>
+        <select class="select select--sm" id="filterRole">
+          <option value="all">All roles</option>
+          <option value="admin">Administrator</option>
+          <option value="staff">Staff</option>
+          <option value="guest">Guest</option>
+        </select>
+
+        <label class="sr-only" for="filterStatus">Filter by status</label>
+        <select class="select select--sm" id="filterStatus">
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="suspended">Suspended</option>
+        </select>
+
+        <span class="filterbar__count" id="resultCount"></span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Permissions</th>
+              <th>Last login</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userRows"></tbody>
+        </table>
+      </div>
+
+      <div class="card__foot" id="tableFoot"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/core/util.js"></script>
+<script src="../assets/js/data/mock-data.js"></script>
+<script src="../assets/js/core/store.js"></script>
+<script src="../assets/js/core/rbac.js"></script>
+<script src="../assets/js/core/session.js"></script>
+<script src="../assets/js/core/scheduling.js"></script>
+<script src="../assets/js/ui/icons.js"></script>
+<script src="../assets/js/ui/shell.js"></script>
+<script src="../assets/js/pages/users.js"></script>
+</body>
+</html>

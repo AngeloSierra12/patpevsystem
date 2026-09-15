@@ -1,0 +1,270 @@
+﻿// =============================================================================
+// BPSU IGP PATVEP HOSTEL & UNIVERSITY CANTEEN SYSTEM
+// File: bpsu_patvep_erd.dbml
+// Tool: dbdiagram.io  (paste this entire file at https://dbdiagram.io/d)
+// Must exactly match 02_tables.sql
+// =============================================================================
+
+Project bpsu_patvep {
+  database_type: 'MySQL'
+  Note: 'Hotel Reservation & Inventory System — BPSU Main Campus'
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUTHENTICATION / USER MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+Table users {
+  user_id       int         [pk, increment, note: "Internal PK"]
+  username      varchar(50) [not null, unique]
+  password_hash varchar(255)[not null, note: "bcrypt hash"]
+  full_name     varchar(120)[not null]
+  email         varchar(120)[not null, unique]
+  phone         varchar(25)
+  role          varchar(20) [not null, note: "ADMIN | STAFF_HOSTEL | STAFF_CANTEEN | GUEST"]
+  department    varchar(120)
+  is_active     tinyint(1)  [not null, default: 1]
+  created_at    datetime    [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at    datetime    [not null, default: `CURRENT_TIMESTAMP`]
+  last_login_at datetime
+
+  indexes {
+    role      [name: "idx_users_role"]
+    is_active [name: "idx_users_active"]
+    email     [name: "idx_users_email"]
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HOTEL RESERVATION MODULE
+// ─────────────────────────────────────────────────────────────────────────────
+
+Table guests {
+  guest_id      int         [pk, increment]
+  guest_user_id int         [null, ref: > users.user_id, note: "NULL = walk-in guest"]
+  full_name     varchar(120)[not null]
+  email         varchar(120)
+  phone         varchar(25)
+  id_type       varchar(60)
+  id_number     varchar(60)
+  address       text
+  notes         text
+  created_at    datetime    [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at    datetime    [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    guest_user_id [name: "idx_guests_user"]
+    full_name     [name: "idx_guests_name"]
+  }
+}
+
+Table room_types {
+  room_type_id        int           [pk, increment]
+  type_name           varchar(80)   [not null, unique]
+  description         text
+  base_rate_per_night decimal(10,2) [not null]
+  max_capacity        int           [not null, default: 1]
+  created_at          datetime      [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at          datetime      [not null, default: `CURRENT_TIMESTAMP`]
+}
+
+Table rooms {
+  room_id         int           [pk, increment]
+  room_type_id    int           [not null, ref: > room_types.room_type_id]
+  room_number     varchar(20)   [not null, unique]
+  floor           tinyint       [not null, default: 1]
+  capacity        int           [not null, default: 1]
+  rate_per_night  decimal(10,2) [not null]
+  description     text
+  status          varchar(12)   [not null, default: "AVAILABLE", note: "AVAILABLE | OCCUPIED | MAINTENANCE | RESERVED"]
+  created_at      datetime      [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at      datetime      [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    status       [name: "idx_rooms_status"]
+    room_type_id [name: "idx_rooms_type"]
+  }
+}
+
+Table reservations {
+  reservation_id         int           [pk, increment]
+  reference_number       varchar(30)   [not null, unique]
+  guest_id               int           [not null, ref: > guests.guest_id]
+  room_id                int           [not null, ref: > rooms.room_id]
+  room_number_snapshot   varchar(20)   [not null, note: "Stored at booking time — room number may change"]
+  room_type_snapshot     varchar(80)   [not null, note: "Stored at booking time"]
+  rate_per_night_snapshot decimal(10,2)[not null, note: "Rate locked at booking time"]
+  check_in_date          date          [not null]
+  check_out_date         date          [not null]
+  number_of_guests       int           [not null, default: 1]
+  total_nights           smallint      [not null]
+  total_amount           decimal(12,2) [not null]
+  paid_amount            decimal(12,2) [not null, default: 0.00]
+  balance                decimal(12,2) [note: "GENERATED: total_amount - paid_amount"]
+  status                 varchar(12)   [not null, default: "PENDING", note: "PENDING|CONFIRMED|CHECKED_IN|CHECKED_OUT|CANCELLED"]
+  cancellation_reason    text
+  notes                  text
+  handled_by             int           [null, ref: > users.user_id]
+  created_at             datetime      [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at             datetime      [not null, default: `CURRENT_TIMESTAMP`]
+  checked_in_at          datetime
+  checked_out_at         datetime
+
+  indexes {
+    (room_id, status, check_in_date, check_out_date) [name: "idx_res_availability"]
+    (status, created_at)                             [name: "idx_res_status_created"]
+  }
+}
+
+Table payments {
+  payment_id      int           [pk, increment]
+  reservation_id  int           [not null, ref: > reservations.reservation_id]
+  receipt_number  varchar(30)   [not null, unique]
+  amount          decimal(12,2) [not null]
+  payment_method  varchar(25)   [not null, default: "CASH", note: "CASH|UNIVERSITY_CHARGE_SLIP|BANK_TRANSFER|GCASH_MANUAL_REF"]
+  reference_code  varchar(100)
+  notes           text
+  received_by     int           [null, ref: > users.user_id]
+  payment_date    datetime      [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    reservation_id [name: "idx_pay_reservation"]
+    payment_date   [name: "idx_pay_date"]
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INVENTORY MODULE
+// ─────────────────────────────────────────────────────────────────────────────
+
+Table suppliers {
+  supplier_id         int         [pk, increment]
+  supplier_name       varchar(120)[not null]
+  contact_person      varchar(100)
+  phone               varchar(25)
+  email               varchar(120)
+  address             text
+  supplied_categories text
+  notes               text
+  is_active           tinyint(1)  [not null, default: 1]
+  created_at          datetime    [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at          datetime    [not null, default: `CURRENT_TIMESTAMP`]
+}
+
+Table inventory_items {
+  item_id               int           [pk, increment]
+  item_code             varchar(25)   [not null, unique]
+  item_name             varchar(120)  [not null]
+  category              varchar(25)   [not null, note: "FOOD_STAPLES|MEAT_POULTRY|BEVERAGES|INGREDIENTS|SUPPLIES_PACKAGING|CLEANING"]
+  unit                  varchar(30)   [not null]
+  current_stock         decimal(12,3) [not null, default: 0]
+  reorder_level         decimal(12,3) [not null, default: 10]
+  critical_level        decimal(12,3) [not null, default: 0]
+  unit_cost             decimal(10,2) [not null, default: 0]
+  preferred_supplier_id int           [null, ref: > suppliers.supplier_id]
+  description           text
+  is_active             tinyint(1)    [not null, default: 1]
+  last_restocked_at     datetime
+  created_at            datetime      [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at            datetime      [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    category      [name: "idx_items_category"]
+    (is_active, current_stock, reorder_level) [name: "idx_items_low_stock"]
+  }
+}
+
+Table deliveries {
+  delivery_id         int           [pk, increment]
+  delivery_receipt_no varchar(60)   [not null, unique, note: "Supplier-issued DR number"]
+  supplier_id         int           [not null, ref: > suppliers.supplier_id]
+  delivery_date       date          [not null]
+  received_by         int           [null, ref: > users.user_id]
+  total_amount        decimal(12,2) [not null, default: 0]
+  status              varchar(10)   [not null, default: "RECEIVED", note: "PENDING|RECEIVED|REJECTED"]
+  notes               text
+  created_at          datetime      [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at          datetime      [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (supplier_id, delivery_date) [name: "idx_del_supplier_date"]
+  }
+}
+
+Table delivery_items {
+  delivery_item_id int           [pk, increment]
+  delivery_id      int           [not null, ref: > deliveries.delivery_id]
+  item_id          int           [not null, ref: > inventory_items.item_id]
+  quantity         decimal(12,3) [not null]
+  unit_cost        decimal(10,2) [not null]
+  line_total       decimal(12,2) [note: "GENERATED: quantity * unit_cost"]
+  notes            text
+
+  indexes {
+    delivery_id [name: "idx_di_delivery"]
+    item_id     [name: "idx_di_item"]
+  }
+}
+
+Table inventory_transactions {
+  txn_id            int           [pk, increment]
+  item_id           int           [not null, ref: > inventory_items.item_id]
+  transaction_type  varchar(12)   [not null, note: "STOCK_IN|STOCK_OUT|ADJUSTMENT"]
+  quantity          decimal(12,3) [not null]
+  unit_cost         decimal(10,2) [not null, default: 0]
+  total_cost        decimal(12,2) [note: "GENERATED: quantity * unit_cost"]
+  stock_before      decimal(12,3) [not null, note: "Snapshot before transaction"]
+  stock_after       decimal(12,3) [not null, note: "Snapshot after transaction"]
+  ref_type          varchar(30)   [note: "DELIVERY | CONSUMPTION | MANUAL"]
+  ref_id            int           [note: "FK by convention to delivery or consumption"]
+  reason            varchar(120)  [not null, default: "MANUAL"]
+  performed_by      int           [null, ref: > users.user_id]
+  transaction_date  datetime      [not null, default: `CURRENT_TIMESTAMP`]
+  notes             text
+
+  indexes {
+    (item_id, transaction_date) [name: "idx_txn_item_date"]
+    (ref_type, ref_id)          [name: "idx_txn_ref"]
+  }
+}
+
+Table inventory_consumption {
+  consumption_id   int           [pk, increment]
+  item_id          int           [not null, ref: > inventory_items.item_id]
+  quantity         decimal(12,3) [not null]
+  purpose          varchar(120)  [not null, note: "KITCHEN_USAGE | CANTEEN_SALES | CANTEEN_USAGE | etc."]
+  notes            text
+  recorded_by      int           [null, ref: > users.user_id]
+  consumption_date datetime      [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    item_id          [name: "idx_con_item"]
+    consumption_date [name: "idx_con_date"]
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUDIT / ACTIVITY LOGS
+// ─────────────────────────────────────────────────────────────────────────────
+
+Table audit_logs {
+  log_id            int         [pk, increment]
+  user_id           int         [null, ref: > users.user_id, note: "NULL = system/unauthenticated event"]
+  username_snapshot varchar(50) [not null, note: "Stored at event time — survives user deletion"]
+  role_snapshot     varchar(30) [not null, default: "SYSTEM"]
+  action_type       varchar(60) [not null, note: "LOGIN|LOGOUT|RESERVATION_CREATE|CHECK_IN|PAYMENT_RECORDED|etc."]
+  target_entity     varchar(60) [not null, note: "Table or module name: RESERVATION|PAYMENT|DELIVERY|etc."]
+  target_id         int         [null, note: "PK of affected record"]
+  description       text
+  old_value         text
+  new_value         text
+  ip_address        varchar(45) [default: "127.0.0.1"]
+  logged_at         datetime    [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (user_id, logged_at)      [name: "idx_log_user_date"]
+    (action_type, logged_at)  [name: "idx_log_action_date"]
+    (target_entity, target_id)[name: "idx_log_target"]
+    logged_at                 [name: "idx_log_archive"]
+  }
+}

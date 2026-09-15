@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scheduling &amp; Calendar &middot; PATVEP Hostel &amp; Canteen System</title>
+<link rel="icon" type="image/png" href="../assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page-body">
+
+    <div class="page-head">
+      <div class="page-head__text">
+        <h1>Scheduling &amp; Calendar</h1>
+        <div class="page-meta" id="pageMeta"></div>
+      </div>
+      <div class="page-head__actions">
+        <button class="btn" id="btnToday" data-icon="clock">Today</button>
+        <button class="btn btn--primary" id="btnNew" data-perm="calendar.create"
+                data-icon="plus">Add schedule entry</button>
+      </div>
+    </div>
+
+    <div id="guestNotice"></div>
+
+    <div class="grid grid--sidebar">
+      <section class="card">
+        <div class="cal-toolbar">
+          <div class="cal-nav">
+            <button class="btn" id="btnPrev" aria-label="Previous">&#8249;</button>
+            <button class="btn" id="btnNext" aria-label="Next">&#8250;</button>
+          </div>
+          <div class="cal-title" id="calTitle">&nbsp;</div>
+
+          <div class="seg" role="tablist" aria-label="Calendar view">
+            <button class="seg__btn is-active" id="viewMonth" role="tab">Month</button>
+            <button class="seg__btn" id="viewTimeline" role="tab">Room timeline</button>
+          </div>
+
+          <label class="sr-only" for="filterType">Filter entries</label>
+          <select class="select select--sm" id="filterType">
+            <option value="all">All entries</option>
+            <option value="reservations">Reservations only</option>
+            <option value="maintenance">Maintenance only</option>
+            <option value="delivery">Deliveries only</option>
+            <option value="inventory">Inventory activities</option>
+          </select>
+        </div>
+
+        <div id="calBody"></div>
+
+        <div class="card__foot" id="calLegend"></div>
+      </section>
+
+      <div>
+        <section class="card mb-2">
+          <div class="card__head">
+            <div>
+              <div class="day-panel__date" id="panelDate">&nbsp;</div>
+              <div class="day-panel__meta" id="panelMeta">&nbsp;</div>
+            </div>
+          </div>
+          <div class="card__body" id="panelBody"></div>
+        </section>
+
+        <section class="card">
+          <div class="card__head">
+            <div>
+              <div class="card__title">Availability check</div>
+              
+            </div>
+          </div>
+          <div class="card__body" id="availabilityBox"></div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="../assets/js/core/util.js"></script>
+<script src="../assets/js/data/mock-data.js"></script>
+<script src="../assets/js/core/store.js"></script>
+<script src="../assets/js/core/rbac.js"></script>
+<script src="../assets/js/core/session.js"></script>
+<script src="../assets/js/core/scheduling.js"></script>
+<script src="../assets/js/ui/charts.js"></script>
+<script src="../assets/js/ui/icons.js"></script>
+<script src="../assets/js/ui/shell.js"></script>
+<script src="../assets/js/pages/calendar.js"></script>
+</body>
+</html>

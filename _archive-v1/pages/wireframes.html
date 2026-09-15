@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI Wireframes &middot; PATVEP Hostel &amp; Canteen System</title>
+<link rel="icon" type="image/png" href="../assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page-body">
+
+    <div class="page-head">
+      <div class="page-head__text">
+        <h1>UI Wireframes</h1>
+        <div class="page-meta" id="pageMeta"></div>
+      </div>
+      <div class="page-head__actions">
+        <button class="btn" onclick="window.print()" data-icon="report">Print</button>
+      </div>
+    </div>
+
+    <div class="notice">
+      <span class="notice__icon" data-icon-slot="info"></span>
+      <div>
+        <div class="notice__title">These are intentionally low fidelity</div>
+        Grey blocks and labels only. A wireframe settles layout, hierarchy and
+        flow; colour, type and spacing are settled separately in the design
+        system (<code>assets/css/app.css</code>).
+      </div>
+    </div>
+
+    <section class="card mb-2">
+      <div class="wf-nav" id="wfNav"></div>
+    </section>
+
+    <div id="wfBody"></div>
+
+  </div>
+</main>
+
+<script src="../assets/js/core/util.js"></script>
+<script src="../assets/js/data/mock-data.js"></script>
+<script src="../assets/js/core/store.js"></script>
+<script src="../assets/js/core/rbac.js"></script>
+<script src="../assets/js/core/session.js"></script>
+<script src="../assets/js/core/scheduling.js"></script>
+<script src="../assets/js/ui/icons.js"></script>
+<script src="../assets/js/ui/shell.js"></script>
+<script src="../assets/js/pages/wireframes.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# Python bytecode from scripts/
+__pycache__/
+*.py[cod]
+
+# Editor and OS clutter
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Local database dumps: the schema in database/ is the source of truth,
+# an export from someone's own XAMPP is not
+*.sql.bak
+*-export.sql
+dump.sql

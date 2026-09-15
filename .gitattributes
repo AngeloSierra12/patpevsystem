@@ -1,0 +1,8 @@
+# Normalise line endings so the four of us on different machines do not see
+# whole files as changed just because one editor writes CRLF.
+* text=auto eol=lf
+
+# Binary: never touch these
+*.png binary
+*.pdf binary
+*.woff2 binary

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Account &middot; PATVEP Hostel &amp; Canteen System</title>
+<link rel="icon" type="image/png" href="../assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page-body">
+
+    <div class="page-head">
+      <div class="page-head__text">
+        <h1>My Account</h1>
+        <div class="page-meta" id="pageMeta"></div>
+      </div>
+      <div class="page-head__actions">
+        <button class="btn btn--primary" id="btnEdit"
+                data-perm="account.self.edit" data-icon="edit">Edit my details</button>
+      </div>
+    </div>
+
+    <div class="grid grid--sidebar-l">
+      <div>
+        <section class="card mb-2">
+          <div class="card__body" id="profileCard"></div>
+        </section>
+
+        <section class="card">
+          <div class="card__head">
+            <div class="card__title">Account details</div>
+          </div>
+          <div class="card__body" id="detailsCard"></div>
+        </section>
+      </div>
+
+      <div>
+        <section class="card mb-2">
+          <div class="card__head">
+            <div>
+              <div class="card__title">What I can do</div>
+              <div class="card__sub">After role, grants and revokes</div>
+            </div>
+            
+          </div>
+          <div class="card__body" id="permCard"></div>
+        </section>
+
+        <section class="card" id="bookingsCard" hidden>
+          <div class="card__head">
+            <div class="card__title">My reservations</div>
+          </div>
+          <div class="card__body card__body--flush" id="bookingsBody"></div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="../assets/js/core/util.js"></script>
+<script src="../assets/js/data/mock-data.js"></script>
+<script src="../assets/js/core/store.js"></script>
+<script src="../assets/js/core/rbac.js"></script>
+<script src="../assets/js/core/session.js"></script>
+<script src="../assets/js/core/scheduling.js"></script>
+<script src="../assets/js/ui/icons.js"></script>
+<script src="../assets/js/ui/shell.js"></script>
+<script src="../assets/js/pages/account.js"></script>
+</body>
+</html>

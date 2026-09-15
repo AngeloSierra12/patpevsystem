@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scheduling and Calendar &middot; PATVEP Hostel &amp; Canteen</title>
+<link rel="icon" type="image/png" href="../assets/img/bpsu-logo.png">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<main class="main">
+  <div class="page">
+
+    <div class="page__head">
+      <div>
+        <h1>Scheduling &amp; Calendar</h1>
+        <div class="page__meta" id="pageMeta"></div>
+      </div>
+      <div class="page__actions"></div>
+    </div>
+
+    <div class="grid grid--side">
+      <div>
+      <section class="panel">
+        <div class="panel__head"><span class="panel__title">Month</span><span class="panel__tools"><button class="btn btn--sm" id="prev" aria-label="Previous month">&#8249;</button><span class="mono" id="calTitle" style="min-width:130px;text-align:center;font-size:12px"></span><button class="btn btn--sm" id="next" aria-label="Next month">&#8250;</button></span></div>
+        <div class="panel__body panel__body--flush" id="cal"></div>
+      </section>
+      </div>
+      <div>
+      <section class="panel">
+        <div class="panel__head"><span class="panel__title">Selected day</span></div>
+        <div class="panel__body panel__body--flush" id="day"></div>
+      </section>
+      <div style="height:14px"></div>
+      <section class="panel">
+        <div class="panel__head"><span class="panel__title">Conflict detection</span></div>
+        <div class="panel__body" id="conflict"></div>
+      </section>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/queries.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script src="../assets/js/pages/calendar.js"></script>
+</body>
+</html>
