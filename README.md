@@ -8,62 +8,49 @@ Bataan Peninsula State University, Main Campus
 
 ## What this is
 
-A **UI shell** for early research and development. It establishes the layout,
-the navigation and the screen inventory for the whole system.
+The **complete interface layer** for the system: all seven screens, every
+region, reading real records from the project database seed.
 
-It is not a working system and does not pretend to be one. Screens that belong
-to other developers show what goes there and **name the person building it**,
-rather than showing a fake version. The records shown are real, read from
-the project database seed; there is no sign-in yet.
+It does not write. Ten of the charter's fifteen in-scope items are write
+operations, and the API layer that would perform them is a separate task. So
+every form here validates fully and then **prints the exact row it would
+write**, rather than reporting a save that did not happen. That is honest, and
+those printed payloads are the specification the endpoints have to satisfy.
+
+There is no sign-in yet either; the shell runs as one fixed account.
 
 **To run:** open `index.html` in any browser. No install, no build step, no
 internet needed.
 
 ---
 
-## Scope
+## What is built
 
-Built against the updated Work Breakdown Structure.
+Every charter deliverable that has a user interface.
 
-### Built here — Angelo Sierra
+| Screen | What works |
+|---|---|
+| Dashboard | Occupancy rate, rooms free, arrivals, low stock; seven-night occupancy chart; stock levels against reorder points; low stock alerts; quick actions |
+| Hotel Reservation | Reservation list with status-aware actions; booking form offering only genuinely free rooms; availability check; payment entry; billing statement; guest registration; guest profiles with stay history |
+| Canteen Inventory | Item management with search and filters; delivery recording; usage recording; suppliers; delivery records; full stock movement ledger; per-item history |
+| Scheduling & Calendar | Month grid of bookings by night; day detail splitting arrivals, departures and in-house; double-booking detection |
+| User Management | Account list with search and role filter; create and edit forms with validation; role assignment; role permission matrix |
+| Reports | All six report types the charter names, plus the summary; date filtering; column totals; CSV export |
+| Audit Trail | The full log, searchable and filterable by action and area |
+| My Account | Own details, what the role reaches, recent activity |
 
-| WBS | Task | Where |
-|-----|------|-------|
-| 3.4 | User Dashboard | `pages/users.html` |
-| 5.4 | Guest Details Profile Menu | `pages/reservations.html` |
-| 8.3 | Quick Actions Panel | `index.html` |
-| 9.4 | Report Summary UI | `pages/reports.html` |
-| 6.1 | UI Wireframing — Scheduling & Calendar | wireframe document |
-| 7.1 | UI Wireframing — Audit Trail | wireframe document |
-| 8.1 | UI Wireframing — Dashboard | wireframe document |
-| 9.1 | UI Wireframing — Reports | wireframe document |
+## What is not built, and whose it is
 
-The layout, navigation, design system and shell chrome are also this
-developer's work, since they follow from the wireframing tasks.
+| Work | Owner |
+|---|---|
+| Authentication and sign-in | John Carlos R. Capuli |
+| The API layer that performs the writes | John Carlos R. Capuli |
+| Official receipt document output | John Carlos R. Capuli |
+| Enforcing the role permission rules | John Carlos R. Capuli |
+| SRS, System Design, User Manual, Installation Guide | Fritz Edrick B. Sarmiento |
 
-### Marked on screen — Andrew Santos
-
-| WBS | Task | Appears on |
-|-----|------|-----------|
-| 3.1 | UI Wireframing — User Management | wireframe document, page 6 |
-| 3.3 | Role Based Access | `pages/users.html`, `pages/account.html` |
-| 4.1 | UI Wireframing — Canteen Inventory | wireframe document, page 7 |
-| 5.1 | UI Wireframing — Hotel Reservation | wireframe document, page 8 |
-| 8.2 | Hotel Metrics Integration | `index.html` |
-| 9.2 | Report Control Panel and Date Filtering | `pages/reports.html` |
-
-### Marked on screen — other developers
-
-| WBS | Task | Owner |
-|-----|------|-------|
-| 2 | Database | Darren Jude S. Tamayo |
-| 3.2 | Authentication Logic | John Carlos R. Capuli |
-| 4.2–4.3 | Inventory logic and alerts | John Carlos R. Capuli |
-| 4.4–4.5 | Suppliers, deliveries, consumption | Darren Jude S. Tamayo |
-| 5.2–5.3, 5.5 | Reservation, check-in/out, billing | John Carlos R. Capuli |
-| 6.2–6.3 | Interactive calendar, conflict detection | John Carlos R. Capuli |
-| 7.2–7.3 | Event logger, log search | Darren Jude S. Tamayo |
-| 9.3 | Data aggregation | Darren Jude S. Tamayo |
+See `HANDOVER-carlos.md` for the API specification and `HANDOVER-andrew.md`
+for project status. `SCOPE-CHECK.md` measures the build against the charter.
 
 ---
 
