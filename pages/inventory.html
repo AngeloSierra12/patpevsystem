@@ -18,22 +18,58 @@
         <h1>Canteen Inventory</h1>
         <div class="page__meta" id="pageMeta"></div>
       </div>
-      <div class="page__actions"></div>
+      <div class="page__actions">
+        <button class="btn" id="btnConsume" data-icon="box">Record usage</button>
+        <button class="btn" id="btnDelivery" data-icon="inbox">Record delivery</button>
+        <button class="btn btn--go" id="btnItem" data-icon="plus">Add item</button>
+      </div>
     </div>
 
     <section class="metrics" id="metrics"></section>
 
-    <section class="panel">
-      <div class="panel__head"><span class="panel__title">Items</span></div>
-      <div class="panel__body panel__body--flush" id="list"></div>
-    </section>
+    <div class="stack">
+      <section class="panel">
+        <div class="panel__head">
+          <span class="panel__title">Items</span>
+          <span class="panel__tools">
+            <div class="toolbar__search">
+              <label class="sr-only" for="q">Search items</label>
+              <span data-icon="search"></span>
+              <input class="input input--sm" id="q" type="search" placeholder="Search item or code">
+            </div>
+            <label class="sr-only" for="fCat">Filter by category</label>
+            <select class="select select--sm" id="fCat"><option value="all">All categories</option></select>
+            <label class="sr-only" for="fLevel">Filter by level</label>
+            <select class="select select--sm" id="fLevel">
+              <option value="all">All levels</option>
+              <option value="low">Needs reorder</option>
+              <option value="critical">Critical only</option>
+            </select>
+            <span class="toolbar__count" id="count"></span>
+          </span>
+        </div>
+        <div class="panel__body panel__body--flush" id="list"></div>
+      </section>
 
-    <div style="height:14px"></div>
+      <div class="grid grid--2">
+        <section class="panel">
+          <div class="panel__head"><span class="panel__title">Suppliers</span></div>
+          <div class="panel__body panel__body--flush" id="suppliers"></div>
+        </section>
+        <section class="panel">
+          <div class="panel__head"><span class="panel__title">Deliveries</span></div>
+          <div class="panel__body panel__body--flush" id="deliveries"></div>
+        </section>
+      </div>
 
-    <section class="panel">
-      <div class="panel__head"><span class="panel__title">Stock movement, suppliers and deliveries</span></div>
-      <div class="panel__body" id="pending"></div>
-    </section>
+      <section class="panel">
+        <div class="panel__head">
+          <span class="panel__title">Stock movement</span>
+          <span class="panel__tools"><span class="toolbar__count" id="moveCount"></span></span>
+        </div>
+        <div class="panel__body panel__body--flush" id="movement"></div>
+      </section>
+    </div>
 
   </div>
 </main>

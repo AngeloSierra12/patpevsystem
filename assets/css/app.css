@@ -212,7 +212,7 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
 
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
 .panel__head {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 9px 13px; border-bottom: 1px solid var(--line);
   background: var(--surface-2); min-height: 38px;
 }
@@ -220,14 +220,19 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
   font-size: 11px; font-weight: 600; letter-spacing: .06em;
   text-transform: uppercase; color: var(--ink-700);
 }
-.panel__tools { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.panel__tools { margin-left: auto; display: flex; gap: 6px; align-items: center;
+                flex-wrap: wrap; min-width: 0; }
 .panel__body { padding: 13px; }
 .panel__body--flush { padding: 0; }
 
 .grid { display: grid; gap: var(--gap); }
+/* a grid item's default minimum is its content, so one long unbreakable
+   string pushes the whole column wider than the screen. This is the fix. */
+.grid > *, .stack > * { min-width: 0; }
 .grid--2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
 .grid--side { grid-template-columns: minmax(0,1fr) 310px; }
-.stack { display: grid; gap: var(--gap); align-content: start; }
+.stack { display: grid; grid-template-columns: minmax(0,1fr);
+          gap: var(--gap); align-content: start; }
 
 /* table */
 .tablewrap { overflow-x: auto; }
@@ -530,6 +535,13 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
   .table td:first-child { padding-bottom: 6px; font-size: 13px; font-weight: 600; }
   .table td:first-child::before { display: none; }
   .table td.table__num, .table td.table__act { text-align: left; }
+
+  /* a panel head carrying a search box and two filters cannot sit on one row
+     at this width: it pushed the whole panel wider than the screen */
+  .panel__tools { margin-left: 0; width: 100%; }
+  .panel__tools .toolbar__search { max-width: none; flex: 1 1 100%; }
+  .panel__tools .select, .panel__tools .input { flex: 1 1 120px; min-width: 0; width: auto; }
+  .panel__tools .btn { flex: 0 0 auto; }
 
   .sidebar {
     width: 220px; transform: translateX(-220px);
