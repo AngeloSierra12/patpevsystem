@@ -18,24 +18,51 @@
         <h1>Hotel Reservation</h1>
         <div class="page__meta" id="pageMeta"></div>
       </div>
-      <div class="page__actions"></div>
+      <div class="page__actions">
+        <button class="btn" id="btnGuest" data-icon="account">Register guest</button>
+        <button class="btn btn--go" id="btnBook" data-icon="plus">New reservation</button>
+      </div>
     </div>
 
     <div id="notice"></div>
 
     <div class="grid grid--side">
-      <div>
-      <section class="panel">
-        <div class="panel__head"><span class="panel__title">Reservations</span></div>
-        <div class="panel__body panel__body--flush" id="list"></div>
-      </section>
+      <div class="stack">
+        <section class="panel">
+          <div class="panel__head">
+            <span class="panel__title">Reservations</span>
+            <span class="panel__tools">
+              <label class="sr-only" for="fStatus">Filter by status</label>
+              <select class="select select--sm" id="fStatus">
+                <option value="all">All statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="CHECKED_IN">Checked in</option>
+                <option value="CHECKED_OUT">Checked out</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </span>
+          </div>
+          <div class="panel__body panel__body--flush" id="list"></div>
+        </section>
+        <section class="panel">
+          <div class="panel__head">
+            <span class="panel__title">Rooms and availability</span>
+            <span class="panel__tools">
+              <label class="sr-only" for="avFrom">Available from</label>
+              <input class="input input--sm" type="date" id="avFrom">
+              <label class="sr-only" for="avTo">Available to</label>
+              <input class="input input--sm" type="date" id="avTo">
+              <button class="btn btn--sm" id="avCheck">Check</button>
+            </span>
+          </div>
+          <div class="panel__body panel__body--flush" id="rooms"></div>
+        </section>
       </div>
-      <div>
       <section class="panel">
         <div class="panel__head"><span class="panel__title">Guest details</span></div>
         <div class="panel__body panel__body--flush" id="guest"></div>
       </section>
-      </div>
     </div>
 
   </div>

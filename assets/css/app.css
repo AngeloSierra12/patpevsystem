@@ -394,6 +394,7 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
   border-radius: var(--r); background: var(--red-050);
   color: var(--red-700); border: 1px solid var(--red-100);
 }
+.qa__item.is-on { background: var(--red-050); box-shadow: inset 3px 0 0 var(--red-700); }
 .qa__item--off { opacity: .5; cursor: default; }
 .qa__item--off:hover { background: none; }
 .qa__item--off .qa__ico { background: var(--surface-2); color: var(--ink-400); border-color: var(--line); }
