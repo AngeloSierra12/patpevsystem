@@ -1,4 +1,4 @@
-﻿# BPSU IGP PATVEP Hostel & University Canteen System
+# BPSU IGP PATVEP Hostel & University Canteen System
 ## Database Package — README
 
 **Role:** Database Specialist — Darren Jude S. Tamayo  
@@ -15,9 +15,9 @@
 | `02_tables.sql` | Creates all 13 tables in dependency order, with constraints | 2 |
 | `03_indexes.sql` | Adds composite/covering indexes for performance | 3 |
 | `04_views.sql` | Creates 13 SQL views for dashboard and reporting | 4 |
-| `05_triggers.sql` | 4 triggers for stock management and audit automation | 5 |
+| `05_triggers.sql` | 6 triggers for stock management, audit automation, and payment integrity | 5 |
 | `06_seed_data.sql` | Realistic demo data for all tables | 6 |
-| `07_audit_archive.sql` | Archive table + stored procedure for log archiving | 7 |
+| `07_audit_archive.sql` | Archive table + stored procedure for log archiving (safe to re-run) | 7 |
 | `bpsu_patvep_erd.dbml` | DBML for importing into dbdiagram.io | — |
 
 ---
@@ -127,8 +127,10 @@ If a user account is renamed or deleted, the audit log must still show who perfo
 |---------|-------|-------|--------|
 | `trg_delivery_item_after_insert` | `delivery_items` | AFTER INSERT | Increases `current_stock`, updates `unit_cost` and `last_restocked_at`, creates STOCK_IN transaction |
 | `trg_consumption_after_insert` | `inventory_consumption` | AFTER INSERT | Decreases `current_stock`, creates STOCK_OUT transaction, validates stock not exceeded |
-| `trg_reservation_after_update` | `reservations` | AFTER UPDATE | Logs status changes (CONFIRM, CHECK_IN, CHECK_OUT, CANCEL) to audit_logs |
-| `trg_payment_after_insert` | `payments` | AFTER INSERT | Accumulates `paid_amount` on reservation, logs payment to audit_logs |
+| `trg_reservation_after_update` | `reservations` | AFTER UPDATE | Logs status changes to `audit_logs`. Actor is `handled_by` (the assigned staff user — see trigger note for limitation) |
+| `trg_payment_after_insert` | `payments` | AFTER INSERT | Validates payment does not exceed reservation balance, accumulates `paid_amount` on reservation, logs payment to `audit_logs` |
+| `trg_payment_before_update` | `payments` | BEFORE UPDATE | **Blocks all updates** — payments are append-only. Raises SIGNAL error. |
+| `trg_payment_before_delete` | `payments` | BEFORE DELETE | **Blocks all deletes** — prevents paid_amount from becoming inconsistent. Raises SIGNAL error. |
 
 **No trigger fires another trigger on the same table. There is no recursion risk.**
 

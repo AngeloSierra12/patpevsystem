@@ -75,16 +75,14 @@
     var detail = !g ? '<div class="empty">No guest selected.</div>' :
       '<div style="padding:13px">' +
         '<div class="kv">' +
-          kv('guest_id', '<code>' + g.guest_id + '</code>') +
+          kv('Guest number', String(g.guest_id)) +
           kv('Full name', S.esc(g.full_name)) +
           kv('Contact number', S.esc(g.phone || '—')) +
           kv('Email address', S.esc(g.email || '—')) +
           kv('Address', S.esc(g.address || '—')) +
           kv('ID presented', S.esc(g.id_type || '—')) +
-          kv('ID number', '<code>' + S.esc(g.id_number || '—') + '</code>') +
-          kv('Linked account', g.guest_user_id
-            ? '<code>user_id ' + g.guest_user_id + '</code>'
-            : 'Walk-in, no account') +
+          kv('ID number', S.esc(g.id_number || '—')) +
+          kv('Linked account', linkedAccount(g)) +
         '</div>' +
         stays(g.guest_id) +
       '</div>';
@@ -126,6 +124,14 @@
           '</span>' +
         '</div>';
       }).join('') + '</div>';
+  }
+
+  /* a guest may also hold a login. Naming the account beats printing its id. */
+  function linkedAccount(g) {
+    if (!g.guest_user_id) return 'Walk-in, no account';
+    var u = App.Q.one(App.DB.users, 'user_id', g.guest_user_id);
+    return u ? S.esc(u.username) + ' · ' + S.esc(App.Q.roleLabel(u.role))
+             : 'Account no. ' + g.guest_user_id;
   }
 
   function kv(k, v) {

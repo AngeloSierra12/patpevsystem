@@ -85,7 +85,19 @@
     ]}
   ];
 
-  /* --- mount --------------------------------------------------------------- */
+  /* which nav group a screen belongs to, for the bar */
+  function sectionOf(navId) {
+    for (var i = 0; i < NAV.length; i++) {
+      for (var j = 0; j < NAV[i].items.length; j++) {
+        if (NAV[i].items[j].id === navId) return NAV[i].group;
+      }
+    }
+    return '';
+  }
+
+  /* --- mount --------------------------------------------------------------- *
+   * opts.title names the screen for the browser tab and the nav; the visible
+   * page name is the <h1> already in the markup.                             */
   function mount(opts) {
     var nav = NAV.map(function (g) {
       return '<div class="nav__label">' + esc(g.group) + '</div>' +
@@ -113,7 +125,12 @@
       '<header class="topbar">' +
         '<button class="navtoggle" id="navToggle" aria-label="Toggle navigation" ' +
           'aria-expanded="false">' + icon('menu', 18) + '</button>' +
-        '<span class="topbar__title">' + esc(opts.title) + '</span>' +
+        /* The bar names the section, not the page. The page name is the <h1> a
+           few pixels below, and printing it in both places said the same word
+           twice. The section is the one piece of context the heading does not
+           already give you, and on a phone it is the only thing left saying
+           which part of the system you are in once the sidebar slides away. */
+        '<span class="topbar__section">' + esc(sectionOf(opts.nav)) + '</span>' +
         '<span class="topbar__spacer"></span>' +
         '<a class="who" href="' + App.path('pages/account.html') + '">' +
           '<span class="avatar">' + esc(initials(me.full_name)) + '</span>' +
@@ -130,7 +147,7 @@
         '<span class="status__dot"></span>' +
         '<span>UI shell · records from the project database</span>' +
         '<span class="status__spacer"></span>' +
-        '<span class="mono">' + esc('U-' + String(me.user_id).padStart(3, '0')) + '</span>' +
+        '<span class="status__role">' + esc(App.Q.roleLabel(me.role)) + '</span>' +
       '</div>');
 
     var tog = el('#navToggle');
@@ -186,7 +203,12 @@
       '</tr></thead><tbody>' +
       rows.map(function (r) {
         return '<tr>' + cols.map(function (c) {
-          return '<td' + attr(c) + '>' + c.cell(r) + '</td>';
+          /* data-label carries the heading down to the cell. On a phone the
+             header row is hidden and each cell prints its own label from this,
+             so a row becomes a readable card instead of a column the reader has
+             to scroll sideways to find. */
+          return '<td' + attr(c) + ' data-label="' + esc(c.head) + '">' +
+            c.cell(r) + '</td>';
         }).join('') + '</tr>';
       }).join('') +
       '</tbody></table></div>';
@@ -197,8 +219,12 @@
    * not own. It states what goes there and who is building it, so the shell is
    * honest about its own boundaries.                                         */
   function owned(who, what, detail) {
+    /* `what` is optional, and should be left out whenever this marker sits
+       inside a panel whose heading already names the region. Passing it anyway
+       printed the heading twice, one line apart — which reads as a rendering
+       fault on a phone, where the panels stack. */
     return '<div class="pending">' +
-      '<div class="pending__title">' + esc(what) + '</div>' +
+      (what ? '<div class="pending__title">' + esc(what) + '</div>' : '') +
       '<div class="pending__text">' + esc(detail || '') + '</div>' +
       '<span class="pending__who">To be built by ' + esc(who) + '</span>' +
       '</div>';

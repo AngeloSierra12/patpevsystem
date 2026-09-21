@@ -4,12 +4,18 @@
  * Generated from database/06_seed_data.sql. Table and column names match the
  * schema exactly (users, guests, room_types, rooms, reservations, payments,
  * suppliers, inventory_items, deliveries, delivery_items,
- * inventory_consumption, audit_logs), so the screens already speak the same
- * language as the database.
+ * inventory_transactions, inventory_consumption, audit_logs), so the screens
+ * already speak the same language as the database.
  *
  * Values the triggers derive are applied here as they would be in MariaDB:
- *   reservations.paid_amount  = sum of that reservation's payments
+ *   reservations.paid_amount      = sum of that reservation's payments
  *   inventory_items.current_stock = deliveries in, minus consumption out
+ *   inventory_items.unit_cost     = the price on the most recent delivery line
+ *   inventory_transactions        = one ledger row per stock movement, with
+ *                                   the before and after snapshot
+ *   audit_logs                    = a PAYMENT_RECORDED row per payment, ahead
+ *                                   of the seeded rows, with log_id assigned
+ *                                   the way AUTO_INCREMENT would
  *
  * users.password_hash is deliberately absent: this file is plain text served
  * to the client, and no screen reads it.
@@ -121,6 +127,29 @@
       {"delivery_id": 5, "item_id": 3, "quantity": 15.5, "unit_cost": 330.0}
     ],
 
+    inventory_transactions: [
+      {"txn_id": 1, "item_id": 1, "transaction_type": "STOCK_IN", "quantity": 6.0, "unit_cost": 2350.0, "total_cost": 14100.0, "stock_before": 0.0, "stock_after": 6.0, "ref_type": "DELIVERY", "ref_id": 1, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 2, "item_id": 9, "transaction_type": "STOCK_IN", "quantity": 200.0, "unit_cost": 11.5, "total_cost": 2300.0, "stock_before": 0.0, "stock_after": 200.0, "ref_type": "DELIVERY", "ref_id": 2, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 3, "item_id": 4, "transaction_type": "STOCK_IN", "quantity": 5.0, "unit_cost": 1450.0, "total_cost": 7250.0, "stock_before": 0.0, "stock_after": 5.0, "ref_type": "DELIVERY", "ref_id": 3, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 4, "item_id": 5, "transaction_type": "STOCK_IN", "quantity": 2.0, "unit_cost": 1800.0, "total_cost": 3600.0, "stock_before": 0.0, "stock_after": 2.0, "ref_type": "DELIVERY", "ref_id": 3, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 5, "item_id": 6, "transaction_type": "STOCK_IN", "quantity": 20.0, "unit_cost": 28.0, "total_cost": 560.0, "stock_before": 0.0, "stock_after": 20.0, "ref_type": "DELIVERY", "ref_id": 3, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 6, "item_id": 10, "transaction_type": "STOCK_IN", "quantity": 48.0, "unit_cost": 64.0, "total_cost": 3072.0, "stock_before": 0.0, "stock_after": 48.0, "ref_type": "DELIVERY", "ref_id": 3, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 7, "item_id": 11, "transaction_type": "STOCK_IN", "quantity": 400.0, "unit_cost": 4.25, "total_cost": 1700.0, "stock_before": 0.0, "stock_after": 400.0, "ref_type": "DELIVERY", "ref_id": 3, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 8, "item_id": 12, "transaction_type": "STOCK_IN", "quantity": 4.0, "unit_cost": 290.0, "total_cost": 1160.0, "stock_before": 0.0, "stock_after": 4.0, "ref_type": "DELIVERY", "ref_id": 3, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 9, "item_id": 7, "transaction_type": "STOCK_IN", "quantity": 8.0, "unit_cost": 490.0, "total_cost": 3920.0, "stock_before": 0.0, "stock_after": 8.0, "ref_type": "DELIVERY", "ref_id": 4, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 10, "item_id": 8, "transaction_type": "STOCK_IN", "quantity": 48.0, "unit_cost": 39.5, "total_cost": 1896.0, "stock_before": 0.0, "stock_after": 48.0, "ref_type": "DELIVERY", "ref_id": 4, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 11, "item_id": 2, "transaction_type": "STOCK_IN", "quantity": 25.0, "unit_cost": 195.0, "total_cost": 4875.0, "stock_before": 0.0, "stock_after": 25.0, "ref_type": "DELIVERY", "ref_id": 5, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 12, "item_id": 3, "transaction_type": "STOCK_IN", "quantity": 15.5, "unit_cost": 330.0, "total_cost": 5115.0, "stock_before": 0.0, "stock_after": 15.5, "ref_type": "DELIVERY", "ref_id": 5, "reason": "SUPPLIER_DELIVERY", "performed_by": 3, "transaction_date": null},
+      {"txn_id": 13, "item_id": 2, "transaction_type": "STOCK_OUT", "quantity": 3.0, "unit_cost": 195.0, "total_cost": 585.0, "stock_before": 25.0, "stock_after": 22.0, "ref_type": "CONSUMPTION", "ref_id": 1, "reason": "KITCHEN_USAGE", "performed_by": 3, "transaction_date": "2026-09-10 07:30:00", "notes": "Morning prep — chicken adobo"},
+      {"txn_id": 14, "item_id": 9, "transaction_type": "STOCK_OUT", "quantity": 8.0, "unit_cost": 11.5, "total_cost": 92.0, "stock_before": 200.0, "stock_after": 192.0, "ref_type": "CONSUMPTION", "ref_id": 2, "reason": "CANTEEN_SALES", "performed_by": 3, "transaction_date": "2026-09-10 12:00:00", "notes": "Water sold at canteen counter"},
+      {"txn_id": 15, "item_id": 1, "transaction_type": "STOCK_OUT", "quantity": 0.5, "unit_cost": 2350.0, "total_cost": 1175.0, "stock_before": 6.0, "stock_after": 5.5, "ref_type": "CONSUMPTION", "ref_id": 3, "reason": "KITCHEN_USAGE", "performed_by": 3, "transaction_date": "2026-09-11 06:30:00", "notes": "Half sack used for day meals"},
+      {"txn_id": 16, "item_id": 2, "transaction_type": "STOCK_OUT", "quantity": 2.0, "unit_cost": 195.0, "total_cost": 390.0, "stock_before": 22.0, "stock_after": 20.0, "ref_type": "CONSUMPTION", "ref_id": 4, "reason": "KITCHEN_USAGE", "performed_by": 3, "transaction_date": "2026-09-11 08:00:00", "notes": "Lunch prep — chicken tinola"},
+      {"txn_id": 17, "item_id": 3, "transaction_type": "STOCK_OUT", "quantity": 2.0, "unit_cost": 330.0, "total_cost": 660.0, "stock_before": 15.5, "stock_after": 13.5, "ref_type": "CONSUMPTION", "ref_id": 5, "reason": "KITCHEN_USAGE", "performed_by": 3, "transaction_date": "2026-09-12 07:45:00", "notes": "Pork liempo grilled for lunch"},
+      {"txn_id": 18, "item_id": 9, "transaction_type": "STOCK_OUT", "quantity": 12.0, "unit_cost": 11.5, "total_cost": 138.0, "stock_before": 192.0, "stock_after": 180.0, "ref_type": "CONSUMPTION", "ref_id": 6, "reason": "CANTEEN_SALES", "performed_by": 3, "transaction_date": "2026-09-12 12:00:00", "notes": "Water sold across two meal periods"},
+      {"txn_id": 19, "item_id": 8, "transaction_type": "STOCK_OUT", "quantity": 6.0, "unit_cost": 39.5, "total_cost": 237.0, "stock_before": 48.0, "stock_after": 42.0, "ref_type": "CONSUMPTION", "ref_id": 7, "reason": "CANTEEN_SALES", "performed_by": 3, "transaction_date": "2026-09-13 07:00:00", "notes": "Evap milk for coffee orders"},
+      {"txn_id": 20, "item_id": 11, "transaction_type": "STOCK_OUT", "quantity": 20.0, "unit_cost": 4.25, "total_cost": 85.0, "stock_before": 400.0, "stock_after": 380.0, "ref_type": "CONSUMPTION", "ref_id": 8, "reason": "CANTEEN_USAGE", "performed_by": 3, "transaction_date": "2026-09-13 11:30:00", "notes": "Bento boxes for packed lunch orders"}
+    ],
+
     inventory_consumption: [
       {"consumption_id": 1, "item_id": 2, "quantity": 3.0, "purpose": "KITCHEN_USAGE", "notes": "Morning prep — chicken adobo", "recorded_by": 3, "consumption_date": "2026-09-10 07:30:00"},
       {"consumption_id": 2, "item_id": 9, "quantity": 8.0, "purpose": "CANTEEN_SALES", "notes": "Water sold at canteen counter", "recorded_by": 3, "consumption_date": "2026-09-10 12:00:00"},
@@ -133,21 +162,24 @@
     ],
 
     audit_logs: [
-      {"log_id": 1, "user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "SYSTEM_INIT", "target_entity": "SYSTEM", "target_id": null, "description": "Initial system database seeded for BPSU PATVEP Hostel & Canteen", "logged_at": "2026-09-01 08:00:00"},
-      {"log_id": 2, "user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "USER_CREATE", "target_entity": "USERS", "target_id": 2, "description": "Created user account: hostel_staff (John Carlos R. Capuli)", "logged_at": "2026-09-01 08:05:00"},
-      {"log_id": 3, "user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "USER_CREATE", "target_entity": "USERS", "target_id": 3, "description": "Created user account: canteen_staff (Darren Jude S. Tamayo)", "logged_at": "2026-09-01 08:10:00"},
-      {"log_id": 4, "user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "USER_CREATE", "target_entity": "USERS", "target_id": 4, "description": "Created user account: qa_staff (Fritz Edrick B. Sarmiento)", "logged_at": "2026-09-01 08:15:00"},
-      {"log_id": 5, "user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "LOGIN", "target_entity": "AUTH", "target_id": null, "description": "User hostel_staff logged in", "logged_at": "2026-09-08 09:55:00"},
-      {"log_id": 6, "user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CREATED", "target_entity": "RESERVATION", "target_id": 1, "description": "Created reservation BPSU-RES-202609-0001 for Angelo Andrei P. Sierra", "logged_at": "2026-09-08 10:00:00"},
-      {"log_id": 7, "user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CONFIRMED", "target_entity": "RESERVATION", "target_id": 1, "description": "Reservation BPSU-RES-202609-0001 confirmed", "logged_at": "2026-09-08 10:05:00"},
-      {"log_id": 8, "user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CREATED", "target_entity": "RESERVATION", "target_id": 2, "description": "Created reservation BPSU-RES-202609-0002 for Prof. Albert C. Tria", "logged_at": "2026-09-09 08:30:00"},
-      {"log_id": 9, "user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "LOGIN", "target_entity": "AUTH", "target_id": null, "description": "User canteen_staff logged in", "logged_at": "2026-09-09 09:00:00"},
-      {"log_id": 10, "user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "DELIVERY_RECORD", "target_entity": "DELIVERY", "target_id": 1, "description": "Recorded delivery DR-2026-041 from BPSU Agricultural Cooperative", "logged_at": "2026-09-09 10:00:00"},
-      {"log_id": 11, "user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "DELIVERY_RECORD", "target_entity": "DELIVERY", "target_id": 2, "description": "Recorded delivery DR-2026-042 from Central Luzon Beverage Corp", "logged_at": "2026-09-09 10:15:00"},
-      {"log_id": 12, "user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CHECKED_IN", "target_entity": "RESERVATION", "target_id": 1, "description": "Guest Angelo Andrei P. Sierra checked in for BPSU-RES-202609-0001", "logged_at": "2026-09-13 14:15:00"},
-      {"log_id": 13, "user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CHECKED_IN", "target_entity": "RESERVATION", "target_id": 2, "description": "Guest Prof. Albert C. Tria checked in for BPSU-RES-202609-0002", "logged_at": "2026-09-14 13:00:00"},
-      {"log_id": 14, "user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CANCELLED", "target_entity": "RESERVATION", "target_id": 6, "description": "Reservation BPSU-RES-202609-0006 cancelled — guest no-show after 24 hrs", "logged_at": "2026-09-11 09:00:00"},
-      {"log_id": 15, "user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "LOGOUT", "target_entity": "AUTH", "target_id": null, "description": "User canteen_staff logged out", "logged_at": "2026-09-14 17:00:00"}
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "PAYMENT_RECORDED", "target_entity": "PAYMENT", "target_id": 1, "description": "Payment OR-2026-00891 of PHP 3600.0 recorded for reservation BPSU-RES-202609-0001 via CASH", "logged_at": "2026-09-13 14:30:00", "log_id": 1, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "PAYMENT_RECORDED", "target_entity": "PAYMENT", "target_id": 2, "description": "Payment OR-2026-00892 of PHP 600.0 recorded for reservation BPSU-RES-202609-0002 via UNIVERSITY_CHARGE_SLIP", "logged_at": "2026-09-14 13:15:00", "log_id": 2, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "PAYMENT_RECORDED", "target_entity": "PAYMENT", "target_id": 3, "description": "Payment OR-2026-00885 of PHP 1200.0 recorded for reservation BPSU-RES-202609-0005 via CASH", "logged_at": "2026-09-05 12:30:00", "log_id": 3, "ip_address": "127.0.0.1"},
+      {"user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "SYSTEM_INIT", "target_entity": "SYSTEM", "target_id": null, "description": "Initial system database seeded for BPSU PATVEP Hostel & Canteen", "logged_at": "2026-09-01 08:00:00", "log_id": 4, "ip_address": "127.0.0.1"},
+      {"user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "USER_CREATE", "target_entity": "USERS", "target_id": 2, "description": "Created user account: hostel_staff (John Carlos R. Capuli)", "logged_at": "2026-09-01 08:05:00", "log_id": 5, "ip_address": "127.0.0.1"},
+      {"user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "USER_CREATE", "target_entity": "USERS", "target_id": 3, "description": "Created user account: canteen_staff (Darren Jude S. Tamayo)", "logged_at": "2026-09-01 08:10:00", "log_id": 6, "ip_address": "127.0.0.1"},
+      {"user_id": 1, "username_snapshot": "admin", "role_snapshot": "ADMIN", "action_type": "USER_CREATE", "target_entity": "USERS", "target_id": 4, "description": "Created user account: qa_staff (Fritz Edrick B. Sarmiento)", "logged_at": "2026-09-01 08:15:00", "log_id": 7, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "LOGIN", "target_entity": "AUTH", "target_id": null, "description": "User hostel_staff logged in", "logged_at": "2026-09-08 09:55:00", "log_id": 8, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CREATED", "target_entity": "RESERVATION", "target_id": 1, "description": "Created reservation BPSU-RES-202609-0001 for Angelo Andrei P. Sierra", "logged_at": "2026-09-08 10:00:00", "log_id": 9, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CONFIRMED", "target_entity": "RESERVATION", "target_id": 1, "description": "Reservation BPSU-RES-202609-0001 confirmed", "logged_at": "2026-09-08 10:05:00", "log_id": 10, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CREATED", "target_entity": "RESERVATION", "target_id": 2, "description": "Created reservation BPSU-RES-202609-0002 for Prof. Albert C. Tria", "logged_at": "2026-09-09 08:30:00", "log_id": 11, "ip_address": "127.0.0.1"},
+      {"user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "LOGIN", "target_entity": "AUTH", "target_id": null, "description": "User canteen_staff logged in", "logged_at": "2026-09-09 09:00:00", "log_id": 12, "ip_address": "127.0.0.1"},
+      {"user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "DELIVERY_RECORD", "target_entity": "DELIVERY", "target_id": 1, "description": "Recorded delivery DR-2026-041 from BPSU Agricultural Cooperative", "logged_at": "2026-09-09 10:00:00", "log_id": 13, "ip_address": "127.0.0.1"},
+      {"user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "DELIVERY_RECORD", "target_entity": "DELIVERY", "target_id": 2, "description": "Recorded delivery DR-2026-042 from Central Luzon Beverage Corp", "logged_at": "2026-09-09 10:15:00", "log_id": 14, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CHECKED_IN", "target_entity": "RESERVATION", "target_id": 1, "description": "Guest Angelo Andrei P. Sierra checked in for BPSU-RES-202609-0001", "logged_at": "2026-09-13 14:15:00", "log_id": 15, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CHECKED_IN", "target_entity": "RESERVATION", "target_id": 2, "description": "Guest Prof. Albert C. Tria checked in for BPSU-RES-202609-0002", "logged_at": "2026-09-14 13:00:00", "log_id": 16, "ip_address": "127.0.0.1"},
+      {"user_id": 2, "username_snapshot": "hostel_staff", "role_snapshot": "STAFF_HOSTEL", "action_type": "RESERVATION_CANCELLED", "target_entity": "RESERVATION", "target_id": 6, "description": "Reservation BPSU-RES-202609-0006 cancelled — guest no-show after 24 hrs", "logged_at": "2026-09-11 09:00:00", "log_id": 17, "ip_address": "127.0.0.1"},
+      {"user_id": 3, "username_snapshot": "canteen_staff", "role_snapshot": "STAFF_CANTEEN", "action_type": "LOGOUT", "target_entity": "AUTH", "target_id": null, "description": "User canteen_staff logged out", "logged_at": "2026-09-14 17:00:00", "log_id": 18, "ip_address": "127.0.0.1"}
     ]
   };
 })(window.App = window.App || {});

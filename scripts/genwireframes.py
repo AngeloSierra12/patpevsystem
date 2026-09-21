@@ -148,8 +148,12 @@ ROW3_Y, ROW3_H = 232, 92
 BOTTOM = 232
 
 
-def app_chrome(c, title, active_row=0):
-    """Sidebar plus top bar, shared by every screen."""
+def app_chrome(c, section, active_row=0):
+    """Sidebar plus top bar, shared by every screen.
+
+    The bar names the SECTION, not the page. The page has its own heading just
+    below, and printing the name in both places said the same word twice.
+    """
     box(c, FX, FY, FW, FH, None, fill=WHITE, stroke=LINE)
 
     # sidebar
@@ -170,15 +174,17 @@ def app_chrome(c, title, active_row=0):
         box(c, FX + 6, yy, 96, 13, label,
             fill=FILL3 if on else FILL2, size=6, bold=on)
 
-    # top bar
+    # top bar: section on the left, account on the right
     box(c, FX + 108, FY + FH - 26, FW - 108, 26, None, fill=FILL2, stroke=LINE)
-    text(c, FX + 118, FY + FH - 16, title, size=8, color=INK, bold=True)
+    text(c, FX + 118, FY + FH - 16, section.upper(), size=6.5, color=MUT, bold=True)
     box(c, FX + FW - 96, FY + FH - 21, 86, 16, 'signed-in user', size=6,
         fill=WHITE, align='center')
 
     # status strip
     box(c, FX + 108, FY, FW - 108, 14, None, fill=FILL2, stroke=LINE)
-    text(c, FX + 116, FY + 5, 'UI shell  |  sample data', size=6)
+    text(c, FX + 116, FY + 5, 'UI shell  |  records from the project database',
+         size=6)
+    text(c, FX + FW - 12, FY + 5, 'role', size=6, align='right')
 
 
 def content_x():
@@ -196,7 +202,7 @@ def head(c, x, y, label, n=None):
 
 # ------------------------------------------------------------- 1. Dashboard
 def draw_dashboard(c):
-    app_chrome(c, 'Dashboard', active_row=0)
+    app_chrome(c, 'Operations', active_row=0)
     px, cw = content_x()
 
     text(c, px, TITLE_Y, 'Dashboard', size=9, color=INK, bold=True)
@@ -274,7 +280,7 @@ def draw_dashboard(c):
 
 # --------------------------------------------------- 2. Scheduling calendar
 def draw_calendar(c):
-    app_chrome(c, 'Scheduling & Calendar', active_row=3)
+    app_chrome(c, 'Operations', active_row=3)
     px, cw = content_x()
 
     text(c, px, TITLE_Y, 'Scheduling & Calendar', size=9, color=INK, bold=True)
@@ -362,7 +368,7 @@ def draw_calendar(c):
 
 # ----------------------------------------------------------- 3. Audit trail
 def draw_audit(c):
-    app_chrome(c, 'Audit Trail', active_row=6)
+    app_chrome(c, 'Administration', active_row=6)
     px, cw = content_x()
 
     text(c, px, TITLE_Y, 'Audit Trail', size=9, color=INK, bold=True)
@@ -417,7 +423,7 @@ def draw_audit(c):
 
 # --------------------------------------------------------------- 4. Reports
 def draw_reports(c):
-    app_chrome(c, 'Reports', active_row=5)
+    app_chrome(c, 'Administration', active_row=5)
     px, cw = content_x()
 
     text(c, px, TITLE_Y, 'Reports', size=9, color=INK, bold=True)

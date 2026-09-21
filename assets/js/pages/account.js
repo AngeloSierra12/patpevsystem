@@ -26,14 +26,14 @@
         S.esc(me.email || '') + '</div></div>' +
       '</div>' +
       '<div class="kv">' +
-        '<div class="kv__k">user_id</div><div><code>' + me.user_id + '</code></div>' +
+        '<div class="kv__k">Account number</div><div>' + me.user_id + '</div>' +
         '<div class="kv__k">Username</div><div>' + S.esc(me.username || '') + '</div>' +
         '<div class="kv__k">Department</div><div>' + S.esc(me.department || '') + '</div>' +
         '<div class="kv__k">Contact</div><div>' + S.esc(me.phone || '') + '</div>' +
       '</div>';
 
     S.el('#access').innerHTML = S.owned(
-      'Andrew Jacob E. Santos', 'Role and permissions',
+      'Andrew Jacob E. Santos', null,
       'What this account is allowed to see and do across the system.');
   });
 })(window.App = window.App || {});

@@ -142,14 +142,56 @@ for r in tables.get('reservations', []):
     r['paid_amount'] = paid.get(r['reservation_id'], 0.0)
     r['balance'] = round(float(r['total_amount']) - r['paid_amount'], 2)
 
-# delivery_items raise stock, consumption lowers it
-stock = {}
+# Stock movement. trg_delivery_item_after_insert and trg_consumption_after_insert
+# each do three things: move current_stock, and write one inventory_transactions
+# row carrying the before/after snapshot. The delivery trigger also overwrites
+# inventory_items.unit_cost with the price on the delivery line, so an item is
+# valued at what it last cost, not at what it cost when the row was created.
+# Replayed here in the same order the seed inserts them.
+receiver = {d['delivery_id']: d.get('received_by') for d in tables.get('deliveries', [])}
+stock, cost, restocked, ledger = {}, {}, {}, []
+txn_id = 0
+
+
+def move(item_id, kind, qty, unit_cost, ref_type, ref_id, reason, who, when, notes=None):
+    global txn_id
+    before = stock.get(item_id, 0.0)
+    after = round(before + qty, 3)
+    stock[item_id] = after
+    txn_id += 1
+    row = {'txn_id': txn_id, 'item_id': item_id, 'transaction_type': kind,
+           'quantity': abs(qty), 'unit_cost': unit_cost,
+           'total_cost': round(abs(qty) * float(unit_cost), 2),
+           'stock_before': before, 'stock_after': after,
+           'ref_type': ref_type, 'ref_id': ref_id, 'reason': reason,
+           'performed_by': who, 'transaction_date': when}
+    if notes is not None:
+        row['notes'] = notes
+    ledger.append(row)
+
+
 for d in tables.get('delivery_items', []):
-    stock[d['item_id']] = round(stock.get(d['item_id'], 0) + float(d['quantity']), 3)
+    move(d['item_id'], 'STOCK_IN', float(d['quantity']), d['unit_cost'],
+         'DELIVERY', d['delivery_id'], 'SUPPLIER_DELIVERY',
+         receiver.get(d['delivery_id']), None)
+    cost[d['item_id']] = d['unit_cost']          # last delivery wins
+    restocked[d['item_id']] = True
+
 for c in tables.get('inventory_consumption', []):
-    stock[c['item_id']] = round(stock.get(c['item_id'], 0) - float(c['quantity']), 3)
+    move(c['item_id'], 'STOCK_OUT', -float(c['quantity']),
+         cost.get(c['item_id'], 0.0), 'CONSUMPTION', c.get('consumption_id'),
+         c.get('purpose', 'MANUAL'), c.get('recorded_by'),
+         c.get('consumption_date'), c.get('notes'))
+
 for it in tables.get('inventory_items', []):
-    it['current_stock'] = stock.get(it['item_id'], 0.0)
+    i = it['item_id']
+    it['current_stock'] = stock.get(i, 0.0)
+    if i in cost:
+        it['unit_cost'] = cost[i]
+
+tables['inventory_transactions'] = ledger
+print('  %-24s %3d rows   (written by the stock triggers)'
+      % ('inventory_transactions', len(ledger)))
 
 neg = [i['item_code'] for i in tables.get('inventory_items', []) if i['current_stock'] < 0]
 print('\n  negative stock after seed:', neg or 'none')
@@ -158,10 +200,41 @@ low = [i['item_code'] for i in tables.get('inventory_items', [])
        if i['current_stock'] <= float(i['reorder_level'])]
 print('  at/below reorder level  :', low or 'none')
 
+# trg_payment_after_insert also writes a PAYMENT_RECORDED row into audit_logs,
+# and the seed no longer hardcodes log_id, so AUTO_INCREMENT assigns it: these
+# trigger rows are inserted first and take 1..n, then the seeded rows follow.
+user_by_id = {u['user_id']: u for u in tables.get('users', [])}
+ref_by_res = {r['reservation_id']: r.get('reference_number')
+              for r in tables.get('reservations', [])}
+
+trigger_audit = []
+for pay in tables.get('payments', []):
+    actor = user_by_id.get(pay.get('received_by'), {})
+    trigger_audit.append({
+        'user_id': pay.get('received_by'),
+        'username_snapshot': actor.get('username', 'SYSTEM'),
+        'role_snapshot': actor.get('role', 'SYSTEM'),
+        'action_type': 'PAYMENT_RECORDED',
+        'target_entity': 'PAYMENT',
+        'target_id': pay['payment_id'],
+        'description': 'Payment %s of PHP %s recorded for reservation %s via %s' % (
+            pay['receipt_number'], pay['amount'],
+            ref_by_res.get(pay['reservation_id'], '?'), pay['payment_method']),
+        'logged_at': pay.get('payment_date'),
+    })
+
+rows = trigger_audit + tables.get('audit_logs', [])
+for i, r in enumerate(rows, 1):
+    r['log_id'] = i
+    r.setdefault('ip_address', '127.0.0.1')
+tables['audit_logs'] = rows
+print('  %-24s %3d rows   (%d written by the payment trigger)'
+      % ('audit_logs (final)', len(rows), len(trigger_audit)))
+
 # ---- emit -----------------------------------------------------------------
 ORDER = ['users', 'guests', 'room_types', 'rooms', 'reservations', 'payments',
          'suppliers', 'inventory_items', 'deliveries', 'delivery_items',
-         'inventory_consumption', 'audit_logs']
+         'inventory_transactions', 'inventory_consumption', 'audit_logs']
 
 parts = []
 for t in ORDER:
@@ -176,12 +249,18 @@ js = '''/* =====================================================================
  * Generated from database/06_seed_data.sql. Table and column names match the
  * schema exactly (users, guests, room_types, rooms, reservations, payments,
  * suppliers, inventory_items, deliveries, delivery_items,
- * inventory_consumption, audit_logs), so the screens already speak the same
- * language as the database.
+ * inventory_transactions, inventory_consumption, audit_logs), so the screens
+ * already speak the same language as the database.
  *
  * Values the triggers derive are applied here as they would be in MariaDB:
- *   reservations.paid_amount  = sum of that reservation's payments
+ *   reservations.paid_amount      = sum of that reservation's payments
  *   inventory_items.current_stock = deliveries in, minus consumption out
+ *   inventory_items.unit_cost     = the price on the most recent delivery line
+ *   inventory_transactions        = one ledger row per stock movement, with
+ *                                   the before and after snapshot
+ *   audit_logs                    = a PAYMENT_RECORDED row per payment, ahead
+ *                                   of the seeded rows, with log_id assigned
+ *                                   the way AUTO_INCREMENT would
  *
  * users.password_hash is deliberately absent: this file is plain text served
  * to the client, and no screen reads it.

@@ -21,16 +21,16 @@
     S.el('#calTitle').textContent = S.MONTHS[now.getMonth()] + ' ' + now.getFullYear();
 
     S.el('#cal').innerHTML = S.owned(
-      'John Carlos R. Capuli', 'Month calendar and room occupancy timeline',
+      'John Carlos R. Capuli', null,
       'Reservations and scheduled activities laid out by date, with a room ' +
       'by room timeline view.');
 
     S.el('#day').innerHTML = S.owned(
-      'John Carlos R. Capuli', 'Selected day detail',
+      'John Carlos R. Capuli', null,
       'Arrivals, departures and activities for the chosen date.');
 
     S.el('#conflict').innerHTML = S.owned(
-      'John Carlos R. Capuli', 'Schedule conflict detection',
+      'John Carlos R. Capuli', null,
       'Checks a new entry against existing bookings and room blocks before ' +
       'it can be saved.');
 

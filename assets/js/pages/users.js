@@ -21,8 +21,8 @@
       '<div class="note note--flat">' +
         '<span class="note__icon">' + S.icon('info', 15) + '</span>' +
         '<div>This screen is the <strong>user dashboard</strong>: it lists and ' +
-        'filters accounts from the <code>users</code> table. Sign-in and the ' +
-        'role permission rules are separate tasks.</div>' +
+        'filters the accounts on file. Sign-in and the role permission rules ' +
+        'are separate tasks.</div>' +
       '</div>';
 
     var search = S.el('#q');
@@ -114,13 +114,13 @@
           'Close</button></span></div>' +
         '<div class="panel__body">' +
           '<div class="kv">' +
-            '<div class="kv__k">user_id</div><div><code>' + u.user_id + '</code></div>' +
+            '<div class="kv__k">Account number</div><div>' + u.user_id + '</div>' +
             '<div class="kv__k">Username</div><div>' + S.esc(u.username) + '</div>' +
             '<div class="kv__k">Email</div><div>' + S.esc(u.email) + '</div>' +
             '<div class="kv__k">Contact</div><div>' + S.esc(u.phone || '—') + '</div>' +
             '<div class="kv__k">Department</div><div>' +
               S.esc(u.department || '—') + '</div>' +
-            '<div class="kv__k">Role</div><div><code>' + S.esc(u.role) + '</code> ' +
+            '<div class="kv__k">Role</div><div>' +
               S.esc(App.Q.roleLabel(u.role)) + '</div>' +
             '<div class="kv__k">Active</div><div><span class="tag tag--' +
               (on ? 'ok' : 'warn') + '">' + (on ? 'Yes' : 'No') + '</span></div>' +

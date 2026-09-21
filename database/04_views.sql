@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- BPSU IGP PATVEP HOSTEL & UNIVERSITY CANTEEN SYSTEM
 -- File: 04_views.sql
 -- Purpose: Reporting and dashboard views
@@ -64,7 +64,15 @@ JOIN rooms   rm ON r.room_id    = rm.room_id
 LEFT JOIN users u ON r.handled_by = u.user_id;
 
 
--- Current room availability: shows status + any active reservation dates
+-- Current room availability: shows each room's physical status and any active
+-- (CONFIRMED or CHECKED_IN) reservation details attached to it.
+--
+-- LIMITATION: A room with multiple CONFIRMED reservations on different future
+-- dates will appear as multiple rows in this view. This view does NOT filter
+-- by a specific requested check-in/check-out range — that requires passing
+-- date parameters via an application query. Use this view to see which rooms
+-- have active bookings and to display the rooms grid on the dashboard.
+-- Filter by room_status = 'AVAILABLE' to find physically unoccupied rooms.
 CREATE VIEW vw_room_availability AS
 SELECT
     rm.room_id,
@@ -128,7 +136,14 @@ LEFT JOIN reservations r ON g.guest_id = r.guest_id
 GROUP BY g.guest_id, g.full_name, g.email, g.phone;
 
 
--- Occupancy report: occupied nights per room type per month
+-- Occupancy report: occupied nights per room type per month.
+--
+-- LIMITATION: Stays are grouped by check_in_date month. A reservation spanning
+-- two calendar months (e.g., Sep 28 – Oct 3) is credited entirely to September.
+-- For the academic prototype this is an acceptable approximation. A production
+-- system would prorate nights across months using a date dimension or calendar
+-- table. total_revenue similarly reflects the full reservation amount in the
+-- check-in month regardless of actual night distribution.
 CREATE VIEW vw_occupancy_report AS
 SELECT
     rt.type_name                        AS room_type,

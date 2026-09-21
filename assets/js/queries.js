@@ -41,7 +41,41 @@
     MAINTENANCE: { text: 'Maintenance', tag: 'stop' }
   };
 
-  function roleLabel(r) { return ROLE_LABEL[r] || r; }
+  /* The database stores these as SCREAMING_SNAKE codes. A code is a fine thing
+     for a column to hold and a poor thing to show a canteen supervisor, so
+     everything on screen goes through one of these. Anything the maps have not
+     seen yet is turned into a sentence rather than leaking the raw code. */
+  var ACTION_LABEL = {
+    SYSTEM_INIT:            'System set up',
+    LOGIN:                  'Signed in',
+    LOGOUT:                 'Signed out',
+    USER_CREATE:            'Account created',
+    RESERVATION_CREATED:    'Reservation created',
+    RESERVATION_CONFIRMED:  'Reservation confirmed',
+    RESERVATION_CHECKED_IN: 'Guest checked in',
+    RESERVATION_CHECKED_OUT:'Guest checked out',
+    RESERVATION_CANCELLED:  'Reservation cancelled',
+    DELIVERY_RECORD:        'Delivery recorded'
+  };
+
+  var ENTITY_LABEL = {
+    AUTH:        'Sign-in',
+    SYSTEM:      'System',
+    USERS:       'User account',
+    RESERVATION: 'Reservation',
+    DELIVERY:    'Delivery',
+    INVENTORY:   'Inventory item'
+  };
+
+  function sentence(code) {
+    var t = String(code || '').toLowerCase().replace(/_/g, ' ').trim();
+    return t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
+  }
+
+  function roleLabel(r) { return ROLE_LABEL[r] || sentence(r); }
+  function actionLabel(a) { return ACTION_LABEL[a] || sentence(a); }
+  function entityLabel(e) { return ENTITY_LABEL[e] || sentence(e); }
+  function category(c) { return sentence(c); }
   function resStatus(s) { return RES_STATUS[s] || { text: s, tag: '' }; }
   function roomStatus(s) { return ROOM_STATUS[s] || { text: s, tag: '' }; }
 
@@ -154,6 +188,7 @@
   App.Q = {
     by: by, one: one,
     roleLabel: roleLabel, resStatus: resStatus, roomStatus: roomStatus,
+    actionLabel: actionLabel, entityLabel: entityLabel, category: category,
     me: me,
     reservationSummary: reservationSummary,
     guestHistory: guestHistory,

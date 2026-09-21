@@ -1,8 +1,8 @@
-﻿// =============================================================================
+// =============================================================================
 // BPSU IGP PATVEP HOSTEL & UNIVERSITY CANTEEN SYSTEM
 // File: bpsu_patvep_erd.dbml
 // Tool: dbdiagram.io  (paste this entire file at https://dbdiagram.io/d)
-// Must exactly match 02_tables.sql
+// Must exactly match 02_tables.sql and 07_audit_archive.sql
 // =============================================================================
 
 Project bpsu_patvep {
@@ -76,7 +76,7 @@ Table rooms {
   capacity        int           [not null, default: 1]
   rate_per_night  decimal(10,2) [not null]
   description     text
-  status          varchar(12)   [not null, default: "AVAILABLE", note: "AVAILABLE | OCCUPIED | MAINTENANCE | RESERVED"]
+  status          varchar(12)   [not null, default: "AVAILABLE", note: "AVAILABLE | OCCUPIED | MAINTENANCE | RESERVED — application-managed"]
   created_at      datetime      [not null, default: `CURRENT_TIMESTAMP`]
   updated_at      datetime      [not null, default: `CURRENT_TIMESTAMP`]
 
@@ -99,8 +99,8 @@ Table reservations {
   number_of_guests       int           [not null, default: 1]
   total_nights           smallint      [not null]
   total_amount           decimal(12,2) [not null]
-  paid_amount            decimal(12,2) [not null, default: 0.00]
-  balance                decimal(12,2) [note: "GENERATED: total_amount - paid_amount"]
+  paid_amount            decimal(12,2) [not null, default: 0.00, note: "Accumulated by trg_payment_after_insert"]
+  balance                decimal(12,2) [note: "GENERATED STORED: total_amount - paid_amount"]
   status                 varchar(12)   [not null, default: "PENDING", note: "PENDING|CONFIRMED|CHECKED_IN|CHECKED_OUT|CANCELLED"]
   cancellation_reason    text
   notes                  text
@@ -120,7 +120,7 @@ Table payments {
   payment_id      int           [pk, increment]
   reservation_id  int           [not null, ref: > reservations.reservation_id]
   receipt_number  varchar(30)   [not null, unique]
-  amount          decimal(12,2) [not null]
+  amount          decimal(12,2) [not null, note: "Must be > 0; cannot exceed outstanding balance (trigger-enforced)"]
   payment_method  varchar(25)   [not null, default: "CASH", note: "CASH|UNIVERSITY_CHARGE_SLIP|BANK_TRANSFER|GCASH_MANUAL_REF"]
   reference_code  varchar(100)
   notes           text
@@ -131,6 +131,8 @@ Table payments {
     reservation_id [name: "idx_pay_reservation"]
     payment_date   [name: "idx_pay_date"]
   }
+
+  Note: "Append-only ledger — UPDATE and DELETE are blocked by database triggers"
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -157,10 +159,10 @@ Table inventory_items {
   item_name             varchar(120)  [not null]
   category              varchar(25)   [not null, note: "FOOD_STAPLES|MEAT_POULTRY|BEVERAGES|INGREDIENTS|SUPPLIES_PACKAGING|CLEANING"]
   unit                  varchar(30)   [not null]
-  current_stock         decimal(12,3) [not null, default: 0]
+  current_stock         decimal(12,3) [not null, default: 0, note: "Maintained by delivery and consumption triggers"]
   reorder_level         decimal(12,3) [not null, default: 10]
   critical_level        decimal(12,3) [not null, default: 0]
-  unit_cost             decimal(10,2) [not null, default: 0]
+  unit_cost             decimal(10,2) [not null, default: 0, note: "Updated to latest delivery cost by trigger"]
   preferred_supplier_id int           [null, ref: > suppliers.supplier_id]
   description           text
   is_active             tinyint(1)    [not null, default: 1]
@@ -170,7 +172,7 @@ Table inventory_items {
 
   indexes {
     category      [name: "idx_items_category"]
-    (is_active, current_stock, reorder_level) [name: "idx_items_low_stock"]
+    (is_active, current_stock, reorder_level) [name: "idx_items_low_stock", note: "is_active prefix narrows scan; column-vs-column comparison evaluated as row filter"]
   }
 }
 
@@ -180,7 +182,7 @@ Table deliveries {
   supplier_id         int           [not null, ref: > suppliers.supplier_id]
   delivery_date       date          [not null]
   received_by         int           [null, ref: > users.user_id]
-  total_amount        decimal(12,2) [not null, default: 0]
+  total_amount        decimal(12,2) [not null, default: 0, note: "Must equal sum of delivery_items.line_total"]
   status              varchar(10)   [not null, default: "RECEIVED", note: "PENDING|RECEIVED|REJECTED"]
   notes               text
   created_at          datetime      [not null, default: `CURRENT_TIMESTAMP`]
@@ -195,28 +197,30 @@ Table delivery_items {
   delivery_item_id int           [pk, increment]
   delivery_id      int           [not null, ref: > deliveries.delivery_id]
   item_id          int           [not null, ref: > inventory_items.item_id]
-  quantity         decimal(12,3) [not null]
+  quantity         decimal(12,3) [not null, note: "Must be > 0"]
   unit_cost        decimal(10,2) [not null]
-  line_total       decimal(12,2) [note: "GENERATED: quantity * unit_cost"]
+  line_total       decimal(12,2) [note: "GENERATED STORED: quantity * unit_cost"]
   notes            text
 
   indexes {
     delivery_id [name: "idx_di_delivery"]
     item_id     [name: "idx_di_item"]
   }
+
+  Note: "INSERT triggers trg_delivery_item_after_insert: increases current_stock, creates STOCK_IN transaction"
 }
 
 Table inventory_transactions {
   txn_id            int           [pk, increment]
   item_id           int           [not null, ref: > inventory_items.item_id]
   transaction_type  varchar(12)   [not null, note: "STOCK_IN|STOCK_OUT|ADJUSTMENT"]
-  quantity          decimal(12,3) [not null]
+  quantity          decimal(12,3) [not null, note: "Always positive; direction implied by transaction_type"]
   unit_cost         decimal(10,2) [not null, default: 0]
-  total_cost        decimal(12,2) [note: "GENERATED: quantity * unit_cost"]
+  total_cost        decimal(12,2) [note: "GENERATED STORED: quantity * unit_cost"]
   stock_before      decimal(12,3) [not null, note: "Snapshot before transaction"]
   stock_after       decimal(12,3) [not null, note: "Snapshot after transaction"]
-  ref_type          varchar(30)   [note: "DELIVERY | CONSUMPTION | MANUAL"]
-  ref_id            int           [note: "FK by convention to delivery or consumption"]
+  ref_type          varchar(30)   [note: "DELIVERY | CONSUMPTION | MANUAL — polymorphic reference"]
+  ref_id            int           [note: "PK of source record (no DB FK — intentional for flexibility)"]
   reason            varchar(120)  [not null, default: "MANUAL"]
   performed_by      int           [null, ref: > users.user_id]
   transaction_date  datetime      [not null, default: `CURRENT_TIMESTAMP`]
@@ -231,7 +235,7 @@ Table inventory_transactions {
 Table inventory_consumption {
   consumption_id   int           [pk, increment]
   item_id          int           [not null, ref: > inventory_items.item_id]
-  quantity         decimal(12,3) [not null]
+  quantity         decimal(12,3) [not null, note: "Must be > 0 and <= current_stock (trigger-enforced)"]
   purpose          varchar(120)  [not null, note: "KITCHEN_USAGE | CANTEEN_SALES | CANTEEN_USAGE | etc."]
   notes            text
   recorded_by      int           [null, ref: > users.user_id]
@@ -241,6 +245,8 @@ Table inventory_consumption {
     item_id          [name: "idx_con_item"]
     consumption_date [name: "idx_con_date"]
   }
+
+  Note: "INSERT triggers trg_consumption_after_insert: decreases current_stock, creates STOCK_OUT transaction"
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -252,8 +258,8 @@ Table audit_logs {
   user_id           int         [null, ref: > users.user_id, note: "NULL = system/unauthenticated event"]
   username_snapshot varchar(50) [not null, note: "Stored at event time — survives user deletion"]
   role_snapshot     varchar(30) [not null, default: "SYSTEM"]
-  action_type       varchar(60) [not null, note: "LOGIN|LOGOUT|RESERVATION_CREATE|CHECK_IN|PAYMENT_RECORDED|etc."]
-  target_entity     varchar(60) [not null, note: "Table or module name: RESERVATION|PAYMENT|DELIVERY|etc."]
+  action_type       varchar(60) [not null, note: "LOGIN|LOGOUT|RESERVATION_CREATED|RESERVATION_CONFIRMED|RESERVATION_CHECKED_IN|RESERVATION_CHECKED_OUT|RESERVATION_CANCELLED|PAYMENT_RECORDED|DELIVERY_RECORD|USER_CREATE|etc."]
+  target_entity     varchar(60) [not null, note: "Table or module name: RESERVATION|PAYMENT|DELIVERY|USERS|AUTH|etc."]
   target_id         int         [null, note: "PK of affected record"]
   description       text
   old_value         text
@@ -267,4 +273,35 @@ Table audit_logs {
     (target_entity, target_id)[name: "idx_log_target"]
     logged_at                 [name: "idx_log_archive"]
   }
+}
+
+// Audit archive: identical structure to audit_logs.
+// Records are MOVED here (not copied) when older than the configured retention
+// period via sp_archive_audit_logs(). Deliberately has NO FK to users because
+// archived records must remain meaningful even if the user account is deleted.
+// username_snapshot and role_snapshot preserve the actor identity permanently.
+
+Table audit_logs_archive {
+  log_id            int         [pk, note: "Preserved original log_id from audit_logs"]
+  user_id           int         [null, note: "No FK to users — intentional for historical preservation"]
+  username_snapshot varchar(50) [not null]
+  role_snapshot     varchar(30) [not null, default: "SYSTEM"]
+  action_type       varchar(60) [not null]
+  target_entity     varchar(60) [not null]
+  target_id         int         [null]
+  description       text
+  old_value         text
+  new_value         text
+  ip_address        varchar(45)
+  logged_at         datetime    [not null]
+  archived_at       datetime    [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    user_id     [name: "idx_arch_user"]
+    action_type [name: "idx_arch_action"]
+    target_entity [name: "idx_arch_entity"]
+    logged_at   [name: "idx_arch_date"]
+  }
+
+  Note: "Records moved from audit_logs via sp_archive_audit_logs(days_to_keep). Query vw_all_audit_logs for combined active+archived search."
 }

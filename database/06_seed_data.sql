@@ -1,12 +1,14 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- BPSU IGP PATVEP HOSTEL & UNIVERSITY CANTEEN SYSTEM
 -- File: 06_seed_data.sql
 -- Purpose: Demo/seed data — realistic but fictional
 -- Run AFTER: 05_triggers.sql
 -- NOTE: Triggers are ACTIVE during seed. Delivery items and consumption records
 --       will auto-update stock and create transaction records.
---       We therefore seed inventory_items with current_stock = 0 and let
---       the delivery_items inserts drive the stock up to realistic levels.
+--       Inventory items are seeded at current_stock = 0; delivery_items inserts
+--       drive stock up to realistic levels via trg_delivery_item_after_insert.
+--       Reservations are seeded with paid_amount = 0 for reservations that have
+--       payments; trg_payment_after_insert accumulates paid_amount naturally.
 -- =============================================================================
 
 USE bpsu_patvep;
@@ -71,7 +73,14 @@ VALUES
 
 -- =============================================================================
 -- 5. RESERVATIONS
--- Dates expressed relative to 2026-09-14 (the project launch week reference)
+-- Dates expressed relative to 2026-09-14 (the project launch week reference).
+--
+-- IMPORTANT: paid_amount is set to 0.00 for reservations that will have
+-- payment records inserted below. trg_payment_after_insert will accumulate
+-- the correct paid_amount naturally when payments are inserted.
+-- Reservations with no payments (res-3, res-4, res-6) keep paid_amount = 0.
+-- res-5 is a completed historical stay — payment inserted below will bring it
+-- to the correct final value.
 -- =============================================================================
 INSERT INTO reservations
     (reservation_id, reference_number, guest_id, room_id,
@@ -80,7 +89,7 @@ INSERT INTO reservations
      total_nights, total_amount, paid_amount,
      status, notes, handled_by, created_at, checked_in_at, checked_out_at)
 VALUES
--- res-1: Already checked in, fully paid
+-- res-1: Already checked in, fully paid (payment will be inserted below)
 (1, 'BPSU-RES-202609-0001', 1, 2,
  '102', 'Standard Double Room', 1200.00,
  '2026-09-13', '2026-09-16', 2,
@@ -88,7 +97,7 @@ VALUES
  'CHECKED_IN', 'Guest checked in for CCST Research Conference.',
  2, '2026-09-08 10:00:00', '2026-09-13 14:15:00', NULL),
 
--- res-2: Checked in, partial payment
+-- res-2: Checked in, partial payment (payment will be inserted below)
 (2, 'BPSU-RES-202609-0002', 2, 5,
  '201', 'PATVEP Student Dorm', 400.00,
  '2026-09-14', '2026-09-17', 4,
@@ -96,7 +105,7 @@ VALUES
  'CHECKED_IN', 'Student delegates for regional IT skills competition.',
  2, '2026-09-09 08:30:00', '2026-09-14 13:00:00', NULL),
 
--- res-3: Confirmed, not yet checked in
+-- res-3: Confirmed, not yet checked in, no payment yet
 (3, 'BPSU-RES-202609-0003', 3, 4,
  '104', 'Deluxe King Suite', 2200.00,
  '2026-09-16', '2026-09-19', 2,
@@ -104,7 +113,7 @@ VALUES
  'CONFIRMED', 'VIP accommodation — CHED Regional Evaluator.',
  2, '2026-09-13 16:40:00', NULL, NULL),
 
--- res-4: Pending
+-- res-4: Pending, no payment
 (4, 'BPSU-RES-202609-0004', 4, 1,
  '101', 'Standard Single Room', 900.00,
  '2026-09-20', '2026-09-22', 1,
@@ -112,7 +121,7 @@ VALUES
  'PENDING', 'Engineer from DPWH for campus inspection.',
  2, '2026-09-14 09:00:00', NULL, NULL),
 
--- res-5: Checked out, completed stay
+-- res-5: Checked out, completed stay (payment will be inserted below)
 (5, 'BPSU-RES-202609-0005', 5, 6,
  '202', 'PATVEP Student Dorm', 400.00,
  '2026-09-05', '2026-09-08', 3,
@@ -120,7 +129,7 @@ VALUES
  'CHECKED_OUT', 'Sports team delegates — completed stay.',
  2, '2026-09-03 11:00:00', '2026-09-05 12:00:00', '2026-09-08 10:30:00'),
 
--- res-6: Cancelled
+-- res-6: Cancelled, no payment
 (6, 'BPSU-RES-202609-0006', 6, 7,
  '203', 'VIP Executive Family Suite', 3200.00,
  '2026-09-10', '2026-09-12', 4,
@@ -130,27 +139,23 @@ VALUES
 
 -- =============================================================================
 -- 6. PAYMENTS
--- Note: trg_payment_after_insert will update paid_amount on reservations.
--- We pre-set paid_amount above to match so seed is consistent.
--- For simplicity, disable the trigger's update effect during seed by setting
--- paid_amount via direct INSERT on reservations above.
+-- trg_payment_after_insert fires on each INSERT and:
+--   a) validates amount > 0 (CHECK constraint on table)
+--   b) validates new payment does not exceed total_amount (trigger guard)
+--   c) accumulates paid_amount on the parent reservation
+--   d) logs a PAYMENT_RECORDED entry to audit_logs
+--
+-- Expected final paid_amount after trigger runs:
+--   reservation 1 → 3,600.00  (one full payment)
+--   reservation 2 →   600.00  (one partial payment)
+--   reservation 5 → 1,200.00  (one full payment)
 -- =============================================================================
-
--- Temporarily disable the payment trigger effect on reservations
--- (we already set paid_amount in the reservations insert above)
--- The trigger will still fire but we reset paid_amount below
--- APPROACH: Insert payments, then fix paid_amount if double-counted.
--- Simpler: keep trigger active and seed payments independently;
--- the trigger will update paid_amount but since we seeded it correctly above,
--- we reset it after all payment inserts.
-
 INSERT INTO payments
     (payment_id, reservation_id, receipt_number, amount, payment_method, reference_code, notes, received_by, payment_date)
 VALUES
-(1, 1, 'OR-2026-00891', 3600.00, 'CASH',                  'CASH-REC-001',    'Full advance settlement at front desk',            2, '2026-09-13 14:30:00'),
-(2, 2, 'OR-2026-00892', 600.00,  'UNIVERSITY_CHARGE_SLIP','BPSU-CCST-PO-881','50% university charging for student delegates',    2, '2026-09-14 13:15:00'),
-(3, 5, 'OR-2026-00885', 1200.00, 'CASH',                  'CASH-REC-002',    'Full payment — sports delegates completed stay',   2, '2026-09-05 12:30:00');
-
+(1, 1, 'OR-2026-00891', 3600.00, 'CASH',                  'CASH-REC-001',    'Full advance settlement at front desk',          2, '2026-09-13 14:30:00'),
+(2, 2, 'OR-2026-00892',  600.00, 'UNIVERSITY_CHARGE_SLIP','BPSU-CCST-PO-881','50% university charging for student delegates',  2, '2026-09-14 13:15:00'),
+(3, 5, 'OR-2026-00885', 1200.00, 'CASH',                  'CASH-REC-002',    'Full payment — sports delegates completed stay', 2, '2026-09-05 12:30:00');
 
 -- =============================================================================
 -- 7. SUPPLIERS
@@ -166,7 +171,7 @@ VALUES
 -- =============================================================================
 -- 8. INVENTORY ITEMS
 -- Start all items at current_stock = 0; delivery_items inserts will drive
--- stock up via the trigger.
+-- stock up via trg_delivery_item_after_insert.
 -- =============================================================================
 INSERT INTO inventory_items
     (item_id, item_code, item_name, category, unit, current_stock,
@@ -187,6 +192,13 @@ VALUES
 
 -- =============================================================================
 -- 9. DELIVERIES  (headers)
+--
+-- Header total_amount values verified against delivery_items line sums below:
+--   DR-2026-041: 6 × 2350.00                                   =  14,100.00
+--   DR-2026-042: 200 × 11.50                                   =   2,300.00
+--   DR-2026-043: 5×1450 + 2×1800 + 20×28 + 48×64 + 400×4.25 + 4×290 = 17,342.00
+--   DR-2026-044: 8×490 + 48×39.50                              =   5,816.00
+--   DR-2026-045: 25×195 + 15.5×330                             =   9,990.00
 -- =============================================================================
 INSERT INTO deliveries
     (delivery_id, delivery_receipt_no, supplier_id, delivery_date, received_by, total_amount, status, notes)
@@ -203,70 +215,110 @@ VALUES
 --   a) updates current_stock on inventory_items
 --   b) updates unit_cost and last_restocked_at on inventory_items
 --   c) inserts STOCK_IN rows in inventory_transactions
+--
+-- Expected current_stock after all deliveries (before consumption):
+--   STP-001 (rice)       :  6.000 sacks
+--   MEA-002 (chicken)    : 25.000 kg
+--   MEA-003 (pork)       : 15.500 kg
+--   ING-004 (oil)        :  5.000 tins
+--   ING-005 (sugar)      :  2.000 bags
+--   ING-006 (salt)       : 20.000 packs
+--   BEV-007 (coffee)     :  8.000 packs
+--   BEV-008 (evap milk)  : 48.000 cans
+--   BEV-009 (water)      :200.000 bottles
+--   STP-010 (corned beef): 48.000 cans
+--   PKG-011 (bento box)  :400.000 pcs
+--   CLN-012 (dishwashing):  4.000 gallons
 -- =============================================================================
 INSERT INTO delivery_items
     (delivery_id, item_id, quantity, unit_cost)
 VALUES
 -- DR-2026-041: 6 sacks of rice
-(1, 1,  6.000, 2350.00),
+(1, 1,   6.000, 2350.00),
 
 -- DR-2026-042: 200 bottles of water
 (2, 9, 200.000,   11.50),
 
--- DR-2026-043: grocery batch
-(3, 4,  5.000, 1450.00),   -- palm oil tins
-(3, 5,  2.000, 1800.00),   -- sugar bags
-(3, 6, 20.000,   28.00),   -- salt packs
-(3,10, 48.000,   64.00),   -- corned beef
-(3,11,400.000,    4.25),   -- bento boxes
-(3,12,  4.000,  290.00),   -- dishwashing liquid
+-- DR-2026-043: wholesale grocery & packaging batch
+(3, 4,   5.000, 1450.00),   -- palm oil tins:    5 × 1450 =  7,250.00
+(3, 5,   2.000, 1800.00),   -- sugar bags:       2 × 1800 =  3,600.00
+(3, 6,  20.000,   28.00),   -- salt packs:      20 ×   28 =    560.00
+(3,10,  48.000,   64.00),   -- corned beef:     48 ×   64 =  3,072.00
+(3,11, 400.000,    4.25),   -- bento boxes:    400 × 4.25 =  1,700.00
+(3,12,   4.000,  290.00),   -- dishwashing liq:  4 ×  290 =  1,160.00
+                             -- DR-2026-043 total:          = 17,342.00
 
 -- DR-2026-044: beverages
-(4, 7,  8.000,  490.00),   -- barako coffee
-(4, 8, 48.000,   39.50),   -- evaporated milk
+(4, 7,   8.000,  490.00),   -- barako coffee:    8 ×  490 =  3,920.00
+(4, 8,  48.000,   39.50),   -- evaporated milk: 48 × 39.5 =  1,896.00
+                             -- DR-2026-044 total:          =  5,816.00
 
 -- DR-2026-045: meat & poultry
-(5, 2, 25.000,  195.00),   -- chicken
-(5, 3, 15.500,  330.00);   -- pork liempo
+(5, 2,  25.000,  195.00),   -- chicken:         25 ×  195 =  4,875.00
+(5, 3,  15.500,  330.00);   -- pork liempo:   15.5 ×  330 =  5,115.00
+                             -- DR-2026-045 total:          =  9,990.00
 
 -- =============================================================================
 -- 11. INVENTORY CONSUMPTION
 -- Inserting these triggers trg_consumption_after_insert which:
 --   a) decreases current_stock on inventory_items
 --   b) inserts STOCK_OUT rows in inventory_transactions
+--
+-- Expected current_stock after consumption:
+--   STP-001 (rice)       :  5.500 sacks  (−0.5)
+--   MEA-002 (chicken)    : 20.000 kg     (−3.0 − 2.0)
+--   MEA-003 (pork)       : 13.500 kg     (−2.0)
+--   BEV-008 (evap milk)  : 42.000 cans   (−6.0)
+--   BEV-009 (water)      :180.000 bottles(−8.0 − 12.0)
+--   PKG-011 (bento box)  :380.000 pcs    (−20.0)
 -- =============================================================================
 INSERT INTO inventory_consumption
     (consumption_id, item_id, quantity, purpose, notes, recorded_by, consumption_date)
 VALUES
-(1,  2, 3.000, 'KITCHEN_USAGE', 'Morning prep — chicken adobo',     3, '2026-09-10 07:30:00'),
-(2,  9, 8.000, 'CANTEEN_SALES', 'Water sold at canteen counter',     3, '2026-09-10 12:00:00'),
-(3,  1, 0.500, 'KITCHEN_USAGE', 'Half sack used for day meals',      3, '2026-09-11 06:30:00'),
-(4,  2, 2.000, 'KITCHEN_USAGE', 'Lunch prep — chicken tinola',       3, '2026-09-11 08:00:00'),
-(5,  3, 2.000, 'KITCHEN_USAGE', 'Pork liempo grilled for lunch',     3, '2026-09-12 07:45:00'),
-(6,  9,12.000, 'CANTEEN_SALES', 'Water sold across two meal periods', 3, '2026-09-12 12:00:00'),
-(7,  8, 6.000, 'CANTEEN_SALES', 'Evap milk for coffee orders',       3, '2026-09-13 07:00:00'),
-(8, 11,20.000, 'CANTEEN_USAGE', 'Bento boxes for packed lunch orders',3, '2026-09-13 11:30:00');
+(1,  2,  3.000, 'KITCHEN_USAGE', 'Morning prep — chicken adobo',      3, '2026-09-10 07:30:00'),
+(2,  9,  8.000, 'CANTEEN_SALES', 'Water sold at canteen counter',      3, '2026-09-10 12:00:00'),
+(3,  1,  0.500, 'KITCHEN_USAGE', 'Half sack used for day meals',       3, '2026-09-11 06:30:00'),
+(4,  2,  2.000, 'KITCHEN_USAGE', 'Lunch prep — chicken tinola',        3, '2026-09-11 08:00:00'),
+(5,  3,  2.000, 'KITCHEN_USAGE', 'Pork liempo grilled for lunch',      3, '2026-09-12 07:45:00'),
+(6,  9, 12.000, 'CANTEEN_SALES', 'Water sold across two meal periods',  3, '2026-09-12 12:00:00'),
+(7,  8,  6.000, 'CANTEEN_SALES', 'Evap milk for coffee orders',        3, '2026-09-13 07:00:00'),
+(8, 11, 20.000, 'CANTEEN_USAGE', 'Bento boxes for packed lunch orders', 3, '2026-09-13 11:30:00');
 
 -- =============================================================================
 -- 12. AUDIT LOGS  (initial/manual entries — triggers add more automatically)
+--
+-- Action naming convention (consistent with trigger output):
+--   SYSTEM_INIT          — system-level initialization event
+--   USER_CREATE          — a user account was created
+--   LOGIN / LOGOUT       — authentication events
+--   RESERVATION_CREATED  — new reservation record created (manual; trigger does status changes)
+--   RESERVATION_CONFIRMED— status changed to CONFIRMED (matches trigger: 'RESERVATION_' + status)
+--   RESERVATION_CHECKED_IN — status changed to CHECKED_IN
+--   RESERVATION_CANCELLED  — status changed to CANCELLED
+--   DELIVERY_RECORD      — a delivery was recorded
+--   PAYMENT_RECORDED     — a payment was posted (auto-generated by trg_payment_after_insert)
 -- =============================================================================
+-- log_id is deliberately NOT listed. trg_payment_after_insert writes its own
+-- PAYMENT_RECORDED rows into this table, and payments are inserted above, so
+-- log_id 1-3 are already taken by the time this statement runs. Hardcoding
+-- log_id here collided with them and aborted the seed. Let AUTO_INCREMENT
+-- assign: the trigger rows keep 1-3 and these fifteen become 4-18.
 INSERT INTO audit_logs
-    (log_id, user_id, username_snapshot, role_snapshot,
+    (user_id, username_snapshot, role_snapshot,
      action_type, target_entity, target_id, description, logged_at)
 VALUES
-(1,  1, 'admin',        'ADMIN',        'SYSTEM_INIT',          'SYSTEM',       NULL, 'Initial system database seeded for BPSU PATVEP Hostel & Canteen',          '2026-09-01 08:00:00'),
-(2,  1, 'admin',        'ADMIN',        'USER_CREATE',          'USERS',        2,    'Created user account: hostel_staff (John Carlos R. Capuli)',               '2026-09-01 08:05:00'),
-(3,  1, 'admin',        'ADMIN',        'USER_CREATE',          'USERS',        3,    'Created user account: canteen_staff (Darren Jude S. Tamayo)',              '2026-09-01 08:10:00'),
-(4,  1, 'admin',        'ADMIN',        'USER_CREATE',          'USERS',        4,    'Created user account: qa_staff (Fritz Edrick B. Sarmiento)',               '2026-09-01 08:15:00'),
-(5,  2, 'hostel_staff', 'STAFF_HOSTEL', 'LOGIN',                'AUTH',         NULL, 'User hostel_staff logged in',                                              '2026-09-08 09:55:00'),
-(6,  2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CREATED',   'RESERVATION',  1,    'Created reservation BPSU-RES-202609-0001 for Angelo Andrei P. Sierra',     '2026-09-08 10:00:00'),
-(7,  2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CONFIRMED','RESERVATION',  1,    'Reservation BPSU-RES-202609-0001 confirmed',                               '2026-09-08 10:05:00'),
-(8,  2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CREATED',   'RESERVATION',  2,    'Created reservation BPSU-RES-202609-0002 for Prof. Albert C. Tria',        '2026-09-09 08:30:00'),
-(9,  3, 'canteen_staff','STAFF_CANTEEN','LOGIN',                 'AUTH',         NULL, 'User canteen_staff logged in',                                             '2026-09-09 09:00:00'),
-(10, 3, 'canteen_staff','STAFF_CANTEEN','DELIVERY_RECORD',       'DELIVERY',     1,    'Recorded delivery DR-2026-041 from BPSU Agricultural Cooperative',         '2026-09-09 10:00:00'),
-(11, 3, 'canteen_staff','STAFF_CANTEEN','DELIVERY_RECORD',       'DELIVERY',     2,    'Recorded delivery DR-2026-042 from Central Luzon Beverage Corp',           '2026-09-09 10:15:00'),
-(12, 2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CHECKED_IN',             'RESERVATION',  1,    'Guest Angelo Andrei P. Sierra checked in for BPSU-RES-202609-0001',        '2026-09-13 14:15:00'),
-(13, 2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CHECKED_IN',             'RESERVATION',  2,    'Guest Prof. Albert C. Tria checked in for BPSU-RES-202609-0002',           '2026-09-14 13:00:00'),
-(14, 2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CANCELLED',   'RESERVATION',  6,    'Reservation BPSU-RES-202609-0006 cancelled — guest no-show after 24 hrs',  '2026-09-11 09:00:00'),
-(15, 3, 'canteen_staff','STAFF_CANTEEN','LOGOUT',                'AUTH',         NULL, 'User canteen_staff logged out',                                            '2026-09-14 17:00:00');
-
+(1, 'admin',        'ADMIN',        'SYSTEM_INIT',             'SYSTEM',      NULL, 'Initial system database seeded for BPSU PATVEP Hostel & Canteen',          '2026-09-01 08:00:00'),
+(1, 'admin',        'ADMIN',        'USER_CREATE',             'USERS',        2,   'Created user account: hostel_staff (John Carlos R. Capuli)',               '2026-09-01 08:05:00'),
+(1, 'admin',        'ADMIN',        'USER_CREATE',             'USERS',        3,   'Created user account: canteen_staff (Darren Jude S. Tamayo)',              '2026-09-01 08:10:00'),
+(1, 'admin',        'ADMIN',        'USER_CREATE',             'USERS',        4,   'Created user account: qa_staff (Fritz Edrick B. Sarmiento)',               '2026-09-01 08:15:00'),
+(2, 'hostel_staff', 'STAFF_HOSTEL', 'LOGIN',                   'AUTH',        NULL, 'User hostel_staff logged in',                                              '2026-09-08 09:55:00'),
+(2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CREATED',     'RESERVATION',  1,   'Created reservation BPSU-RES-202609-0001 for Angelo Andrei P. Sierra',     '2026-09-08 10:00:00'),
+(2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CONFIRMED',   'RESERVATION',  1,   'Reservation BPSU-RES-202609-0001 confirmed',                               '2026-09-08 10:05:00'),
+(2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CREATED',     'RESERVATION',  2,   'Created reservation BPSU-RES-202609-0002 for Prof. Albert C. Tria',        '2026-09-09 08:30:00'),
+(3, 'canteen_staff','STAFF_CANTEEN','LOGIN',                   'AUTH',        NULL, 'User canteen_staff logged in',                                             '2026-09-09 09:00:00'),
+(3, 'canteen_staff','STAFF_CANTEEN','DELIVERY_RECORD',         'DELIVERY',     1,   'Recorded delivery DR-2026-041 from BPSU Agricultural Cooperative',         '2026-09-09 10:00:00'),
+(3, 'canteen_staff','STAFF_CANTEEN','DELIVERY_RECORD',         'DELIVERY',     2,   'Recorded delivery DR-2026-042 from Central Luzon Beverage Corp',           '2026-09-09 10:15:00'),
+(2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CHECKED_IN',  'RESERVATION',  1,   'Guest Angelo Andrei P. Sierra checked in for BPSU-RES-202609-0001',        '2026-09-13 14:15:00'),
+(2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CHECKED_IN',  'RESERVATION',  2,   'Guest Prof. Albert C. Tria checked in for BPSU-RES-202609-0002',           '2026-09-14 13:00:00'),
+(2, 'hostel_staff', 'STAFF_HOSTEL', 'RESERVATION_CANCELLED',   'RESERVATION',  6,   'Reservation BPSU-RES-202609-0006 cancelled — guest no-show after 24 hrs',  '2026-09-11 09:00:00'),
+(3, 'canteen_staff','STAFF_CANTEEN','LOGOUT',                  'AUTH',        NULL, 'User canteen_staff logged out',                                            '2026-09-14 17:00:00');

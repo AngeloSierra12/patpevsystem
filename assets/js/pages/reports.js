@@ -17,11 +17,11 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     S.mount({ title: 'Reports', nav: 'reports' });
-    S.meta([['Tables read', 6], 'figures counted from seeded records']);
+    S.meta([['Tables read', 7], 'figures counted from seeded records']);
 
     summary();
     S.el('#controls').innerHTML = S.owned(
-      'Andrew Jacob E. Santos', 'Report control panel',
+      'Andrew Jacob E. Santos', null,
       'Report type, date range and filters deciding what the summary covers.');
 
     var ex = S.els('.page__actions .btn')[0];
@@ -47,45 +47,56 @@
       return r.status !== 'CANCELLED';
     }).reduce(function (s, r) { return s + Number(r.total_nights); }, 0);
 
+    /* Each block is the shape of one database view. The view name stays in the
+       comment rather than on the screen: it tells the next developer where the
+       real figure will come from, and means nothing to the person reading the
+       report. */
     S.el('#summary').innerHTML =
-      block('Hostel occupancy', 'vw_occupancy_report', [
-          ['Rooms in inventory', DB.rooms.length],
-          ['Rooms currently occupied', occupied],
-          ['Room types offered', DB.room_types.length],
-          ['Booked nights, excluding cancellations', nights]
-        ]) +
+      block('Hostel occupancy', [                   /* vw_occupancy_report */
+        ['Rooms in inventory', DB.rooms.length],
+        ['Rooms currently occupied', occupied],
+        ['Room types offered', DB.room_types.length],
+        ['Booked nights, excluding cancellations', nights]
+      ]) +
 
-        block('Reservations', 'vw_reservation_summary',
-          Object.keys(byStatus).map(function (k) {
-            return [Q.resStatus(k).text, byStatus[k]];
-          }).concat([['Total on file', DB.reservations.length]])) +
+      block('Reservations',                         /* vw_reservation_summary */
+        Object.keys(byStatus).map(function (k) {
+          return [Q.resStatus(k).text, byStatus[k]];
+        }).concat([['Total on file', DB.reservations.length]])) +
 
-        block('Revenue', 'vw_daily_revenue', [
-          ['Amount booked', S.peso(Q.amountBooked())],
-          ['Collected from payments', S.peso(Q.revenueCollected())],
-          ['Outstanding balance', S.peso(Q.outstandingBalance())],
-          ['Payments recorded', DB.payments.length]
-        ]) +
+      block('Revenue', [                            /* vw_daily_revenue */
+        ['Amount booked', S.peso(Q.amountBooked())],
+        ['Collected from payments', S.peso(Q.revenueCollected())],
+        ['Outstanding balance', S.peso(Q.outstandingBalance())],
+        ['Payments recorded', DB.payments.length]
+      ]) +
 
-        block('Canteen inventory', 'vw_inventory_value', [
-          ['Items tracked', DB.inventory_items.length],
-          ['At or below reorder level', Q.lowStockItems().length],
-          ['At or below critical level', Q.criticalStockItems().length],
-          ['Stock value', S.peso(Math.round(Q.inventoryValue()))]
-        ]) +
+      block('Canteen inventory', [                  /* vw_inventory_value */
+        ['Items tracked', DB.inventory_items.length],
+        ['At or below reorder level', Q.lowStockItems().length],
+        ['At or below critical level', Q.criticalStockItems().length],
+        ['Stock value', S.peso(Math.round(Q.inventoryValue()))]
+      ]) +
 
-        block('Deliveries and suppliers', 'vw_delivery_summary', [
-          ['Suppliers on file', DB.suppliers.length],
-          ['Deliveries received', DB.deliveries.length],
-          ['Delivery line items', DB.delivery_items.length],
-          ['Value delivered', S.peso(Q.deliveryTotal())]
+      block('Stock movement', [                     /* inventory_transactions */
+        ['Movements recorded', DB.inventory_transactions.length],
+        ['Stock received', DB.inventory_transactions.filter(function (t) {
+          return t.transaction_type === 'STOCK_IN'; }).length],
+        ['Stock issued', DB.inventory_transactions.filter(function (t) {
+          return t.transaction_type === 'STOCK_OUT'; }).length]
+      ]) +
+
+      block('Deliveries and suppliers', [           /* vw_delivery_summary */
+        ['Suppliers on file', DB.suppliers.length],
+        ['Deliveries received', DB.deliveries.length],
+        ['Delivery line items', DB.delivery_items.length],
+        ['Value delivered', S.peso(Q.deliveryTotal())]
       ]);
   }
 
-  function block(heading, view, rows) {
-    return '<div style="margin-bottom:16px">' +
-      '<div class="label">' + S.esc(heading) +
-        '<code>' + S.esc(view) + '</code></div>' +
+  function block(heading, rows) {
+    return '<div class="repblock">' +
+      '<div class="label">' + S.esc(heading) + '</div>' +
       rows.map(function (r) {
         return '<div class="rowitem" style="padding:4px 0;border-bottom:none">' +
           '<span class="rowitem__main"><span class="rowitem__title" ' +

@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- BPSU IGP PATVEP HOSTEL & UNIVERSITY CANTEEN SYSTEM
 -- File: 05_triggers.sql
 -- Purpose: Database triggers for stock management and audit automation
@@ -34,6 +34,19 @@
 --     Event:   AFTER INSERT
 --     Purpose: Update paid_amount on the parent reservation, and log the
 --              payment event to audit_logs.
+--
+-- trg_payment_before_update
+--     Table:   payments
+--     Event:   BEFORE UPDATE
+--     Purpose: Prevent modification of posted payment records.
+--              Payments are append-only; use a reversal record if needed.
+--
+-- trg_payment_before_delete
+--     Table:   payments
+--     Event:   BEFORE DELETE
+--     Purpose: Prevent deletion of payment records.
+--              Deleting a payment would cause paid_amount on the reservation
+--              to become inconsistent with the payment ledger.
 --
 -- NOTE: No trigger causes another trigger on the same table (no recursion risk).
 -- NOTE: Triggers use SIGNAL SQLSTATE for input validation where relevant.
@@ -114,6 +127,12 @@ BEGIN
     WHERE item_id = NEW.item_id;
 
     -- Guard: cannot consume more than available
+    
+    IF NEW.quantity <= 0 THEN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Consumption quantity must be greater than zero';
+	END IF;
+    
     IF NEW.quantity > v_stock_before THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Consumption quantity exceeds available stock';
@@ -141,6 +160,12 @@ END $$
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. RESERVATION STATUS CHANGE → audit log
+--
+-- ACTOR NOTE: This trigger logs reservation.handled_by as the audit actor.
+-- handled_by is the staff member assigned to the reservation, not necessarily
+-- the currently authenticated application user making the status change.
+-- For the prototype, this is an acceptable approximation. A production system
+-- would pass the authenticated session user via application-level logic.
 -- ─────────────────────────────────────────────────────────────────────────────
 DROP TRIGGER IF EXISTS trg_reservation_after_update $$
 
@@ -155,6 +180,9 @@ BEGIN
     -- Only log if status actually changed
     IF OLD.status <> NEW.status THEN
 
+        -- Action name: RESERVATION_ + new status value
+        -- Results in: RESERVATION_CONFIRMED, RESERVATION_CHECKED_IN,
+        --             RESERVATION_CHECKED_OUT, RESERVATION_CANCELLED, etc.
         SET v_action = CONCAT('RESERVATION_', NEW.status);
 
         -- Resolve handler username for the snapshot
@@ -182,6 +210,9 @@ END $$
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 4. PAYMENT INSERT → update reservation paid_amount + audit log
+--
+-- OVERPAYMENT GUARD: A payment that would cause paid_amount to exceed
+-- total_amount is rejected. Staff must resolve overpayment disputes manually.
 -- ─────────────────────────────────────────────────────────────────────────────
 DROP TRIGGER IF EXISTS trg_payment_after_insert $$
 
@@ -189,9 +220,22 @@ CREATE TRIGGER trg_payment_after_insert
 AFTER INSERT ON payments
 FOR EACH ROW
 BEGIN
-    DECLARE v_ref      VARCHAR(30);
-    DECLARE v_username VARCHAR(50);
-    DECLARE v_role     VARCHAR(30);
+    DECLARE v_ref         VARCHAR(30);
+    DECLARE v_total       DECIMAL(12,2);
+    DECLARE v_paid        DECIMAL(12,2);
+    DECLARE v_username    VARCHAR(50);
+    DECLARE v_role        VARCHAR(30);
+
+    -- Read current reservation state
+    SELECT reference_number, total_amount, paid_amount
+    INTO v_ref, v_total, v_paid
+    FROM reservations WHERE reservation_id = NEW.reservation_id;
+
+    -- Guard: prevent overpayment
+    IF v_paid + NEW.amount > v_total THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Payment amount would exceed the reservation total. Correct the amount or adjust the reservation total first.';
+    END IF;
 
     -- Accumulate paid_amount on the reservation
     UPDATE reservations
@@ -199,10 +243,7 @@ BEGIN
         updated_at  = NOW()
     WHERE reservation_id = NEW.reservation_id;
 
-    -- Resolve receiver info
-    SELECT reference_number INTO v_ref
-    FROM reservations WHERE reservation_id = NEW.reservation_id;
-
+    -- Resolve receiver info for audit
     IF NEW.received_by IS NOT NULL THEN
         SELECT username, role INTO v_username, v_role
         FROM users WHERE user_id = NEW.received_by;
@@ -224,5 +265,43 @@ BEGIN
                 ' via ', NEW.payment_method),
          NOW());
 END $$
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 5. PAYMENT BEFORE UPDATE → prevent modification of posted payments
+--
+-- Payments are an append-only financial ledger. Modifying a posted payment
+-- record would make paid_amount on the reservation inconsistent.
+-- If a payment was entered in error, it must be voided via a new adjustment
+-- record (application-level), not by editing the payment row directly.
+-- ─────────────────────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_payment_before_update $$
+
+CREATE TRIGGER trg_payment_before_update
+BEFORE UPDATE ON payments
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Payment records are append-only and cannot be modified. To void a payment, use the reversal process.';
+END $$
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 6. PAYMENT BEFORE DELETE → prevent deletion of posted payments
+--
+-- Deleting a payment row would cause paid_amount on the parent reservation
+-- to be overstated (since the trigger only increments, never decrements).
+-- Deletion is blocked at the database level to enforce ledger integrity.
+-- ─────────────────────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_payment_before_delete $$
+
+CREATE TRIGGER trg_payment_before_delete
+BEFORE DELETE ON payments
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Payment records cannot be deleted. The payment ledger must remain intact for audit and billing accuracy.';
+END $$
+
 
 DELIMITER ;

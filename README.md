@@ -138,6 +138,27 @@ arrive and parse before it learns the second file exists.
 **Icons are inline SVG.** No emoji is used as an interface icon: they render
 differently on every machine and cannot be recoloured by the theme.
 
+**Database codes never reach the screen.** The schema stores roles, statuses,
+actions and categories as `SCREAMING_SNAKE` codes. That is the right thing for
+a column to hold and the wrong thing to show a canteen supervisor, so every one
+of them passes through a label map in `queries.js` first: `STAFF_CANTEEN`
+reads as Canteen Staff, `RESERVATION_CHECKED_IN` as Guest checked in. A code
+the maps have not seen is turned into a sentence rather than printed raw.
+Primary keys are labelled in English too. The codes that *are* shown — item
+codes, room numbers, booking references — are real ones the staff already use.
+
+**On a phone a table becomes a list of cards.** Six columns cannot fit in
+375px: they either scroll out of sight or squeeze each word onto its own line.
+Below 800px the header row is hidden and every cell prints its own label from
+the `data-label` the table renderer puts there, so a row reads top to bottom.
+
+**The top bar names the section, not the page.** It used to repeat the page
+title, which the `<h1>` directly beneath it already carries — the same words
+twice, stacked a few pixels apart on a phone. It now shows the section
+(Operations, Administration, Account), which is the one piece of context the
+heading does not give you, and the only thing still saying which part of the
+system you are in once the sidebar slides away on a narrow screen.
+
 Accessibility: skip link, visible focus rings, `aria-current` on the active nav
 item, labels on every field, 16px inputs on mobile so iOS does not zoom, status
 never conveyed by colour alone, and `prefers-reduced-motion` respected.
@@ -155,13 +176,23 @@ schema's exact table and column names:
 
 ```
 users  guests  room_types  rooms  reservations  payments  suppliers
-inventory_items  deliveries  delivery_items  inventory_consumption  audit_logs
+inventory_items  deliveries  delivery_items  inventory_transactions
+inventory_consumption  audit_logs
 ```
 
 Values the triggers derive are applied during generation, so the JS mirrors the
-state MariaDB would actually be in after seeding: `reservations.paid_amount`
-from the payments, and `inventory_items.current_stock` from deliveries in minus
-consumption out.
+state MariaDB would actually be in after seeding:
+
+| Derived | From |
+|---|---|
+| `reservations.paid_amount` | the sum of that reservation's payments |
+| `inventory_items.current_stock` | deliveries in, minus consumption out |
+| `inventory_items.unit_cost` | the price on the most recent delivery line |
+| `inventory_transactions` | one ledger row per movement, with the before and after snapshot |
+
+The seed inserts no `inventory_transactions` rows; the stock triggers write
+them. The generator replays those triggers in insert order, so the mirror holds
+the 20 rows MariaDB would hold.
 
 Regenerate after a seed change:
 

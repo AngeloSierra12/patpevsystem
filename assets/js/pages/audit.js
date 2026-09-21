@@ -15,8 +15,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     S.mount({ title: 'Audit Trail', nav: 'audit' });
-    S.meta([['Entries', App.DB.audit_logs.length],
-            'read-only view of audit_logs']);
+    S.meta([['Entries', App.DB.audit_logs.length], 'read-only']);
     S.el('#notice').innerHTML = '<div class="note note--flat">' +
       '<span class="note__icon">' + S.icon('info', 15) + '</span>' +
       '<div>The audit trail records who did what and when. The logger and ' +
@@ -26,13 +25,15 @@
       { head: 'Logged at', cls: 'mono', cell: function (r) { return S.esc(r.logged_at); } },
       { head: 'User', cell: function (r) {
         return S.esc(r.username_snapshot) +
-          '<div class="who-cell__sub">' + S.esc(r.role_snapshot) + '</div>';
+          '<div class="who-cell__sub">' + S.esc(App.Q.roleLabel(r.role_snapshot)) +
+          '</div>';
       } },
       { head: 'Action', cell: function (r) {
-        return '<code>' + S.esc(r.action_type) + '</code>';
+        return S.esc(App.Q.actionLabel(r.action_type));
       } },
-      { head: 'Target', cls: 'mono', cell: function (r) {
-        return S.esc(r.target_entity) + (r.target_id ? ' #' + r.target_id : '');
+      { head: 'Target', cell: function (r) {
+        return S.esc(App.Q.entityLabel(r.target_entity)) +
+          (r.target_id ? ' <span class="muted">no. ' + r.target_id + '</span>' : '');
       } },
       { head: 'Description', cell: function (r) { return S.esc(r.description || ''); } }
     ], App.Q.auditLog()) +

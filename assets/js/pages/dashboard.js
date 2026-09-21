@@ -41,19 +41,19 @@
 
   function occupancyRegion() {
     S.el('#occupancy').innerHTML = S.owned(
-      'Andrew Jacob E. Santos', 'Room occupancy chart',
+      'Andrew Jacob E. Santos', null,
       'Rooms held per night across the coming week.');
   }
 
   function stockRegion() {
     S.el('#stock').innerHTML = S.owned(
-      'Andrew Jacob E. Santos', 'Canteen stock levels',
+      'Andrew Jacob E. Santos', null,
       'Current quantity for each item against its reorder point.');
   }
 
   function alertsRegion() {
     S.el('#alerts').innerHTML =
-      S.owned('Andrew Jacob E. Santos', 'Low stock alerts',
+      S.owned('Andrew Jacob E. Santos', null,
         'Items that have fallen to or below their reorder point.');
   }
 

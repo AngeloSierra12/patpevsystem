@@ -28,7 +28,7 @@
       { head: 'Code', cls: 'mono', cell: function (i) { return S.esc(i.item_code); } },
       { head: 'Item', cell: function (i) { return S.esc(i.item_name); } },
       { head: 'Category', cell: function (i) {
-        return S.esc(i.category.replace(/_/g, ' '));
+        return S.esc(App.Q.category(i.category));
       } },
       { head: 'Stock', cls: 'table__num mono', cell: function (i) {
         return i.current_stock + ' ' + S.esc(i.unit);
@@ -40,7 +40,7 @@
         'Recording stock in and out, and raising alerts at the reorder point.');
 
     S.el('#pending').innerHTML = S.owned(
-      'Darren Jude S. Tamayo', 'Stock movement, suppliers and deliveries',
+      'Darren Jude S. Tamayo', null,
       'Stock in and out, supplier records, delivery logs and consumption.');
   });
 

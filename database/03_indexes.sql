@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- BPSU IGP PATVEP HOSTEL & UNIVERSITY CANTEEN SYSTEM
 -- File: 03_indexes.sql
 -- Purpose: Additional composite and covering indexes for query performance
@@ -22,7 +22,12 @@ CREATE INDEX idx_pay_method_date
     ON payments (payment_method, payment_date);
 
 -- ── INVENTORY_ITEMS ──────────────────────────────────────────────────────────
--- Low-stock dashboard: find items where current_stock <= reorder_level
+-- Low-stock dashboard index.
+-- Leading column is_active = 1 allows MariaDB to efficiently filter active items.
+-- NOTE: The column-vs-column comparison (current_stock <= reorder_level) cannot
+-- be resolved by an index alone — MariaDB evaluates it as a row filter after
+-- the is_active range scan. This index is still beneficial because the is_active
+-- prefix significantly narrows the scan before the comparison is applied.
 CREATE INDEX idx_items_low_stock
     ON inventory_items (is_active, current_stock, reorder_level);
 

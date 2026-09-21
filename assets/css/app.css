@@ -140,8 +140,12 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
   box-shadow: inset 0 -3px 0 var(--red-700);
   display: flex; align-items: center; gap: 12px; padding: 0 16px; z-index: 30;
 }
-.topbar__title { font-size: 14px; font-weight: 600; }
 .topbar__spacer { flex: 1; }
+/* the section, not the page: the <h1> below already names the page */
+.topbar__section {
+  font-size: 12px; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--ink-500);
+}
 .topbar__label { font-size: 11.5px; color: var(--ink-500); }
 
 .who {
@@ -242,6 +246,9 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
 .table tbody tr:last-child td { border-bottom: none; }
 .table tbody tr:hover { background: var(--red-050); }
 .table__num { text-align: right; }
+/* an item code, a room number or a peso figure split across two lines reads as
+   two values. None of them are long enough to be worth wrapping. */
+.table td.mono, .table td.table__num { white-space: nowrap; }
 .table__act { text-align: right; white-space: nowrap; }
 
 .who-cell { display: flex; align-items: center; gap: 9px; }
@@ -378,6 +385,9 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
   border-bottom: 1px solid var(--line);
 }
 .label code { margin-left: auto; font-size: 9.5px; }
+.muted { color: var(--ink-500); }
+.repblock { margin-bottom: 16px; }
+.repblock:last-child { margin-bottom: 0; }
 
 /* key/value */
 .kv { display: grid; grid-template-columns: 140px minmax(0,1fr); gap: 6px 13px; font-size: 12.5px; }
@@ -423,13 +433,42 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
 }
 .status__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--warn-700); }
 .status__spacer { flex: 1; }
+.status__role { white-space: nowrap; }
 
 /* --------------------------------------------------------- 6. Responsive */
 @media (max-width: 1150px) {
   .grid--side { grid-template-columns: minmax(0,1fr); }
 }
+/* ---------------------------------------------------------------------- *
+ * Phones. A six column table cannot fit in 375px: it either scrolls sideways
+ * out of sight or squeezes every word onto its own line. So each row is
+ * re-laid as a card that prints its own labels from data-label.
+ * ---------------------------------------------------------------------- */
 @media (max-width: 800px) {
   :root { --sidebar: 0px; }
+
+  .status__role { display: none; }
+
+  .tablewrap { overflow-x: visible; }
+  .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
+  .table thead { display: none; }
+  .table tr { padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  .table tbody tr:last-child { border-bottom: none; }
+  .table td {
+    display: flex; gap: 10px; align-items: baseline;
+    padding: 2px 0; border: none;
+  }
+  .table td::before {
+    content: attr(data-label);
+    flex: 0 0 7.5em;
+    font-size: 10px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-500);
+  }
+  /* the leading cell identifies the record, so it reads as the card's heading */
+  .table td:first-child { padding-bottom: 6px; font-size: 13px; font-weight: 600; }
+  .table td:first-child::before { display: none; }
+  .table td.table__num, .table td.table__act { text-align: left; }
+
   .sidebar {
     width: 220px; transform: translateX(-220px);
     transition: transform .2s; box-shadow: 0 0 40px rgba(0,0,0,.3);
