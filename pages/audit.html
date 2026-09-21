@@ -25,6 +25,19 @@
 
     <section class="panel">
       <div class="panel__head"><span class="panel__title">Activity log</span></div>
+      <div class="toolbar">
+        <div class="toolbar__search">
+          <label class="sr-only" for="q">Search the log</label>
+          <span data-icon="search"></span>
+          <input class="input input--sm" id="q" type="search"
+                 placeholder="Search user, action or description">
+        </div>
+        <label class="sr-only" for="fAction">Filter by action</label>
+        <select class="select select--sm" id="fAction"><option value="all">All actions</option></select>
+        <label class="sr-only" for="fEntity">Filter by area</label>
+        <select class="select select--sm" id="fEntity"><option value="all">All areas</option></select>
+        <span class="toolbar__count" id="count"></span>
+      </div>
       <div class="panel__body panel__body--flush" id="log"></div>
     </section>
 
