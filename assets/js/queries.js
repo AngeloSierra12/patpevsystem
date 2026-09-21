@@ -185,9 +185,96 @@
     });
   }
 
+  /* --- dashboard reads ------------------------------------------------- *
+   * These mirror what vw_occupancy_report and vw_room_availability answer.
+   * Room status is the live column; occupancy across nights is computed from
+   * the reservation dates, because a room being held on a future night is not
+   * something rooms.status can express.
+   * --------------------------------------------------------------------- */
+
+  var HELD = ['CONFIRMED', 'CHECKED_IN', 'PENDING'];
+
+  function roomsByStatus() {
+    var out = { AVAILABLE: 0, OCCUPIED: 0, RESERVED: 0, MAINTENANCE: 0 };
+    DB.rooms.forEach(function (r) { out[r.status] = (out[r.status] || 0) + 1; });
+    return out;
+  }
+
+  /* rooms in service = everything not out for maintenance. Counting a room
+     under repair as "unsold" would understate how full the hostel really is. */
+  function occupancyRate() {
+    var by = roomsByStatus();
+    var inService = DB.rooms.length - (by.MAINTENANCE || 0);
+    if (!inService) return 0;
+    return Math.round(((by.OCCUPIED || 0) + (by.RESERVED || 0)) / inService * 100);
+  }
+
+  function heldOn(dayIso) {
+    return DB.reservations.filter(function (r) {
+      return HELD.indexOf(r.status) !== -1 &&
+             r.check_in_date <= dayIso && dayIso < r.check_out_date;
+    });
+  }
+
+  function arrivalsOn(dayIso) {
+    return DB.reservations.filter(function (r) {
+      return r.status !== 'CANCELLED' && r.check_in_date === dayIso;
+    });
+  }
+
+  function departuresOn(dayIso) {
+    return DB.reservations.filter(function (r) {
+      return r.status !== 'CANCELLED' && r.check_out_date === dayIso;
+    });
+  }
+
+  /* Seven nights of room occupancy. Starts today, but if nothing at all is
+     held in that week the window slides back to the last week that had
+     bookings, and says so — an empty chart tells the reader nothing, and
+     "no bookings this week" is itself worth reporting. */
+  function occupancyWeek(startIso) {
+    var S = App.Shell;
+    var start = startIso || S.today();
+    function week(from) {
+      var days = [];
+      for (var i = 0; i < 7; i++) {
+        var d = S.addDays(from, i);
+        days.push({ date: d, held: heldOn(d).length });
+      }
+      return days;
+    }
+    var days = week(start);
+    var total = days.reduce(function (n, d) { return n + d.held; }, 0);
+    if (total) return { days: days, shifted: false, start: start };
+
+    var latest = DB.reservations.filter(function (r) {
+      return HELD.indexOf(r.status) !== -1;
+    }).map(function (r) { return r.check_in_date; }).sort().pop();
+    if (!latest) return { days: days, shifted: false, start: start };
+    return { days: week(latest), shifted: true, start: latest };
+  }
+
+  /* every item, ordered worst first, for the stock panel */
+  function stockLevels() {
+    return DB.inventory_items.slice().sort(function (a, b) {
+      return (a.current_stock / (a.reorder_level || 1)) -
+             (b.current_stock / (b.reorder_level || 1));
+    });
+  }
+
+  function stockState(i) {
+    var n = Number(i.current_stock);
+    if (n <= Number(i.critical_level)) return { tag: 'stop', text: 'Critical' };
+    if (n <= Number(i.reorder_level))  return { tag: 'warn', text: 'Reorder' };
+    return { tag: 'ok', text: 'OK' };
+  }
+
   App.Q = {
     by: by, one: one,
     roleLabel: roleLabel, resStatus: resStatus, roomStatus: roomStatus,
+    roomsByStatus: roomsByStatus, occupancyRate: occupancyRate,
+    heldOn: heldOn, arrivalsOn: arrivalsOn, departuresOn: departuresOn,
+    occupancyWeek: occupancyWeek, stockLevels: stockLevels, stockState: stockState,
     actionLabel: actionLabel, entityLabel: entityLabel, category: category,
     me: me,
     reservationSummary: reservationSummary,

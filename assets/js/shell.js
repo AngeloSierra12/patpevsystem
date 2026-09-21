@@ -32,11 +32,25 @@
 
   var MONTHS = ['January','February','March','April','May','June','July',
                 'August','September','October','November','December'];
+  var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+  function iso(d) {
+    /* local date, never toISOString(): that converts to UTC first, which in
+       Philippine time lands the day before. */
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+           '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function today() { return iso(new Date()); }
   function parseIso(s) {
     var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || ''));
     return m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
   }
+  function addDays(s, n) {
+    var d = parseIso(s); if (!d) return '';
+    d.setDate(d.getDate() + n); return iso(d);
+  }
+  function dayNum(s) { var d = parseIso(s); return d ? d.getDate() : ''; }
+  function dowShort(s) { var d = parseIso(s); return d ? DOW[d.getDay()] : ''; }
   function shortDate(s) {
     var d = parseIso(s); if (!d) return '—';
     return MONTHS[d.getMonth()].slice(0,3) + ' ' + d.getDate();
@@ -56,6 +70,8 @@
     plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
     search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
     info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+    alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
     clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>'
   };
@@ -233,6 +249,8 @@
   App.Shell = {
     mount: mount, icon: icon, meta: meta, owned: owned, table: table,
     esc: esc, el: el, els: els, peso: peso, initials: initials,
-    shortDate: shortDate, MONTHS: MONTHS
+    iso: iso, today: today, parseIso: parseIso, addDays: addDays,
+    dayNum: dayNum, dowShort: dowShort, shortDate: shortDate,
+    MONTHS: MONTHS, DOW: DOW
   };
 })(window.App = window.App || {});

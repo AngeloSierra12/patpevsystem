@@ -393,6 +393,27 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
 .kv { display: grid; grid-template-columns: 140px minmax(0,1fr); gap: 6px 13px; font-size: 12.5px; }
 .kv__k { color: var(--ink-500); font-size: 11.5px; }
 
+/* seven-night occupancy columns */
+.cols { display: flex; align-items: flex-end; gap: 6px; height: 132px; padding-top: 4px; }
+.col { flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-end;
+       height: 100%; min-width: 0; }
+.col__bar {
+  background: var(--red-700); border-radius: 2px 2px 0 0; min-height: 2px;
+  position: relative;
+}
+.col__bar--none { background: var(--line-soft); }
+.col__n {
+  position: absolute; top: -15px; left: 0; right: 0; text-align: center;
+  font-family: var(--mono); font-size: 10px; color: var(--ink-700);
+}
+.col__foot {
+  text-align: center; font-size: 10px; color: var(--ink-500);
+  padding-top: 5px; border-top: 1px solid var(--line); margin-top: 4px;
+  white-space: nowrap; overflow: hidden;
+}
+.col--today .col__bar { background: var(--red-600); box-shadow: 0 0 0 2px var(--red-100); }
+.col--today .col__foot { color: var(--red-700); font-weight: 600; }
+
 /* bars */
 .bar { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
 .bar__label { flex: 0 0 160px; font-size: 12px; overflow: hidden;
@@ -416,6 +437,11 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
 .cal__day:nth-child(7n) { border-right: none; }
 .cal__day.is-out { background: var(--surface-2); color: var(--ink-400); }
 .cal__day.is-today { background: var(--red-050); box-shadow: inset 0 2px 0 var(--red-700); }
+.cal__day[data-day] { cursor: pointer; }
+.cal__day[data-day]:hover { background: var(--surface-2); }
+.cal__day.is-picked { background: var(--red-100); box-shadow: inset 0 0 0 2px var(--red-700); }
+.cal__day.is-picked:hover { background: var(--red-100); }
+.cal__pill--more { background: var(--surface-2); color: var(--ink-500); }
 .cal__num { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--ink-700); }
 .cal__day.is-today .cal__num { color: var(--red-700); font-weight: 700; }
 .cal__pill {
