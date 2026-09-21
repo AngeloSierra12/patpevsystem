@@ -230,6 +230,105 @@
       '</tbody></table></div>';
   }
 
+  /* --- modal --------------------------------------------------------------- *
+   * One dialog, used by every form on the system. Closes on the X, on Escape,
+   * and on a click outside the box; focus moves into it on open and back to
+   * whatever opened it on close.
+   * ------------------------------------------------------------------------ */
+  function dialog(opts) {
+    var wrap = document.createElement('div');
+    wrap.className = 'modal';
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-modal', 'true');
+    wrap.innerHTML =
+      '<div class="modal__box">' +
+        '<div class="modal__head">' +
+          '<span class="modal__title">' + esc(opts.title) + '</span>' +
+          '<button class="modal__x" aria-label="Close">×</button>' +
+        '</div>' +
+        '<div class="modal__body">' + opts.body + '</div>' +
+        '<div class="modal__foot">' +
+          '<button class="btn" data-x>' + esc(opts.cancelText || 'Cancel') + '</button>' +
+          (opts.okText ? '<button class="btn btn--go" data-ok>' + esc(opts.okText) +
+            '</button>' : '') +
+        '</div>' +
+      '</div>';
+
+    var opener = document.activeElement;
+    function close() {
+      wrap.remove();
+      document.removeEventListener('keydown', onKey);
+      if (opener && opener.focus) opener.focus();
+    }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+
+    wrap.addEventListener('click', function (e) {
+      if (e.target === wrap || e.target.closest('[data-x]') || e.target.closest('.modal__x')) {
+        close();
+      }
+    });
+    document.addEventListener('keydown', onKey);
+
+    document.body.appendChild(wrap);
+    fillIcons(wrap);
+    var ok = el('[data-ok]', wrap);
+    if (ok && opts.onOk) {
+      ok.addEventListener('click', function () {
+        if (opts.onOk(wrap) !== false) close();
+      });
+    }
+    var first = el('input, select, textarea', wrap);
+    (first || el('.modal__x', wrap)).focus();
+    return { root: wrap, close: close };
+  }
+
+  /* --- the record a form would write --------------------------------------- *
+   * There is no API yet, so a form that reported "Saved" would be lying. It
+   * shows the row it would write instead. That is honest, and it doubles as
+   * the contract the endpoint has to accept: these are the schema's own
+   * column names, in the schema's own types.
+   * ------------------------------------------------------------------------ */
+  function wouldWrite(table, record, note) {
+    var body = Object.keys(record).map(function (k) {
+      var v = record[k];
+      var shown = v === null ? 'NULL'
+                : typeof v === 'number' ? String(v)
+                : "'" + String(v).replace(/'/g, "''") + "'";
+      return '  <b>' + esc(k) + '</b>: ' + esc(shown);
+    }).join('\n');
+
+    return '<div class="note note--flat" style="margin-bottom:12px">' +
+        '<span class="note__icon">' + icon('info', 15) + '</span>' +
+        '<div>' + esc(note || ('This is the row that would be written to ' + table +
+          '. Saving needs the API layer, which is a separate task.')) + '</div>' +
+      '</div>' +
+      '<pre class="payload">INSERT INTO ' + esc(table) + '\n' + body + '</pre>';
+  }
+
+  /* --- form reading and validation ----------------------------------------- */
+  function readForm(root) {
+    var out = {};
+    els('[name]', root).forEach(function (f) {
+      out[f.name] = f.type === 'checkbox' ? (f.checked ? 1 : 0) : f.value.trim();
+    });
+    return out;
+  }
+
+  function markErrors(root, errors) {
+    els('.field__err', root).forEach(function (e) { e.remove(); });
+    els('.is-bad', root).forEach(function (e) { e.classList.remove('is-bad'); });
+    Object.keys(errors).forEach(function (name) {
+      var f = el('[name="' + name + '"]', root);
+      if (!f) return;
+      f.classList.add('is-bad');
+      f.insertAdjacentHTML('afterend',
+        '<div class="field__err">' + esc(errors[name]) + '</div>');
+    });
+    var first = el('.is-bad', root);
+    if (first) first.focus();
+    return !Object.keys(errors).length;
+  }
+
   /* --- the marker for work that belongs to someone else -------------------- *
    * Used wherever a screen has a real place for a feature this developer does
    * not own. It states what goes there and who is building it, so the shell is
@@ -248,6 +347,8 @@
 
   App.Shell = {
     mount: mount, icon: icon, meta: meta, owned: owned, table: table,
+    dialog: dialog, wouldWrite: wouldWrite, readForm: readForm,
+    markErrors: markErrors, fillIcons: fillIcons,
     esc: esc, el: el, els: els, peso: peso, initials: initials,
     iso: iso, today: today, parseIso: parseIso, addDays: addDays,
     dayNum: dayNum, dowShort: dowShort, shortDate: shortDate,
