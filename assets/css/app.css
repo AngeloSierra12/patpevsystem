@@ -254,6 +254,9 @@ table td, table th, .num { font-variant-numeric: tabular-nums; }
 /* an item code, a room number or a peso figure split across two lines reads as
    two values. None of them are long enough to be worth wrapping. */
 .table td.mono, .table td.table__num { white-space: nowrap; }
+/* a reservations guest name and its date range read as one value each, so
+   neither should be broken across lines while the row has width to spare */
+.table td.nowrap { white-space: nowrap; }
 .table__act { text-align: right; white-space: nowrap; }
 
 .who-cell { display: flex; align-items: center; gap: 9px; }

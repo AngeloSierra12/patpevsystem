@@ -82,7 +82,7 @@
     { head: 'Reference', cls: 'mono', cell: function (r) {
       return '<strong>' + S.esc(r.reference_number) + '</strong>';
     } },
-    { head: 'Guest', cell: function (r) {
+    { head: 'Guest', cls: 'nowrap', cell: function (r) {
       var g = Q.one(App.DB.guests, 'guest_id', r.guest_id);
       return '<a href="#" data-guest="' + r.guest_id + '">' +
         S.esc(g ? g.full_name : 'Unknown') + '</a>';
@@ -90,7 +90,7 @@
     { head: 'Room', cls: 'mono', cell: function (r) {
       return S.esc(r.room_number_snapshot);
     } },
-    { head: 'Nights', cell: function (r) {
+    { head: 'Nights', cls: 'nowrap', cell: function (r) {
       return S.esc(S.shortDate(r.check_in_date)) + ' – ' +
              S.esc(S.shortDate(r.check_out_date)) +
              '<div class="who-cell__sub">' + r.total_nights + ' nights</div>';
