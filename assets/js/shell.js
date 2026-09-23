@@ -4,10 +4,9 @@
  *
  * Draws the sidebar, top bar and status strip, then hands control to the page.
  *
- * This is a UI shell for early research and development. Screens show their
- * real structure and controls; the logic behind them belongs to modules that
- * have not been written yet, and each of those areas names its owner on screen
- * rather than pretending to work.
+ * Every screen is built. What is missing is the API layer that would make the
+ * writes persist, so each form validates fully and then prints the row it
+ * would send rather than reporting a save that did not happen.
  * ========================================================================== */
 (function (App) {
   'use strict';
@@ -330,26 +329,10 @@
     return !Object.keys(errors).length;
   }
 
-  /* --- the marker for work that belongs to someone else -------------------- *
-   * Used wherever a screen has a real place for a feature this developer does
-   * not own. It states what goes there and who is building it, so the shell is
-   * honest about its own boundaries.                                         */
-  function owned(who, what, detail) {
-    /* `what` is optional, and should be left out whenever this marker sits
-       inside a panel whose heading already names the region. Passing it anyway
-       printed the heading twice, one line apart — which reads as a rendering
-       fault on a phone, where the panels stack. */
-    return '<div class="pending">' +
-      (what ? '<div class="pending__title">' + esc(what) + '</div>' : '') +
-      '<div class="pending__text">' + esc(detail || '') + '</div>' +
-      '<span class="pending__who">To be built by ' + esc(who) + '</span>' +
-      '</div>';
-  }
-
   App.Shell = {
-    mount: mount, icon: icon, meta: meta, owned: owned, table: table,
+    mount: mount, icon: icon, meta: meta, table: table,
     dialog: dialog, wouldWrite: wouldWrite, readForm: readForm,
-    markErrors: markErrors, fillIcons: fillIcons,
+    markErrors: markErrors,
     esc: esc, el: el, els: els, peso: peso, initials: initials,
     iso: iso, today: today, parseIso: parseIso, addDays: addDays,
     dayNum: dayNum, dowShort: dowShort, shortDate: shortDate,

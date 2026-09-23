@@ -86,28 +86,6 @@
     return one(DB.users, 'username', 'admin') || DB.users[0];
   }
 
-  /* --- vw_reservation_summary --------------------------------------------- */
-  function reservationSummary() {
-    return DB.reservations.map(function (r) {
-      var g = one(DB.guests, 'guest_id', r.guest_id);
-      return {
-        reservation_id: r.reservation_id,
-        reference_number: r.reference_number,
-        guest_name: g ? g.full_name : '',
-        room_number: r.room_number_snapshot,
-        room_type: r.room_type_snapshot,
-        check_in_date: r.check_in_date,
-        check_out_date: r.check_out_date,
-        total_nights: r.total_nights,
-        number_of_guests: r.number_of_guests,
-        total_amount: r.total_amount,
-        paid_amount: r.paid_amount,
-        balance: r.balance,
-        status: r.status
-      };
-    });
-  }
-
   /* --- vw_guest_history --------------------------------------------------- */
   function guestHistory(guestId) {
     return by(DB.reservations, 'guest_id', guestId).sort(function (a, b) {
@@ -270,14 +248,13 @@
   }
 
   App.Q = {
-    by: by, one: one,
+    one: one,
     roleLabel: roleLabel, resStatus: resStatus, roomStatus: roomStatus,
     roomsByStatus: roomsByStatus, occupancyRate: occupancyRate,
     heldOn: heldOn, arrivalsOn: arrivalsOn, departuresOn: departuresOn,
     occupancyWeek: occupancyWeek, stockLevels: stockLevels, stockState: stockState,
     actionLabel: actionLabel, entityLabel: entityLabel, category: category,
     me: me,
-    reservationSummary: reservationSummary,
     guestHistory: guestHistory,
     paymentsFor: paymentsFor,
     revenueCollected: revenueCollected,

@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 
+# Local dev tooling: the no-cache server and its launch config are for this
+# machine, not for the team or the turnover package
+.claude/
+
 # Editor and OS clutter
 .vscode/
 .idea/

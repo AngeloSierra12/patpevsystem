@@ -56,20 +56,21 @@ for project status. `SCOPE-CHECK.md` measures the build against the charter.
 
 ## Wireframe document
 
-`wireframes/PATVEP-UI-Wireframes.pdf` — 8 pages, A4 landscape.
+`wireframes/PATVEP-UI-Wireframes.html` — four sheets, open it in any browser.
 
-Delivered as a **separate PDF, deliberately not a page inside the site**. A
-wireframe is a design document for the team, not a feature for the user.
+Low fidelity on purpose: grey blocks, placeholder lines and region labels, no
+colour and no real content. A wireframe settles where things sit and what
+outranks what; colour and wording are decided afterwards, deliberately.
 
-Four wireframes are drawn in full with numbered annotations explaining each
-layout decision. Three are placeholder pages for the screens Andrew Santos is
-wireframing, listing what each should cover.
+| Sheet | WBS | Screen |
+|---|---|---|
+| 01 | 8.1 | Dashboard |
+| 02 | 6.1 | Scheduling & Calendar |
+| 03 | 7.1 | Audit Trail |
+| 04 | 9.1 | Reports |
 
-Regenerate it after a layout change:
-
-```bash
-python scripts/genwireframes.py
-```
+User Management (3.1), Canteen Inventory (4.1) and Hotel Reservation (5.1) are
+Andrew Santos' wireframing tasks and are not in this set.
 
 ---
 
@@ -96,11 +97,9 @@ assets/
     pages/               One file per screen
 database/                Project schema (MariaDB 10.4), 7 SQL files + DBML
 scripts/
-  genwireframes.py       Builds the wireframe PDF
   sql2js.py              Regenerates data.js from the seed
 wireframes/
-  PATVEP-UI-Wireframes.pdf
-_archive-v1/             Previous build, kept for reference
+  PATVEP-UI-Wireframes.html
 ```
 
 ---

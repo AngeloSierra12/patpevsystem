@@ -1,0 +1,458 @@
+<title>PATVEP Wireframe Set</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper:      #fbfaf9;
+    --sheet:      #ffffff;
+    --ink:        #1a1818;
+    --ink-soft:   #5c5755;
+    --label:      #8a8483;
+    --rule:       #d9d5d3;
+    --rule-soft:  #ebe8e6;
+    --fill:       #e6e3e1;
+    --fill-deep:  #d2cecb;
+    --line:       #cfcbc8;
+    --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #17161a;  --sheet: #201e23;  --ink: #f0eeec;  --ink-soft: #a9a3a0;
+      --label: #8b8481;  --rule: #3a373d;   --rule-soft: #2b292f;
+      --fill: #333037;   --fill-deep: #423e46; --line: #46424b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #17161a;  --sheet: #201e23;  --ink: #f0eeec;  --ink-soft: #a9a3a0;
+    --label: #8b8481;  --rule: #3a373d;   --rule-soft: #2b292f;
+    --fill: #333037;   --fill-deep: #423e46; --line: #46424b;
+  }
+
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 64px; }
+
+  /* ---- masthead ---- */
+  .mast { border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 8px; }
+  .mast__kicker {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--label);
+  }
+  .mast h1 {
+    font-size: clamp(26px, 5vw, 40px); font-weight: 600; letter-spacing: -.02em;
+    margin: 8px 0 10px; text-wrap: balance; line-height: 1.1;
+  }
+  .mast p { max-width: 62ch; color: var(--ink-soft); font-size: 14.5px; line-height: 1.6; }
+  .mast__meta {
+    display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 16px;
+    font-family: var(--mono); font-size: 11.5px; color: var(--label);
+  }
+  .mast__meta b { color: var(--ink-soft); font-weight: 500; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center;
+    padding: 12px 0 0; margin-bottom: 30px;
+    font-family: var(--mono); font-size: 11px; color: var(--label);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .key { width: 24px; height: 11px; border: 1px solid var(--line); flex: none; }
+  .key--fill { background: var(--fill); }
+  .key--text { border: 0; height: 3px; background: var(--line); }
+  .key--box  { background: transparent; }
+
+  /* ---- sheets ---- */
+  .set { display: grid; gap: 40px; }
+  .sheet { border-top: 1px solid var(--rule); padding-top: 22px; }
+  .sheet__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+  .sheet__no {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    color: var(--label); text-transform: uppercase;
+  }
+  .sheet__name { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+  .sheet__wbs {
+    font-family: var(--mono); font-size: 11px; color: var(--ink-soft);
+    border: 1px solid var(--rule); padding: 2px 7px;
+  }
+  .sheet__note {
+    max-width: 68ch; color: var(--ink-soft); font-size: 13.5px;
+    line-height: 1.6; margin: 8px 0 18px;
+  }
+
+  .plates { display: grid; grid-template-columns: 1fr 188px; gap: 18px; align-items: start; }
+  @media (max-width: 720px) { .plates { grid-template-columns: 1fr; } }
+
+  .plate { background: var(--sheet); border: 1px solid var(--rule); padding: 10px; }
+  .plate__cap {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--label); padding-bottom: 8px;
+  }
+
+  /* ---- the wireframe drawing itself ---- */
+  .wf { display: grid; grid-template-columns: 62px 1fr; border: 1px solid var(--line); }
+  .wf--sm { grid-template-columns: 1fr; }
+  .rail { border-right: 1px solid var(--line); padding: 7px 6px; display: grid; gap: 5px; align-content: start; }
+  .rail .bar { height: 7px; background: var(--fill); }
+  .rail .bar--on { background: var(--fill-deep); }
+  .rail .cap { height: 5px; width: 60%; background: var(--line); margin-top: 5px; }
+
+  .body { display: grid; gap: 7px; padding: 7px; align-content: start; }
+  .top { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--line);
+         margin: -7px -7px 0; padding: 6px 7px; }
+  .top .w { height: 7px; background: var(--fill); }
+  .top .grow { flex: 1; }
+
+  .box { border: 1px solid var(--line); padding: 6px; display: grid; gap: 5px; align-content: start; }
+  .box__t {
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--label);
+  }
+  .fill { background: var(--fill); }
+  .txt { height: 4px; background: var(--line); }
+  .txt.w90 { width: 90%; } .txt.w70 { width: 70%; } .txt.w50 { width: 50%; } .txt.w35 { width: 35%; }
+
+  .row { display: grid; gap: 7px; }
+  .row--4 { grid-template-columns: repeat(4, 1fr); }
+  .row--3 { grid-template-columns: repeat(3, 1fr); }
+  .row--2 { grid-template-columns: repeat(2, 1fr); }
+  .row--side { grid-template-columns: 1fr 96px; }
+  .row--rev  { grid-template-columns: 116px 1fr; }
+
+  .chart { height: 74px; }
+  .chart--sm { height: 44px; }
+  .tall { height: 128px; }
+  .tall--sm { height: 70px; }
+
+  /* table stand-in: header strip then rows */
+  .tbl { display: grid; gap: 4px; }
+  .tbl .hr { display: grid; gap: 5px; grid-auto-flow: column; }
+  .tbl .hr i { height: 5px; background: var(--fill-deep); display: block; }
+  .tbl .rr { display: grid; gap: 5px; grid-auto-flow: column; padding-top: 3px;
+             border-top: 1px solid var(--rule-soft); }
+  .tbl .rr i { height: 4px; background: var(--line); display: block; }
+
+  /* month grid */
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal i { display: block; aspect-ratio: 1 / .78; border: 1px solid var(--rule-soft); }
+  .cal i.has { background: var(--fill); }
+
+  /* stacked cards, the phone pattern */
+  .cards { display: grid; gap: 5px; }
+  .card { border: 1px solid var(--line); padding: 5px; display: grid; gap: 4px; }
+
+  .foot {
+    margin-top: 44px; border-top: 1px solid var(--rule); padding-top: 16px;
+    font-family: var(--mono); font-size: 11px; color: var(--label);
+    display: flex; flex-wrap: wrap; gap: 6px 24px; justify-content: space-between;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="mast__kicker">Low-fidelity wireframe set &middot; Sheets 01&ndash;04</div>
+    <h1>PATVEP Hostel &amp; Canteen</h1>
+    <p>
+      Layout studies for the four screens assigned to the Frontend and UI/UX developer.
+      Deliberately rough: grey blocks, placeholder lines and region labels only. A
+      wireframe settles where things sit and what outranks what. Colour, wording and
+      real records are decided afterwards, on purpose.
+    </p>
+    <div class="mast__meta">
+      <span><b>Prepared by</b> Angelo Andrei P. Sierra</span>
+      <span><b>Course</b> BSIT-NW3A</span>
+      <span><b>Institution</b> Bataan Peninsula State University, Main Campus</span>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span><i class="key key--box"></i> region outline</span>
+    <span><i class="key key--fill"></i> chart, image or figure</span>
+    <span><i class="key key--text"></i> line of text</span>
+    <span>UPPERCASE&nbsp;MONO = region name</span>
+  </div>
+
+  <div class="set">
+
+    <!-- ============================ SHEET 01 ============================ -->
+    <section class="sheet">
+      <div class="sheet__head">
+        <span class="sheet__no">Sheet 01</span>
+        <h2 class="sheet__name">Dashboard</h2>
+        <span class="sheet__wbs">WBS 8.1</span>
+      </div>
+      <p class="sheet__note">
+        Four figures across the top, never five &mdash; a fifth wraps the row on a laptop
+        and flattens the hierarchy. Occupancy gets the largest block because it is the
+        question staff arrive with. Alerts sit as a list, not a chart: a warning has to
+        name the item.
+      </p>
+      <div class="plates">
+        <div class="plate">
+          <div class="plate__cap">Desktop &mdash; 1440</div>
+          <div class="wf">
+            <div class="rail">
+              <div class="cap"></div>
+              <div class="bar bar--on"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar"></div><div class="cap"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <div class="body">
+              <div class="top"><i class="w" style="width:74px"></i><i class="w grow"></i><i class="w" style="width:46px"></i></div>
+              <div class="row row--4">
+                <div class="box"><div class="box__t">stat</div><div class="txt w70"></div><div class="fill" style="height:16px"></div></div>
+                <div class="box"><div class="box__t">stat</div><div class="txt w70"></div><div class="fill" style="height:16px"></div></div>
+                <div class="box"><div class="box__t">stat</div><div class="txt w70"></div><div class="fill" style="height:16px"></div></div>
+                <div class="box"><div class="box__t">stat</div><div class="txt w70"></div><div class="fill" style="height:16px"></div></div>
+              </div>
+              <div class="row row--side">
+                <div class="box"><div class="box__t">occupancy chart</div><div class="fill chart"></div></div>
+                <div class="box"><div class="box__t">actions</div>
+                  <div class="txt w90"></div><div class="txt w90"></div><div class="txt w90"></div>
+                  <div class="txt w90"></div><div class="txt w90"></div><div class="txt w90"></div>
+                </div>
+              </div>
+              <div class="row row--side">
+                <div class="box"><div class="box__t">stock levels</div>
+                  <div class="txt w90"></div><div class="txt w70"></div>
+                  <div class="txt w90"></div><div class="txt w50"></div>
+                </div>
+                <div class="box"><div class="box__t">alerts</div>
+                  <div class="txt w90"></div><div class="txt w70"></div><div class="txt w90"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="plate">
+          <div class="plate__cap">Phone &mdash; 375</div>
+          <div class="wf wf--sm">
+            <div class="body">
+              <div class="top"><i class="w" style="width:14px"></i><i class="w grow"></i><i class="w" style="width:14px"></i></div>
+              <div class="row row--2">
+                <div class="box"><div class="box__t">stat</div><div class="fill" style="height:12px"></div></div>
+                <div class="box"><div class="box__t">stat</div><div class="fill" style="height:12px"></div></div>
+                <div class="box"><div class="box__t">stat</div><div class="fill" style="height:12px"></div></div>
+                <div class="box"><div class="box__t">stat</div><div class="fill" style="height:12px"></div></div>
+              </div>
+              <div class="box"><div class="box__t">occupancy</div><div class="fill chart--sm"></div></div>
+              <div class="box"><div class="box__t">alerts</div><div class="txt w90"></div><div class="txt w70"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SHEET 02 ============================ -->
+    <section class="sheet">
+      <div class="sheet__head">
+        <span class="sheet__no">Sheet 02</span>
+        <h2 class="sheet__name">Scheduling &amp; Calendar</h2>
+        <span class="sheet__wbs">WBS 6.1</span>
+      </div>
+      <p class="sheet__note">
+        The month grid takes the width because the whole point of the screen is seeing a
+        span of nights at once. Detail for the chosen day sits beside it rather than
+        below, so picking a date never scrolls the grid out of view.
+      </p>
+      <div class="plates">
+        <div class="plate">
+          <div class="plate__cap">Desktop &mdash; 1440</div>
+          <div class="wf">
+            <div class="rail">
+              <div class="cap"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar bar--on"></div><div class="cap"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            <div class="body">
+              <div class="top"><i class="w" style="width:74px"></i><i class="w grow"></i><i class="w" style="width:46px"></i></div>
+              <div class="row row--side">
+                <div class="box">
+                  <div class="box__t">month grid &mdash; one cell per night</div>
+                  <div class="cal">
+                    <i></i><i></i><i class="has"></i><i class="has"></i><i></i><i></i><i></i>
+                    <i></i><i class="has"></i><i class="has"></i><i class="has"></i><i></i><i></i><i></i>
+                    <i class="has"></i><i class="has"></i><i></i><i></i><i class="has"></i><i></i><i></i>
+                    <i></i><i></i><i class="has"></i><i></i><i></i><i></i><i></i>
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                  </div>
+                </div>
+                <div class="box" style="gap:7px">
+                  <div class="box__t">selected day</div>
+                  <div class="txt w90"></div><div class="txt w70"></div><div class="txt w90"></div>
+                  <div class="box__t" style="padding-top:6px">conflicts</div>
+                  <div class="txt w90"></div><div class="txt w50"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="plate">
+          <div class="plate__cap">Phone &mdash; 375</div>
+          <div class="wf wf--sm">
+            <div class="body">
+              <div class="top"><i class="w" style="width:14px"></i><i class="w grow"></i><i class="w" style="width:14px"></i></div>
+              <div class="box"><div class="box__t">month</div>
+                <div class="cal">
+                  <i></i><i></i><i class="has"></i><i class="has"></i><i></i><i></i><i></i>
+                  <i></i><i class="has"></i><i class="has"></i><i></i><i></i><i></i><i></i>
+                  <i class="has"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+              </div>
+              <div class="box"><div class="box__t">selected day</div><div class="txt w90"></div><div class="txt w70"></div></div>
+              <div class="box"><div class="box__t">conflicts</div><div class="txt w50"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SHEET 03 ============================ -->
+    <section class="sheet">
+      <div class="sheet__head">
+        <span class="sheet__no">Sheet 03</span>
+        <h2 class="sheet__name">Audit Trail</h2>
+        <span class="sheet__wbs">WBS 7.1</span>
+      </div>
+      <p class="sheet__note">
+        One table, nothing competing with it. The filter bar sits above the rows rather
+        than in a side panel, because narrowing the log is the only thing anyone does
+        here. No action column: the trail is read, never edited &mdash; that is what makes
+        it evidence.
+      </p>
+      <div class="plates">
+        <div class="plate">
+          <div class="plate__cap">Desktop &mdash; 1440</div>
+          <div class="wf">
+            <div class="rail">
+              <div class="cap"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar"></div><div class="cap"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar bar--on"></div>
+            </div>
+            <div class="body">
+              <div class="top"><i class="w" style="width:74px"></i><i class="w grow"></i><i class="w" style="width:46px"></i></div>
+              <div class="box" style="gap:7px">
+                <div class="box__t">filters</div>
+                <div class="row row--3">
+                  <div class="fill" style="height:13px"></div>
+                  <div class="fill" style="height:13px"></div>
+                  <div class="fill" style="height:13px"></div>
+                </div>
+              </div>
+              <div class="box">
+                <div class="box__t">log table &mdash; 5 columns</div>
+                <div class="tbl">
+                  <div class="hr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="rr"><i></i><i></i><i></i><i></i><i></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="plate">
+          <div class="plate__cap">Phone &mdash; 375</div>
+          <div class="wf wf--sm">
+            <div class="body">
+              <div class="top"><i class="w" style="width:14px"></i><i class="w grow"></i><i class="w" style="width:14px"></i></div>
+              <div class="box"><div class="box__t">filters</div><div class="fill" style="height:11px"></div></div>
+              <div class="box">
+                <div class="box__t">one card per entry</div>
+                <div class="cards">
+                  <div class="card"><div class="txt w50"></div><div class="txt w90"></div><div class="txt w70"></div></div>
+                  <div class="card"><div class="txt w50"></div><div class="txt w90"></div><div class="txt w70"></div></div>
+                  <div class="card"><div class="txt w50"></div><div class="txt w90"></div><div class="txt w70"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SHEET 04 ============================ -->
+    <section class="sheet">
+      <div class="sheet__head">
+        <span class="sheet__no">Sheet 04</span>
+        <h2 class="sheet__name">Reports</h2>
+        <span class="sheet__wbs">WBS 9.1</span>
+      </div>
+      <p class="sheet__note">
+        Output on the left, controls on the right. The controls are a short stacked form,
+        not a toolbar, because choosing a report is a sequence &mdash; type, then range,
+        then generate &mdash; and a stack reads in that order. Output keeps the width so a
+        wide table does not have to scroll sideways.
+      </p>
+      <div class="plates">
+        <div class="plate">
+          <div class="plate__cap">Desktop &mdash; 1440</div>
+          <div class="wf">
+            <div class="rail">
+              <div class="cap"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar"></div><div class="cap"></div>
+              <div class="bar"></div><div class="bar bar--on"></div><div class="bar"></div>
+            </div>
+            <div class="body">
+              <div class="top"><i class="w" style="width:74px"></i><i class="w grow"></i><i class="w" style="width:46px"></i></div>
+              <div class="row row--side">
+                <div class="box">
+                  <div class="box__t">report output</div>
+                  <div class="tbl">
+                    <div class="hr"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="rr"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="rr"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="rr"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="rr"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="rr"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="rr"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                  </div>
+                  <div class="txt w35" style="justify-self:end;height:5px;background:var(--fill-deep)"></div>
+                </div>
+                <div class="box" style="gap:8px">
+                  <div class="box__t">controls</div>
+                  <div class="txt w50"></div><div class="fill" style="height:13px"></div>
+                  <div class="txt w50"></div><div class="fill" style="height:13px"></div>
+                  <div class="txt w50"></div><div class="fill" style="height:13px"></div>
+                  <div class="fill" style="height:15px;background:var(--fill-deep)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="plate">
+          <div class="plate__cap">Phone &mdash; 375</div>
+          <div class="wf wf--sm">
+            <div class="body">
+              <div class="top"><i class="w" style="width:14px"></i><i class="w grow"></i><i class="w" style="width:14px"></i></div>
+              <div class="box"><div class="box__t">controls</div>
+                <div class="fill" style="height:11px"></div>
+                <div class="fill" style="height:11px"></div>
+                <div class="fill" style="height:13px;background:var(--fill-deep)"></div>
+              </div>
+              <div class="box"><div class="box__t">output</div>
+                <div class="cards">
+                  <div class="card"><div class="txt w70"></div><div class="txt w90"></div></div>
+                  <div class="card"><div class="txt w70"></div><div class="txt w90"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="foot">
+    <span>Sheets 01&ndash;04 &middot; assigned to A. Sierra</span>
+    <span>3.1 User Management, 4.1 Canteen Inventory, 5.1 Hotel Reservation &rarr; A. Santos</span>
+  </div>
+
+</div>
