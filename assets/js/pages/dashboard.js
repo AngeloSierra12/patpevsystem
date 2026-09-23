@@ -18,9 +18,10 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     S.mount({ title: 'Dashboard', nav: 'dashboard' });
-    S.meta([['Rooms', App.DB.rooms.length],
-            ['Reservations', App.DB.reservations.length],
-            ['Items', App.DB.inventory_items.length]]);
+    /* No meta line. The metric strip sits directly below and carries the same
+       figures with more behind them; printing both put the same numbers on
+       screen twice, two lines apart. */
+    S.meta([longToday()]);
 
     metrics();
     occupancy();
@@ -62,6 +63,12 @@
 
       tile('Low stock', low.length, low.length === 1 ? 'item' : 'items', '',
         critical.length ? critical.length + ' at critical level' : 'none critical');
+  }
+
+  function longToday() {
+    var d = new Date();
+    return S.DOW[d.getDay()] + ', ' + S.MONTHS[d.getMonth()] + ' ' +
+           d.getDate() + ', ' + d.getFullYear();
   }
 
   function tile(label, value, unit, extra, note) {

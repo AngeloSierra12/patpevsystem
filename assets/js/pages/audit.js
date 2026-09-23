@@ -95,9 +95,8 @@
     var actors = {};
     all.forEach(function (r) { actors[r.username_snapshot] = true; });
 
-    S.meta([['Entries', all.length],
-            ['Users', Object.keys(actors).length],
-            'append only']);
+    /* the toolbar count prints the entry total */
+    S.meta([['Users', Object.keys(actors).length], 'append only']);
 
     S.el('#count').textContent =
       list.length === all.length ? all.length + ' entries'

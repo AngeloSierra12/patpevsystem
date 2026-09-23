@@ -101,8 +101,9 @@
     var counts = {};
     all.forEach(function (u) { counts[u.role] = (counts[u.role] || 0) + 1; });
 
-    S.meta([['Accounts', all.length],
-            ['Admin', counts.ADMIN || 0],
+    /* the toolbar count already prints the total, so meta carries only the
+       breakdown it cannot show */
+    S.meta([['Admin', counts.ADMIN || 0],
             ['Hostel', counts.STAFF_HOSTEL || 0],
             ['Canteen', counts.STAFF_CANTEEN || 0],
             ['Guest', counts.GUEST || 0]]);

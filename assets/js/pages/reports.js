@@ -164,6 +164,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     S.mount({ title: 'Reports', nav: 'reports' });
+    S.meta([['Tables read', 7], 'figures counted from the records']);
     controls();
     render();
 

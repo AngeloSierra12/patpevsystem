@@ -64,9 +64,9 @@
     var value = Q.inventoryValue();
     var moves = App.DB.inventory_transactions;
 
-    S.meta([['Items', App.DB.inventory_items.length],
-            ['Low stock', low.length],
-            ['Suppliers', App.DB.suppliers.length],
+    /* Items, low stock and movements are all in the metric strip below, and
+       the item count sits on the toolbar. Meta adds only what is missing. */
+    S.meta([['Suppliers', App.DB.suppliers.length],
             ['Deliveries', App.DB.deliveries.length]]);
 
     S.el('#metrics').innerHTML =
