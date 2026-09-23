@@ -19,3 +19,6 @@ desktop.ini
 *.sql.bak
 *-export.sql
 dump.sql
+
+# Notes for teammates: kept locally, not part of the project
+HANDOVER-*.md
