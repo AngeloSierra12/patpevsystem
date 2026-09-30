@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Audit Trail - PATVEP Hostel & Canteen</title>
+    <link rel="icon" type="image/png" href="images/bpsu-logo.png">
+    <link rel="stylesheet" type="text/css" href="css/audit-trail.css">
+</head>
+<body>
+
+    <header>
+        <div id="container">
+            <div id="left-div">
+                <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
+                <p>PATVEP Hostel &amp; University Canteen</p>
+            </div>
+            <div id="right-div">
+                <div class="dropdown">
+                    <button class="dropbtn">Hi, Andrew &#9662;</button>
+                    <div class="dropdown-content">
+                        <p id="who">Andrew Santos<br><span>Administrator</span></p>
+                        <a class="off">My Account</a>
+                        <a class="off">Change password</a>
+                        <a href="index.html" id="logout">Log out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="nav-bar">
+            <a class="nav" href="dashboard.html">Dashboard</a>
+            <a class="nav off">Reservations</a>
+            <a class="nav" href="guests.html">Guests</a>
+            <a class="nav off">Canteen Inventory</a>
+            <a class="nav" href="calendar.html">Calendar</a>
+            <a class="nav off">Users</a>
+            <a class="nav" href="reports.html">Reports</a>
+            <a class="nav" id="active" href="audit-trail.html">Audit Trail</a>
+            <a class="nav off">My Account</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Audit Trail</h1>
+
+        <div class="box">
+
+            <form id="filter" action="audit-trail.html">
+                <input type="text" id="search" placeholder="Search user or action">
+                <label for="from">From</label>
+                <input type="date" id="from">
+                <label for="to">To</label>
+                <input type="date" id="to">
+                <select id="type">
+                    <option>All actions</option>
+                    <option>Sign-ins</option>
+                    <option>Reservations</option>
+                    <option>Payments</option>
+                    <option>Rooms</option>
+                    <option>Canteen stock</option>
+                    <option>Deliveries</option>
+                    <option>User accounts</option>
+                </select>
+                <button type="submit" id="btn">Search</button>
+            </form>
+
+            <p class="small">Showing 15 of 64</p>
+
+            <table>
+                <tr>
+                    <th>Time</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Record</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td>2026-09-30 08:02</td>
+                    <td>asantos<br><span class="small">Administrator</span></td>
+                    <td>Signed in</td>
+                    <td>-</td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-30 07:59</td>
+                    <td>asantos<br><span class="small">Administrator</span></td>
+                    <td>Tried to sign in</td>
+                    <td>-</td>
+                    <td><span class="tag red">Failed</span><br><span class="small">wrong password</span></td>
+                </tr>
+                <tr>
+                    <td>2026-09-29 18:30</td>
+                    <td>rdizon<br><span class="small">Canteen Staff</span></td>
+                    <td>Took stock out</td>
+                    <td>Refined White Sugar, 1 bag<br><span class="small">2 bags left, below reorder level</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-29 10:15</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Made a reservation</td>
+                    <td>BPSU-RES-202609-0006<br><span class="small">Engr. Rodrigo Salceda, Oct 2 to 4</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-28 15:30</td>
+                    <td>rdizon<br><span class="small">Canteen Staff</span></td>
+                    <td>Recorded a delivery</td>
+                    <td>DR-2026-043<br><span class="small">from Bataan Fresh Farms</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-28 14:10</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Recorded a payment</td>
+                    <td>OR-2026-00893, Php 3,600 cash<br><span class="small">for BPSU-RES-202609-0003</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-28 14:00</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Checked in a guest</td>
+                    <td>Angelo Sierra, Room 102<br><span class="small">BPSU-RES-202609-0003</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-28 11:00</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Checked out a guest</td>
+                    <td>Ms. Lourdes Enriquez, Room 202<br><span class="small">BPSU-RES-202609-0001</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-27 14:20</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Recorded a payment</td>
+                    <td>OR-2026-00892, Php 600 charge slip<br><span class="small">for BPSU-RES-202609-0002</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-27 14:10</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Checked in a guest</td>
+                    <td>Prof. Albert Tria, Room 201<br><span class="small">BPSU-RES-202609-0002</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-26 09:00</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Confirmed a reservation</td>
+                    <td>BPSU-RES-202609-0005<br><span class="small">Dr. Marilyn De Jesus, Sept 30 to Oct 2</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-25 16:40</td>
+                    <td>asantos<br><span class="small">Administrator</span></td>
+                    <td>Closed a room for repair</td>
+                    <td>Room 204<br><span class="small">aircon repair, back Oct 5</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-25 14:05</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Recorded a payment</td>
+                    <td>OR-2026-00891, Php 1,200 cash<br><span class="small">for BPSU-RES-202609-0001</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-25 14:00</td>
+                    <td>gmanalo<br><span class="small">Hostel Staff</span></td>
+                    <td>Checked in a guest</td>
+                    <td>Ms. Lourdes Enriquez, Room 202<br><span class="small">BPSU-RES-202609-0001</span></td>
+                    <td>OK</td>
+                </tr>
+                <tr>
+                    <td>2026-09-25 07:58</td>
+                    <td>rdizon<br><span class="small">Canteen Staff</span></td>
+                    <td>Took stock out</td>
+                    <td>Jasmine Premium Rice, 1 sack<br><span class="small">4.5 sacks left</span></td>
+                    <td>OK</td>
+                </tr>
+            </table>
+
+            <a id="older" href="#">Older entries &gt;</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>Bataan Peninsula State University - Main Campus</p>
+    </footer>
+
+</body>
+</html>

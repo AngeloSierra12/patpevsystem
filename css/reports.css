@@ -1,0 +1,320 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: whitesmoke;
+    font-size: 15px;
+}
+
+#container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #7d0606;
+    color: white;
+    padding: 10px 30px;
+}
+
+#left-div {
+    display: flex;
+    align-items: center;
+}
+
+#logo {
+    width: 45px;
+    height: 45px;
+}
+
+#left-div p {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 12px;
+}
+
+#right-div {
+    font-size: 14px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #7d0606;
+    color: white;
+    padding: 8px 14px;
+    font-size: 15px;
+    border: 1px solid #a33a3a;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 190px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+#who {
+    margin: 0;
+    padding: 12px 16px;
+    color: black;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+}
+
+#who span {
+    font-weight: normal;
+    font-size: 13px;
+    color: gray;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f3e9e9;
+}
+
+#logout {
+    color: #ae0404;
+    border-top: 1px solid #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:focus-within .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #5e0404;
+}
+
+#nav-bar {
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+    padding: 0 22px;
+}
+
+.nav {
+    display: inline-block;
+    padding: 12px 10px;
+    color: black;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.nav:hover {
+    color: #ae0404;
+}
+
+#active {
+    color: #ae0404;
+    font-weight: bold;
+    border-bottom: 3px solid #ae0404;
+}
+
+.off {
+    color: silver;
+    cursor: default;
+}
+
+.off:hover {
+    color: silver;
+}
+
+.dropdown-content .off {
+    color: silver;
+}
+
+.dropdown-content .off:hover {
+    background-color: white;
+}
+
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 30px;
+}
+
+h1 {
+    margin: 0 0 20px;
+    font-size: 26px;
+}
+
+#date {
+    color: gray;
+    margin: 4px 0 20px;
+}
+
+h2 {
+    font-size: 17px;
+    color: #7d0606;
+    margin: 0 0 12px;
+}
+
+.box {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.box p {
+    margin: 6px 0;
+}
+
+#columns {
+    display: flex;
+    gap: 20px;
+}
+
+#left-col {
+    flex: 2;
+}
+
+#right-col {
+    flex: 1;
+}
+
+.small {
+    font-size: 13px;
+    color: gray;
+}
+
+h3 {
+    font-size: 14px;
+    margin: 20px 0 6px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+td {
+    padding: 6px 0;
+}
+
+.num {
+    text-align: right;
+    width: 120px;
+}
+
+.total td {
+    font-weight: bold;
+    border-top: 1px solid #ddd;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+#type {
+    width: 100%;
+    height: 35px;
+    border: 1px solid silver;
+    border-radius: 4px;
+    padding-left: 6px;
+    font-size: 14px;
+}
+
+#from {
+    width: 100%;
+    height: 35px;
+    border: 1px solid silver;
+    border-radius: 4px;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+
+#to {
+    width: 100%;
+    height: 35px;
+    border: 1px solid silver;
+    border-radius: 4px;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+
+#btn {
+    width: 100%;
+    height: 38px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ae0404;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#btn:hover {
+    opacity: 0.7;
+}
+
+footer {
+    text-align: center;
+    color: gray;
+    font-size: 13px;
+    padding: 10px;
+}
+
+#right-col .box {
+    position: sticky;
+    top: 20px;
+}
+
+@media screen and (max-width: 600px) {
+    #container {
+        padding: 10px 15px;
+    }
+
+    #logo {
+        width: 35px;
+        height: 35px;
+    }
+
+    #left-div p {
+        font-size: 14px;
+    }
+
+    #nav-bar {
+        padding: 0 5px;
+    }
+
+    main {
+        padding: 15px;
+    }
+
+    #columns {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .box {
+        overflow-x: auto;
+    }
+}

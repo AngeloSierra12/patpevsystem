@@ -1,14 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PATVEP Hostel &amp; Canteen</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Log in - PATVEP Hostel & Canteen</title>
+    <link rel="icon" type="image/png" href="images/bpsu-logo.png">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
 </head>
 <body>
 
-<h1>PATVEP Hostel &amp; University Canteen</h1>
-<p>Hotel Reservation System and Inventory System</p>
+    <div id="login-page">
+
+        <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
+        <h1>PATVEP Hostel &amp; University Canteen</h1>
+        <p id="school">Bataan Peninsula State University - Main Campus</p>
+
+        <div class="login">
+            <h2>Log in</h2>
+
+            <!-- no database yet, so any username and password just goes to the dashboard -->
+            <form id="login" action="dashboard.html">
+                <label for="Uname"><b>Username</b></label>
+                <input type="text" id="Uname" required>
+                <br><br>
+                <label for="Pass"><b>Password</b></label>
+                <input type="password" id="Pass" required>
+                <br><br>
+                <input type="checkbox" id="check">
+                <span>Remember me</span>
+                <br><br>
+                <button type="submit" id="btn">Log in</button>
+            </form>
+
+            <p id="guest">Staying at the hostel? <a class="off">Make a guest account</a></p>
+        </div>
+
+        <p id="forgot">Forgot your password? Ask the hostel or canteen admin.</p>
+
+    </div>
 
 </body>
 </html>
