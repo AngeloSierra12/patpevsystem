@@ -275,30 +275,20 @@ td {
     color: #ae0404;
 }
 
-.in {
+.done {
     background-color: lightgreen;
 }
 
-.coming {
+.planned {
     background-color: lightblue;
 }
 
-.pending {
+.reorder {
     background-color: khaki;
 }
 
-.out {
-    background-color: gainsboro;
-    color: gray;
-}
-
-.noshow {
+.low {
     background-color: lightpink;
-}
-
-.closed {
-    background-color: gainsboro;
-    color: gray;
 }
 
 .key {
@@ -324,19 +314,13 @@ li a {
     color: #ae0404;
 }
 
-#rooms td {
-    height: 38px;
-    padding: 4px 6px;
-    font-size: 13px;
+#sched td {
+    padding: 8px 10px;
 }
 
-.room {
-    width: 130px;
-    font-weight: bold;
-}
-
-.room span {
-    font-weight: normal;
+#sched th {
+    text-align: left;
+    padding: 8px 10px;
 }
 
 .tag {
@@ -376,17 +360,14 @@ footer {
     padding: 10px;
 }
 
+#cal .today p {
+    color: black;
+    font-weight: normal;
+}
+
 #cal .other p {
     color: black;
     opacity: 0.6;
-}
-
-#rooms {
-    table-layout: fixed;
-}
-
-#rooms th:first-child {
-    width: 130px;
 }
 
 @media screen and (max-width: 600px) {
@@ -424,7 +405,7 @@ footer {
         min-width: 480px;
     }
 
-    #rooms {
-        min-width: 750px;
+    #sched {
+        min-width: 450px;
     }
 }

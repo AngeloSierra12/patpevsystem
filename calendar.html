@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Calendar - PATVEP Hostel & Canteen</title>
+    <title>Calendar - PATVEP Inventory</title>
     <link rel="icon" type="image/png" href="images/bpsu-logo.png">
     <link rel="stylesheet" type="text/css" href="css/calendar.css">
 </head>
@@ -13,7 +13,7 @@
         <div id="container">
             <div id="left-div">
                 <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
-                <p>PATVEP Hostel &amp; University Canteen</p>
+                <p>PATVEP Hostel &amp; Canteen Inventory</p>
             </div>
             <div id="right-div">
                 <div class="dropdown">
@@ -29,13 +29,12 @@
         </div>
         <div id="nav-bar">
             <a class="nav" href="dashboard.html">Dashboard</a>
-            <a class="nav off">Reservations</a>
-            <a class="nav" href="guests.html">Guests</a>
-            <a class="nav off">Canteen Inventory</a>
+            <a class="nav off">Inventory</a>
+            <a class="nav off">Suppliers</a>
             <a class="nav" id="active" href="calendar.html">Calendar</a>
-            <a class="nav off">Users</a>
             <a class="nav" href="reports.html">Reports</a>
             <a class="nav" href="audit-trail.html">Audit Trail</a>
+            <a class="nav off">Users</a>
             <a class="nav off">My Account</a>
         </div>
     </header>
@@ -46,7 +45,7 @@
         <!-- no js so the switch just jumps down the page -->
         <div id="switch">
             <a href="#month">Month</a>
-            <a href="#timeline">Room timeline</a>
+            <a href="#list">List</a>
         </div>
 
         <div id="columns">
@@ -98,28 +97,27 @@
                         <tr>
                             <td>20</td>
                             <td>21</td>
-                            <td>22</td>
+                            <td>22<p class="done" title="Done">Agri Coop delivery</p><p class="done" title="Done">Beverage delivery</p></td>
                             <td>23</td>
-                            <td>24</td>
-                            <td>25<p class="out" title="Checked out">202 Enriquez</p></td>
-                            <td>26<p class="out" title="Checked out">202 Enriquez</p></td>
+                            <td>24<p class="done" title="Done">Linen delivery</p></td>
+                            <td>25</td>
+                            <td>26<p class="done" title="Done">Canteen count</p></td>
                         </tr>
                         <tr>
-                            <td>27<p class="out" title="Checked out">202 Enriquez</p><p class="in" title="Checked in">201 Tria</p></td>
-                            <td>28<p class="in" title="Checked in">201 Tria</p><p class="in" title="Checked in">102 Sierra</p></td>
-                            <td>29<p class="in" title="Checked in">201 Tria</p><p class="in" title="Checked in">102 Sierra</p><p class="noshow" title="Didn't show up">203 Dela Cruz</p></td>
-                            <td class="today">30<p class="in" title="Checked in">102 Sierra</p><p class="coming" title="Confirmed">104 De Jesus</p></td>
-                            <td class="other">1<p class="coming" title="Confirmed">104 De Jesus</p></td>
-                            <td class="other">2<p class="pending" title="Not confirmed">101 Salceda</p></td>
-                            <td class="other">3<p class="pending" title="Not confirmed">101 Salceda</p></td>
+                            <td>27</td>
+                            <td>28<p class="done" title="Done">Fresh Farms delivery</p></td>
+                            <td>29<p class="reorder" title="Reorder">Sugar low</p><p class="reorder" title="Reorder">Toilet paper low</p><p class="low" title="Almost out">Shampoo almost out</p></td>
+                            <td class="today">30<p class="planned" title="Planned">Beverage delivery</p></td>
+                            <td class="other">1<p class="planned" title="Planned">Linen count</p></td>
+                            <td class="other">2<p class="planned" title="Planned">Agri Coop delivery</p></td>
+                            <td class="other">3<p class="planned" title="Planned">Canteen count</p></td>
                         </tr>
                     </table>
                     <p class="small">
-                        <span class="key in"></span> Checked in
-                        <span class="key coming"></span> Confirmed
-                        <span class="key pending"></span> Not confirmed
-                        <span class="key out"></span> Checked out
-                        <span class="key noshow"></span> Didn't show up
+                        <span class="key done"></span> Done
+                        <span class="key planned"></span> Planned
+                        <span class="key reorder"></span> Reorder
+                        <span class="key low"></span> Almost out
                     </p>
                 </div>
             </div>
@@ -128,22 +126,27 @@
 
                 <div class="box">
                     <h2>Today, Sept 30</h2>
-                    <p><b>Staying now</b></p>
+                    <p><b>Expected</b></p>
                     <ul>
-                        <li>Room 102 - <a href="guests.html">Angelo Sierra</a><br><span class="small">checks out tomorrow</span></li>
-                        <li>Room 201 - Prof. Albert Tria<br><span class="small">checks out today</span></li>
+                        <li>Central Luzon Beverage Corp<br><span class="small">canteen drinks</span></li>
                     </ul>
-                    <p><b>Checking in:</b> Room 104 - Dr. Marilyn De Jesus</p>
-                    <p><b>Checking out:</b> Room 201 - Prof. Albert Tria</p>
+                    <p><b>Needs reorder</b></p>
+                    <ul>
+                        <li>Shampoo sachets <span class="tag red">Almost out</span></li>
+                        <li>Toilet paper rolls <span class="tag yellow">Reorder</span></li>
+                        <li>Refined White Sugar <span class="tag yellow">Reorder</span></li>
+                    </ul>
                 </div>
 
                 <div class="box">
-                    <h2>Double booking check</h2>
-                    <p><span class="tag green">No double bookings</span></p>
+                    <h2>Late deliveries</h2>
+                    <p><span class="tag green">None</span></p>
                     <br>
-                    <p><b>Can't be booked</b></p>
+                    <p><b>Coming up</b></p>
                     <ul>
-                        <li>Room 204 <span class="tag grey">Under repair</span><br><span class="small">aircon repair, back Oct 5</span></li>
+                        <li>Oct 1 - Linen count<br><span class="small">hostel</span></li>
+                        <li>Oct 2 - BPSU Agricultural Cooperative<br><span class="small">rice and eggs</span></li>
+                        <li>Oct 3 - Weekly stock count<br><span class="small">canteen</span></li>
                     </ul>
                 </div>
 
@@ -151,148 +154,56 @@
 
         </div>
 
-        <div class="box" id="timeline">
-            <h2>Room timeline, Sept 27 to Oct 10</h2>
-            <table id="rooms">
+        <div class="box" id="list">
+            <h2>Schedule, Sept 27 to Oct 10</h2>
+            <table id="sched">
                 <tr>
-                    <th>Room</th>
-                    <th>27</th>
-                    <th>28</th>
-                    <th>29</th>
-                    <th class="today">30</th>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>6</th>
-                    <th>7</th>
-                    <th>8</th>
-                    <th>9</th>
-                    <th>10</th>
+                    <th>Date</th>
+                    <th>What</th>
+                    <th>For</th>
+                    <th>Status</th>
                 </tr>
                 <tr>
-                    <td class="room">101<br><span class="small">Standard Single</span></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td colspan="2" class="pending" title="Not confirmed">Salceda</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>Sept 28</td>
+                    <td>Delivery from Bataan Fresh Farms</td>
+                    <td>Canteen</td>
+                    <td><span class="tag green">Done</span></td>
                 </tr>
                 <tr>
-                    <td class="room">102<br><span class="small">Standard Double</span></td>
-                    <td></td>
-                    <td colspan="3" class="in" title="Checked in">Sierra</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>Sept 30</td>
+                    <td>Delivery from Central Luzon Beverage Corp</td>
+                    <td>Canteen</td>
+                    <td><span class="tag blue">Expected today</span></td>
                 </tr>
                 <tr>
-                    <td class="room">103<br><span class="small">Deluxe Twin</span></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>Oct 1</td>
+                    <td>Linen count</td>
+                    <td>Hostel</td>
+                    <td><span class="tag blue">Planned</span></td>
                 </tr>
                 <tr>
-                    <td class="room">104<br><span class="small">Deluxe King</span></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td colspan="2" class="coming" title="Confirmed">De Jesus</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>Oct 2</td>
+                    <td>Delivery from BPSU Agricultural Cooperative</td>
+                    <td>Canteen</td>
+                    <td><span class="tag blue">Planned</span></td>
                 </tr>
                 <tr>
-                    <td class="room">201<br><span class="small">Student Dorm</span></td>
-                    <td colspan="3" class="in" title="Checked in">Tria</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>Oct 3</td>
+                    <td>Weekly stock count</td>
+                    <td>Canteen</td>
+                    <td><span class="tag blue">Planned</span></td>
                 </tr>
                 <tr>
-                    <td class="room">202<br><span class="small">Student Dorm</span></td>
-                    <td class="out" title="Checked out">Enriquez</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>Oct 6</td>
+                    <td>Delivery from Balanga Linen &amp; Supply</td>
+                    <td>Hostel</td>
+                    <td><span class="tag blue">Planned</span></td>
                 </tr>
                 <tr>
-                    <td class="room">203<br><span class="small">VIP Family Suite</span></td>
-                    <td></td>
-                    <td></td>
-                    <td class="noshow" title="Didn't show up">Dela Cruz</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="room">204<br><span class="small">Executive Guest</span></td>
-                    <td colspan="8" class="closed" title="Under repair">Under repair, back Oct 5</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>Oct 10</td>
+                    <td>Weekly stock count</td>
+                    <td>Canteen</td>
+                    <td><span class="tag blue">Planned</span></td>
                 </tr>
             </table>
         </div>

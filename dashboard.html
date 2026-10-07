@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard - PATVEP Hostel & Canteen</title>
+    <title>Dashboard - PATVEP Inventory</title>
     <link rel="icon" type="image/png" href="images/bpsu-logo.png">
     <link rel="stylesheet" type="text/css" href="css/dashboard.css">
 </head>
@@ -13,7 +13,7 @@
         <div id="container">
             <div id="left-div">
                 <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
-                <p>PATVEP Hostel &amp; University Canteen</p>
+                <p>PATVEP Hostel &amp; Canteen Inventory</p>
             </div>
             <div id="right-div">
                 <div class="dropdown">
@@ -29,13 +29,12 @@
         </div>
         <div id="nav-bar">
             <a class="nav" id="active" href="dashboard.html">Dashboard</a>
-            <a class="nav off">Reservations</a>
-            <a class="nav" href="guests.html">Guests</a>
-            <a class="nav off">Canteen Inventory</a>
+            <a class="nav off">Inventory</a>
+            <a class="nav off">Suppliers</a>
             <a class="nav" href="calendar.html">Calendar</a>
-            <a class="nav off">Users</a>
             <a class="nav" href="reports.html">Reports</a>
             <a class="nav" href="audit-trail.html">Audit Trail</a>
+            <a class="nav off">Users</a>
             <a class="nav off">My Account</a>
         </div>
     </header>
@@ -46,19 +45,18 @@
 
         <div id="summary">
             <div class="box">
-                <h2>Hostel today</h2>
-                <p>Rooms occupied now: <b>2 of 8</b></p>
-                <p>Free tonight: <b>5</b></p>
-                <p>Under repair: <b>1</b> (Room 204, back Oct 5)</p>
-                <p>Checking in today: <b>1</b> (Room 104)</p>
-                <p>Checking out today: <b>1</b> (Room 201)</p>
-            </div>
-            <div class="box">
-                <h2>Canteen today</h2>
-                <p>Items in stock: <b>12</b></p>
+                <h2>Canteen</h2>
+                <p>Items: <b>12</b></p>
                 <p>Need to reorder: <b>1</b> (Refined White Sugar)</p>
                 <p>Almost out: <b>0</b></p>
                 <p>Last delivery: <b>Sept 28</b> from Bataan Fresh Farms</p>
+            </div>
+            <div class="box">
+                <h2>Hostel supplies</h2>
+                <p>Items: <b>10</b></p>
+                <p>Need to reorder: <b>1</b> (Toilet paper rolls)</p>
+                <p>Almost out: <b>1</b> (Shampoo sachets)</p>
+                <p>Last delivery: <b>Sept 24</b> from Balanga Linen &amp; Supply</p>
             </div>
         </div>
 
@@ -67,9 +65,10 @@
             <div id="left-col">
 
                 <div class="box">
-                    <h2>Rooms booked this week</h2>
+                    <h2>Stock in and out this week</h2>
                     <table>
                         <tr>
+                            <th></th>
                             <th>Sun 27</th>
                             <th>Mon 28</th>
                             <th>Tue 29</th>
@@ -79,71 +78,68 @@
                             <th>Sat 3</th>
                         </tr>
                         <tr>
-                            <td>2</td>
-                            <td>2</td>
+                            <td><b>Deliveries</b></td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td class="today">0</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><b>Taken out</b></td>
+                            <td>1</td>
+                            <td>0</td>
                             <td>3</td>
-                            <td class="today">2</td>
-                            <td>1</td>
-                            <td>1</td>
-                            <td>1</td>
+                            <td class="today">0</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
                         </tr>
                     </table>
-                    <p class="small">Out of 8 rooms</p>
                 </div>
 
                 <div class="box">
-                    <h2>Canteen stock</h2>
+                    <h2>Recent deliveries</h2>
                     <table>
                         <tr>
-                            <th>Item</th>
-                            <th>On hand</th>
-                            <th>Reorder at</th>
-                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Delivery no.</th>
+                            <th>Supplier</th>
+                            <th>For</th>
+                            <th>Items</th>
                         </tr>
                         <tr>
-                            <td>Refined White Sugar (25kg bag)</td>
-                            <td>2 bags</td>
-                            <td>2</td>
-                            <td><span class="tag yellow">Reorder</span></td>
+                            <td>Sept 28</td>
+                            <td>DR-2026-044</td>
+                            <td>Bataan Fresh Farms</td>
+                            <td>Canteen</td>
+                            <td>4</td>
                         </tr>
                         <tr>
-                            <td>Ground Barako Coffee (1kg)</td>
-                            <td>8 packs</td>
-                            <td>5</td>
-                            <td>OK</td>
+                            <td>Sept 24</td>
+                            <td>DR-2026-043</td>
+                            <td>Balanga Linen &amp; Supply</td>
+                            <td>Hostel</td>
+                            <td>4</td>
                         </tr>
                         <tr>
-                            <td>Fresh Pork Liempo (sliced)</td>
-                            <td>13.5 kg</td>
-                            <td>8</td>
-                            <td>OK</td>
-                        </tr>
-                        <tr>
-                            <td>Evaporated Filled Milk (370ml)</td>
-                            <td>42 cans</td>
-                            <td>24</td>
-                            <td>OK</td>
-                        </tr>
-                        <tr>
-                            <td>Jasmine Premium Rice (50kg sack)</td>
-                            <td>5.5 sacks</td>
+                            <td>Sept 22</td>
+                            <td>DR-2026-042</td>
+                            <td>Central Luzon Beverage Corp</td>
+                            <td>Canteen</td>
                             <td>3</td>
-                            <td>OK</td>
                         </tr>
                         <tr>
-                            <td>Fresh Dressed Chicken (cut)</td>
-                            <td>20 kg</td>
-                            <td>10</td>
-                            <td>OK</td>
-                        </tr>
-                        <tr>
-                            <td>Canned Corned Beef (260g)</td>
-                            <td>48 cans</td>
-                            <td>20</td>
-                            <td>OK</td>
+                            <td>Sept 22</td>
+                            <td>DR-2026-041</td>
+                            <td>BPSU Agricultural Cooperative</td>
+                            <td>Canteen</td>
+                            <td>5</td>
                         </tr>
                     </table>
-                    <a class="more off">See all 12 items</a>
+                    <a class="more off">See all deliveries</a>
                 </div>
 
             </div>
@@ -153,31 +149,31 @@
                 <div class="box">
                     <h2>Needs attention (4)</h2>
                     <div class="alert">
-                        <span class="tag red">Unpaid</span>
-                        <p><b>Room 201</b> - Prof. Albert Tria checks out today with Php 600 left to pay.</p>
-                        <a class="off">Record payment</a>
-                    </div>
-                    <div class="alert">
-                        <span class="tag red">Didn't show up</span>
-                        <p><b>Room 203</b> - Mr. Ramon Dela Cruz was supposed to check in last night.</p>
-                        <a class="off">Open booking</a>
-                    </div>
-                    <div class="alert">
-                        <span class="tag yellow">Not confirmed</span>
-                        <p><b>Room 101</b> - Engr. Rodrigo Salceda arrives Oct 2.</p>
-                        <a class="off">Confirm booking</a>
+                        <span class="tag red">Almost out</span>
+                        <p><b>Shampoo sachets</b> - hostel, only 15 left.</p>
+                        <a class="off">Reorder</a>
                     </div>
                     <div class="alert">
                         <span class="tag yellow">Reorder</span>
-                        <p><b>Refined White Sugar</b> - only 2 bags left.</p>
-                        <a class="off">See stock</a>
+                        <p><b>Toilet paper rolls</b> - hostel, 18 left, reorder at 30.</p>
+                        <a class="off">Reorder</a>
+                    </div>
+                    <div class="alert">
+                        <span class="tag yellow">Reorder</span>
+                        <p><b>Refined White Sugar</b> - canteen, 2 bags left.</p>
+                        <a class="off">Reorder</a>
+                    </div>
+                    <div class="alert">
+                        <span class="tag blue">Expected today</span>
+                        <p><b>Central Luzon Beverage Corp</b> - canteen drinks, not recorded yet.</p>
+                        <a class="off">Record delivery</a>
                     </div>
                 </div>
 
                 <div class="box">
                     <h2>Shortcuts</h2>
-                    <a class="button off">+ New reservation</a>
                     <a class="button off">Record a delivery</a>
+                    <a class="button off">Take stock out</a>
                     <a class="button" href="calendar.html">Open calendar</a>
                     <a class="button" href="reports.html">Reports</a>
                     <a class="button" href="audit-trail.html">Audit trail</a>

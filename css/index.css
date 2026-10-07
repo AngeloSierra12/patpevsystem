@@ -87,24 +87,10 @@ span {
     opacity: 0.7;
 }
 
-#guest {
-    font-size: 14px;
-    margin: 20px 0 0;
-}
-
-#guest a {
-    color: #ae0404;
-}
-
 #forgot {
     font-size: 13px;
     color: gray;
     margin-top: 15px;
-}
-
-#guest .off {
-    color: silver;
-    cursor: default;
 }
 
 @media screen and (max-width: 600px) {
