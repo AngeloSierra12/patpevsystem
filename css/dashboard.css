@@ -297,32 +297,6 @@ td {
     color: silver;
 }
 
-.button {
-    display: block;
-    background-color: white;
-    color: #ae0404;
-    border: 1px solid #ae0404;
-    text-decoration: none;
-    padding: 9px 14px;
-    border-radius: 5px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    transition: 0.3s;
-}
-
-.button:hover {
-    opacity: 0.7;
-}
-
-.button.off {
-    border-color: gainsboro;
-    color: silver;
-}
-
-.button.off:hover {
-    opacity: 1;
-}
-
 footer {
     text-align: center;
     color: gray;
