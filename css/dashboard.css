@@ -190,6 +190,53 @@ h2 {
     flex: 1;
 }
 
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.counts {
+    display: flex;
+    gap: 12px;
+    margin: 6px 0 12px;
+}
+
+.count {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px 14px;
+}
+
+.count b {
+    display: block;
+    font-size: 28px;
+}
+
+.count span {
+    font-size: 13px;
+    color: gray;
+}
+
+.count.low {
+    background-color: khaki;
+    border-color: khaki;
+}
+
+.count.low span {
+    color: black;
+}
+
+.count.critical {
+    background-color: lightpink;
+    border-color: lightpink;
+}
+
+.count.critical span {
+    color: black;
+}
+
 #columns {
     display: flex;
     gap: 20px;
