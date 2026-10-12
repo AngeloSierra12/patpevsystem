@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User Management - PATVEP Inventory</title>
+    <link rel="icon" type="image/png" href="images/bpsu-logo.png">
+    <link rel="stylesheet" type="text/css" href="css/users.css">
+</head>
+<body>
+
+    <header>
+        <div id="container">
+            <div id="left-div">
+                <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
+                <p>PATVEP Hostel &amp; Canteen Inventory</p>
+            </div>
+            <div id="right-div">
+                <div class="dropdown">
+                    <button class="dropbtn">Hi, Andrew &#9662;</button>
+                    <div class="dropdown-content">
+                        <p id="who">Andrew Santos<br><span>Administrator</span></p>
+                        <a href="my-account.html">My Account</a>
+                        <a class="off">Change password</a>
+                        <a href="index.html" id="logout">Log out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="nav-bar">
+            <a class="nav" href="dashboard.html">Dashboard</a>
+            <a class="nav off">Inventory</a>
+            <a class="nav off">Suppliers</a>
+            <a class="nav" href="reports.html">Reports</a>
+            <a class="nav" href="audit-trail.html">Audit Trail</a>
+            <a class="nav" id="active" href="users.html">Users</a>
+            <a class="nav" href="my-account.html">My Account</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>User Management</h1>
+
+        <div class="box">
+            <form id="filter" action="users.html">
+                <input type="text" id="search" placeholder="Search name, email, or role">
+                <select id="sort">
+                    <option>Sort by name</option>
+                    <option>Sort by role</option>
+                    <option>Sort by status</option>
+                </select>
+                <a class="button off">Permissions</a>
+                <a class="button" href="#add-user">Add user</a>
+            </form>
+
+            <p class="small">Showing 3 of 3</p>
+
+            <table>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Contact No.</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                <tr>
+                    <td>Andrew Santos</td>
+                    <td>0917 000 0001</td>
+                    <td>asantos@bpsu.edu.ph</td>
+                    <td>Administrator</td>
+                    <td>System Administrator</td>
+                    <td>Active</td>
+                    <td><a href="#">View</a> - <a href="#">Edit</a></td>
+                </tr>
+                <tr>
+                    <td>Grace Manalo</td>
+                    <td>0917 000 0002</td>
+                    <td>gmanalo@bpsu.edu.ph</td>
+                    <td>Staff</td>
+                    <td>Hostel Staff</td>
+                    <td>Active</td>
+                    <td><a href="#">View</a> - <a href="#">Edit</a></td>
+                </tr>
+                <tr>
+                    <td>Ramil Dizon</td>
+                    <td>0917 000 0003</td>
+                    <td>rdizon@bpsu.edu.ph</td>
+                    <td>Staff</td>
+                    <td>Canteen Staff</td>
+                    <td>Active</td>
+                    <td><a href="#">View</a> - <a href="#">Edit</a></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- popup opens with #add-user in the link, no js -->
+        <div class="popup" id="add-user">
+            <div class="popup-box">
+                <h2>Add User</h2>
+                <form action="users.html">
+                    <div class="row">
+                        <div>
+                            <label for="first"><b>First Name</b></label>
+                            <input type="text" id="first" required>
+                        </div>
+                        <div>
+                            <label for="last"><b>Last Name</b></label>
+                            <input type="text" id="last" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="contact"><b>Contact Number</b></label>
+                            <input type="text" id="contact">
+                        </div>
+                        <div>
+                            <label for="email"><b>Email Address</b></label>
+                            <input type="email" id="email">
+                        </div>
+                    </div>
+                    <label for="username"><b>System Username</b></label>
+                    <input type="text" id="username" required>
+                    <label for="password"><b>Default Password</b></label>
+                    <input type="password" id="password" required>
+                    <div class="row">
+                        <div>
+                            <p><b>System Role</b></p>
+                            <input type="radio" id="role-admin" name="role">
+                            <label class="inline" for="role-admin">Administrator</label>
+                            <br>
+                            <input type="radio" id="role-staff" name="role">
+                            <label class="inline" for="role-staff">Staff</label>
+                        </div>
+                        <div>
+                            <p><b>Department (Optional)</b></p>
+                            <input type="radio" id="dept-hostel" name="dept">
+                            <label class="inline" for="dept-hostel">Hostel Staff</label>
+                            <br>
+                            <input type="radio" id="dept-canteen" name="dept">
+                            <label class="inline" for="dept-canteen">Canteen Staff</label>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Save User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Bataan Peninsula State University - Main Campus</p>
+    </footer>
+
+    <script src="js/users.js"></script>
+
+</body>
+</html>

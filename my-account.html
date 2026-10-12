@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Account - PATVEP Inventory</title>
+    <link rel="icon" type="image/png" href="images/bpsu-logo.png">
+    <link rel="stylesheet" type="text/css" href="css/my-account.css">
+</head>
+<body>
+
+    <header>
+        <div id="container">
+            <div id="left-div">
+                <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
+                <p>PATVEP Hostel &amp; Canteen Inventory</p>
+            </div>
+            <div id="right-div">
+                <div class="dropdown">
+                    <button class="dropbtn">Hi, Andrew &#9662;</button>
+                    <div class="dropdown-content">
+                        <p id="who">Andrew Santos<br><span>Administrator</span></p>
+                        <a href="my-account.html">My Account</a>
+                        <a class="off">Change password</a>
+                        <a href="index.html" id="logout">Log out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="nav-bar">
+            <a class="nav" href="dashboard.html">Dashboard</a>
+            <a class="nav off">Inventory</a>
+            <a class="nav off">Suppliers</a>
+            <a class="nav" href="reports.html">Reports</a>
+            <a class="nav" href="audit-trail.html">Audit Trail</a>
+            <a class="nav" href="users.html">Users</a>
+            <a class="nav" id="active" href="my-account.html">My Account</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>My Account</h1>
+
+        <div id="columns">
+
+            <div class="box">
+                <h2>Profile</h2>
+                <div id="person">
+                    <div id="photo">AS</div>
+                    <div>
+                        <p id="name">Andrew Santos</p>
+                        <p class="small">asantos@bpsu.edu.ph</p>
+                    </div>
+                </div>
+                <table id="details">
+                    <tr><td class="label">Username</td><td>asantos</td></tr>
+                    <tr><td class="label">Role</td><td>Administrator</td></tr>
+                    <tr><td class="label">Department</td><td>System Administrator</td></tr>
+                    <tr><td class="label">Contact</td><td>0917 000 0001</td></tr>
+                    <tr><td class="label">Account created</td><td>2026-09-21 08:00</td></tr>
+                    <tr><td class="label">Last sign-in</td><td>2026-09-30 08:02</td></tr>
+                </table>
+                <div class="actions">
+                    <a class="button off">Change password</a>
+                    <a class="button" href="#edit-details">Edit my details</a>
+                </div>
+            </div>
+
+            <div class="box">
+                <h2>Permissions</h2>
+                <table id="perms">
+                    <tr><td>Inventory</td><td class="num">No access</td></tr>
+                    <tr><td>Suppliers</td><td class="num">No access</td></tr>
+                    <tr><td>Deliveries</td><td class="num">No access</td></tr>
+                    <tr><td>Reports</td><td class="num">Full</td></tr>
+                    <tr><td>User management</td><td class="num">Full</td></tr>
+                    <tr><td>Audit trail</td><td class="num">Full</td></tr>
+                </table>
+
+                <h3>My recent activity</h3>
+                <table id="activity">
+                    <tr><td>Signed in</td><td class="num small">2026-09-30 08:02</td></tr>
+                    <tr><td>Tried to sign in <span class="tag red">Failed</span></td><td class="num small">2026-09-30 07:59</td></tr>
+                    <tr><td>Made an account: rdizon</td><td class="num small">2026-09-21 08:10</td></tr>
+                    <tr><td>Made an account: gmanalo</td><td class="num small">2026-09-21 08:05</td></tr>
+                </table>
+                <a class="more" href="audit-trail.html">See all in audit trail</a>
+            </div>
+
+        </div>
+
+        <!-- popup opens with #edit-details in the link, no js -->
+        <div class="popup" id="edit-details">
+            <div class="popup-box">
+                <h2>Edit details</h2>
+                <form action="my-account.html">
+                    <div class="row">
+                        <div>
+                            <label for="first"><b>First Name</b></label>
+                            <input type="text" id="first" value="Andrew" required>
+                        </div>
+                        <div>
+                            <label for="last"><b>Last Name</b></label>
+                            <input type="text" id="last" value="Santos" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="contact"><b>Contact Number</b></label>
+                            <input type="text" id="contact" value="0917 000 0001">
+                        </div>
+                        <div>
+                            <label for="email"><b>Email Address</b></label>
+                            <input type="email" id="email" value="asantos@bpsu.edu.ph">
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Bataan Peninsula State University - Main Campus</p>
+    </footer>
+
+</body>
+</html>
