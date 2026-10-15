@@ -1,8 +1,101 @@
-(async function () {
+var AUDIT_TYPES = {
+    'All actions': 'all',
+    'Sign-ins': 'signins',
+    'Deliveries': 'deliveries',
+    'Stock out': 'stockout',
+    'Item counts': 'counts',
+    'Items': 'items',
+    'User accounts': 'users'
+};
+
+var auditPageNumber = 1;
+var auditTable;
+var auditCount;
+var olderLink;
+var newerLink;
+var latestRequest = 0;
+
+function auditRow(entry) {
+    var time = dateTime(entry.time);
+    if (entry.archived) {
+        time += '<br><span class="small">archived</span>';
+    }
+
+    var result = 'OK';
+    if (entry.result === 'FAILED') {
+        result = '<span class="tag red">Failed</span>';
+    }
+
+    return '<tr><td>' + time + '</td>' +
+        '<td>' + esc(entry.username) + '<br><span class="small">' + esc(entry.roleName) + '</span></td>' +
+        '<td>' + esc(entry.actionLabel) + '</td>' +
+        '<td>' + esc(entry.description || '-') + '</td>' +
+        '<td>' + result + '</td></tr>';
+}
+
+async function loadAudit() {
+    var type = AUDIT_TYPES[document.getElementById('type').value];
+    if (!type) {
+        type = 'all';
+    }
+
+    var params = new URLSearchParams({
+        search: document.getElementById('search').value.trim(),
+        from: document.getElementById('from').value,
+        to: document.getElementById('to').value,
+        type: type,
+        page: auditPageNumber
+    });
+
+    latestRequest = latestRequest + 1;
+    var thisRequest = latestRequest;
+
+    var data;
+    try {
+        data = await api('audit.php?' + params);
+    } catch (error) {
+        if (thisRequest !== latestRequest) {
+            return;
+        }
+        showError(auditCount, error);
+        return;
+    }
+
+    if (thisRequest !== latestRequest) {
+        return;
+    }
+
+    var firstShown = (data.page - 1) * data.perPage + 1;
+    var lastShown = (data.page - 1) * data.perPage + data.entries.length;
+    if (data.total > 0) {
+        auditCount.textContent = 'Showing ' + firstShown + ' to ' + lastShown + ' of ' + data.total;
+    } else {
+        auditCount.textContent = 'No entries found';
+    }
+
+    var html = '<tr><th>Time</th><th>User</th><th>Action</th><th>Record</th><th>Result</th></tr>';
+    for (var i = 0; i < data.entries.length; i++) {
+        html += auditRow(data.entries[i]);
+    }
+    auditTable.innerHTML = html;
+
+    if (lastShown < data.total) {
+        olderLink.style.display = '';
+    } else {
+        olderLink.style.display = 'none';
+    }
+    if (data.page > 1) {
+        newerLink.style.display = '';
+    } else {
+        newerLink.style.display = 'none';
+    }
+}
+
+async function setupAuditPage() {
     var user;
     try {
         user = await startPage();
-    } catch (err) {
+    } catch (error) {
         return;
     }
     if (user.role !== 'ADMIN') {
@@ -10,87 +103,50 @@
         return;
     }
 
-    var form = document.getElementById('filter');
-    form.removeAttribute('action');
-    var table = document.querySelector('main table');
-    var count = document.querySelector('main p.small');
-    var older = document.getElementById('older');
-    var newer = document.createElement('a');
-    newer.href = '#';
-    newer.innerHTML = '&lt; Newer entries';
-    newer.style.marginRight = '16px';
-    older.parentNode.insertBefore(newer, older);
-    var page = 1;
+    var filterForm = document.getElementById('filter');
+    filterForm.removeAttribute('action');
+    auditTable = document.querySelector('main table');
+    auditCount = document.querySelector('main p.small');
 
-    var TYPES = {
-        'All actions': 'all',
-        'Sign-ins': 'signins',
-        'Deliveries': 'deliveries',
-        'Stock out': 'stockout',
-        'Item counts': 'counts',
-        'Items': 'items',
-        'User accounts': 'users',
-    };
+    olderLink = document.getElementById('older');
+    newerLink = document.createElement('a');
+    newerLink.href = '#';
+    newerLink.innerHTML = '&lt; Newer entries';
+    newerLink.style.marginRight = '16px';
+    olderLink.parentNode.insertBefore(newerLink, olderLink);
 
-    async function load() {
-        var params = new URLSearchParams({
-            search: document.getElementById('search').value.trim(),
-            from: document.getElementById('from').value,
-            to: document.getElementById('to').value,
-            type: TYPES[document.getElementById('type').value] || 'all',
-            page: page,
-        });
-        try {
-            var data = await api('audit.php?' + params);
-        } catch (err) {
-            showError(count, err);
-            return;
+    olderLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        auditPageNumber = auditPageNumber + 1;
+        loadAudit();
+        window.scrollTo(0, 0);
+    });
+
+    newerLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        if (auditPageNumber > 1) {
+            auditPageNumber = auditPageNumber - 1;
         }
-
-        var shownUpTo = (data.page - 1) * data.perPage + data.entries.length;
-        count.textContent = data.total ? 'Showing ' + ((data.page - 1) * data.perPage + 1) + ' to ' + shownUpTo + ' of ' + data.total : 'No entries found';
-
-        table.innerHTML = '<tr><th>Time</th><th>User</th><th>Action</th><th>Record</th><th>Result</th></tr>' +
-            data.entries.map(function (e) {
-                var result = e.result === 'FAILED'
-                    ? '<span class="tag red">Failed</span>'
-                    : 'OK';
-                return '<tr><td>' + dateTime(e.time) + (e.archived ? '<br><span class="small">archived</span>' : '') + '</td>' +
-                    '<td>' + esc(e.username) + '<br><span class="small">' + esc(e.roleName) + '</span></td>' +
-                    '<td>' + esc(e.actionLabel) + '</td>' +
-                    '<td>' + esc(e.description || '-') + '</td>' +
-                    '<td>' + result + '</td></tr>';
-            }).join('');
-
-        older.style.display = shownUpTo < data.total ? '' : 'none';
-        newer.style.display = data.page > 1 ? '' : 'none';
-    }
-
-    older.addEventListener('click', function (e) {
-        e.preventDefault();
-        page++;
-        load();
+        loadAudit();
         window.scrollTo(0, 0);
     });
 
-    newer.addEventListener('click', function (e) {
-        e.preventDefault();
-        page = Math.max(1, page - 1);
-        load();
-        window.scrollTo(0, 0);
-    });
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        page = 1;
-        load();
+    filterForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        auditPageNumber = 1;
+        loadAudit();
     });
 
     var timer;
     document.getElementById('search').addEventListener('input', function () {
         clearTimeout(timer);
-        timer = setTimeout(function () { page = 1; load(); }, 400);
+        timer = setTimeout(function () {
+            auditPageNumber = 1;
+            loadAudit();
+        }, 400);
     });
 
-    load();
-})();
+    loadAudit();
+}
+
+setupAuditPage();

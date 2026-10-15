@@ -1,168 +1,262 @@
-(async function () {
-    var user;
+var userList = [];
+var editingUserId = null;
+var loggedInUser = null;
+var userTable;
+var userCount;
+var latestRequest = 0;
+var userForm;
+var userFormError;
+
+function field(id) {
+    return document.getElementById(id);
+}
+
+function findUser(id) {
+    for (var i = 0; i < userList.length; i++) {
+        if (userList[i].id === id) {
+            return userList[i];
+        }
+    }
+    return null;
+}
+
+function userRow(user) {
+    var status = 'Active';
+    if (!user.isActive) {
+        status = '<span class="tag grey">Inactive</span>';
+    }
+
+    var actions = '<a href="#" data-edit="' + user.id + '">Edit</a>';
+    if (user.id !== loggedInUser.id) {
+        var toggleText = 'Activate';
+        if (user.isActive) {
+            toggleText = 'Deactivate';
+        }
+        actions += ' - <a href="#" data-toggle="' + user.id + '">' + toggleText + '</a>';
+    }
+
+    return '<tr><td>' + esc(user.fullName) + '</td>' +
+        '<td>' + esc(user.phone || '-') + '</td>' +
+        '<td>' + esc(user.email) + '</td>' +
+        '<td>' + esc(user.roleName) + '</td>' +
+        '<td>' + esc(user.department || '-') + '</td>' +
+        '<td>' + status + '</td>' +
+        '<td>' + actions + '</td></tr>';
+}
+
+async function loadUsers() {
+    var sort = 'name';
+    if (field('sort').value === 'Sort by role') {
+        sort = 'role';
+    } else if (field('sort').value === 'Sort by status') {
+        sort = 'status';
+    }
+
+    var params = new URLSearchParams({ search: field('search').value.trim(), sort: sort });
+
+    latestRequest = latestRequest + 1;
+    var thisRequest = latestRequest;
+
+    var data;
     try {
-        user = await startPage();
-    } catch (err) {
+        data = await api('users.php?' + params);
+    } catch (error) {
+        if (thisRequest !== latestRequest) {
+            return;
+        }
+        showError(userCount, error);
         return;
     }
-    if (user.role !== 'ADMIN') {
+
+    if (thisRequest !== latestRequest) {
+        return;
+    }
+
+    userList = data.users;
+    userCount.textContent = 'Showing ' + userList.length + ' of ' + data.total;
+
+    var html = '<tr><th>Full Name</th><th>Contact No.</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Actions</th></tr>';
+    for (var i = 0; i < userList.length; i++) {
+        html += userRow(userList[i]);
+    }
+    userTable.innerHTML = html;
+}
+
+function openUserForm(user) {
+    userFormError.hidden = true;
+    userForm.reset();
+
+    var passwordLabel = userForm.querySelector('label[for=password]');
+    var saveButton = userForm.querySelector('button[type=submit]');
+    var title = document.querySelector('#add-user h2');
+
+    if (user === null) {
+        editingUserId = null;
+        title.textContent = 'Add User';
+        saveButton.textContent = 'Save User';
+        field('username').readOnly = false;
+        field('password').required = true;
+        passwordLabel.innerHTML = '<b>Default Password</b>';
+    } else {
+        editingUserId = user.id;
+        title.textContent = 'Edit User';
+        saveButton.textContent = 'Save Changes';
+        field('username').readOnly = true;
+        field('password').required = false;
+        passwordLabel.innerHTML = '<b>New Password (leave blank to keep)</b>';
+
+        var nameParts = user.fullName.split(' ');
+        field('last').value = nameParts.pop();
+        field('first').value = nameParts.join(' ');
+        field('contact').value = user.phone || '';
+        field('email').value = user.email;
+        field('username').value = user.username;
+        field('role-admin').checked = user.role === 'ADMIN';
+        field('role-staff').checked = user.role !== 'ADMIN';
+        field('dept-hostel').checked = user.role === 'STAFF_HOSTEL';
+        field('dept-canteen').checked = user.role === 'STAFF_CANTEEN';
+    }
+
+    openPopup('add-user');
+}
+
+function chosenRole() {
+    if (field('role-admin').checked) {
+        return 'ADMIN';
+    }
+    if (field('role-staff').checked && field('dept-hostel').checked) {
+        return 'STAFF_HOSTEL';
+    }
+    if (field('role-staff').checked && field('dept-canteen').checked) {
+        return 'STAFF_CANTEEN';
+    }
+    return null;
+}
+
+async function saveUser(event) {
+    event.preventDefault();
+    userFormError.hidden = true;
+
+    var role = chosenRole();
+    if (role === null) {
+        if (field('role-staff').checked) {
+            showFormError(userFormError, 'Choose Hostel Staff or Canteen Staff for a staff account.');
+        } else {
+            showFormError(userFormError, 'Choose a system role.');
+        }
+        return;
+    }
+
+    var body = {
+        firstName: field('first').value.trim(),
+        lastName: field('last').value.trim(),
+        phone: field('contact').value.trim(),
+        email: field('email').value.trim(),
+        role: role
+    };
+
+    if (editingUserId === null) {
+        body.username = field('username').value.trim();
+        body.password = field('password').value;
+    } else {
+        var editing = findUser(editingUserId);
+        if (editing.role !== role) {
+            body.department = '';
+        }
+        if (field('password').value) {
+            body.newPassword = field('password').value;
+        }
+    }
+
+    var saveButton = userForm.querySelector('button[type=submit]');
+    saveButton.disabled = true;
+    try {
+        if (editingUserId === null) {
+            await api('users.php', 'POST', body);
+        } else {
+            await api('users.php?id=' + editingUserId, 'PUT', body);
+        }
+        closePopup();
+        loadUsers();
+    } catch (error) {
+        showFormError(userFormError, error.message);
+    }
+    saveButton.disabled = false;
+}
+
+async function toggleUser(user) {
+    var question = 'Activate ' + user.fullName + '?';
+    if (user.isActive) {
+        question = 'Deactivate ' + user.fullName + '? They will not be able to log in.';
+    }
+    if (!confirm(question)) {
+        return;
+    }
+
+    try {
+        await api('users.php?id=' + user.id, 'PUT', { isActive: !user.isActive });
+        loadUsers();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function setupUsersPage() {
+    try {
+        loggedInUser = await startPage();
+    } catch (error) {
+        return;
+    }
+    if (loggedInUser.role !== 'ADMIN') {
         adminOnly();
         return;
     }
 
-    var filter = document.getElementById('filter');
-    filter.removeAttribute('action');
-    var table = document.querySelector('main > .box table');
-    var count = document.querySelector('main > .box p.small');
-    var popup = document.getElementById('add-user');
-    var popupForm = popup.querySelector('form');
-    popupForm.removeAttribute('action');
-    var popupTitle = popup.querySelector('h2');
-    var saveBtn = popupForm.querySelector('button[type=submit]');
-    var passwordLabel = popupForm.querySelector('label[for=password]');
-    var users = [];
-    var editingId = null;
+    var filterForm = document.getElementById('filter');
+    filterForm.removeAttribute('action');
+    userTable = document.querySelector('main > .box table');
+    userCount = document.querySelector('main > .box p.small');
+    userForm = document.querySelector('#add-user form');
+    userForm.removeAttribute('action');
+    userFormError = addErrorLine(userForm);
 
-    var error = document.createElement('p');
-    error.style.color = '#c0392b';
-    error.hidden = true;
-    popupForm.insertBefore(error, popupForm.querySelector('.actions'));
-
-    function field(id) {
-        return document.getElementById(id);
-    }
-
-    async function load() {
-        var sort = { 'Sort by name': 'name', 'Sort by role': 'role', 'Sort by status': 'status' }[field('sort').value] || 'name';
-        try {
-            var data = await api('users.php?' + new URLSearchParams({ search: field('search').value.trim(), sort: sort }));
-        } catch (err) {
-            showError(count, err);
-            return;
-        }
-        users = data.users;
-        count.textContent = 'Showing ' + users.length + ' of ' + data.total;
-        table.innerHTML = '<tr><th>Full Name</th><th>Contact No.</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Actions</th></tr>' +
-            users.map(function (u) {
-                var self = u.id === user.id;
-                return '<tr><td>' + esc(u.fullName) + '</td><td>' + esc(u.phone || '-') + '</td><td>' + esc(u.email) + '</td>' +
-                    '<td>' + esc(u.roleName) + '</td><td>' + esc(u.department || '-') + '</td>' +
-                    '<td>' + (u.isActive ? 'Active' : '<span class="tag grey">Inactive</span>') + '</td>' +
-                    '<td><a href="#" data-edit="' + u.id + '">Edit</a>' +
-                    (self ? '' : ' - <a href="#" data-toggle="' + u.id + '">' + (u.isActive ? 'Deactivate' : 'Activate') + '</a>') +
-                    '</td></tr>';
-            }).join('');
-    }
-
-    function openPopup(u) {
-        editingId = u ? u.id : null;
-        error.hidden = true;
-        popupForm.reset();
-        popupTitle.textContent = u ? 'Edit User' : 'Add User';
-        saveBtn.textContent = u ? 'Save Changes' : 'Save User';
-        field('username').readOnly = !!u;
-        field('password').required = !u;
-        passwordLabel.innerHTML = u ? '<b>New Password (leave blank to keep)</b>' : '<b>Default Password</b>';
-        if (u) {
-            var parts = u.fullName.split(' ');
-            field('last').value = parts.pop();
-            field('first').value = parts.join(' ');
-            field('contact').value = u.phone || '';
-            field('email').value = u.email;
-            field('username').value = u.username;
-            field('role-admin').checked = u.role === 'ADMIN';
-            field('role-staff').checked = u.role !== 'ADMIN';
-            field('dept-hostel').checked = u.role === 'STAFF_HOSTEL';
-            field('dept-canteen').checked = u.role === 'STAFF_CANTEEN';
-        }
-        window.location.hash = 'add-user';
-    }
-
-    function closePopup() {
-        window.location.hash = '';
-    }
-
-    document.querySelector('main a.button[href="#add-user"]').addEventListener('click', function (e) {
-        e.preventDefault();
-        openPopup(null);
+    document.querySelector('main a.button[href="#add-user"]').addEventListener('click', function (event) {
+        event.preventDefault();
+        openUserForm(null);
     });
 
-    table.addEventListener('click', async function (e) {
-        var edit = e.target.getAttribute('data-edit');
-        var toggle = e.target.getAttribute('data-toggle');
-        if (!edit && !toggle) return;
-        e.preventDefault();
-        var u = users.find(function (x) { return x.id === Number(edit || toggle); });
-        if (edit) return openPopup(u);
-
-        var verb = u.isActive ? 'Deactivate' : 'Activate';
-        if (!confirm(verb + ' ' + u.fullName + '?' + (u.isActive ? ' They will not be able to log in.' : ''))) return;
-        try {
-            await api('users.php?id=' + u.id, 'PUT', { isActive: !u.isActive });
-            load();
-        } catch (err) {
-            alert(err.message);
+    userTable.addEventListener('click', function (event) {
+        var editId = event.target.getAttribute('data-edit');
+        var toggleId = event.target.getAttribute('data-toggle');
+        if (editId) {
+            event.preventDefault();
+            openUserForm(findUser(Number(editId)));
+        } else if (toggleId) {
+            event.preventDefault();
+            toggleUser(findUser(Number(toggleId)));
         }
     });
 
-    popupForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        error.hidden = true;
+    userForm.addEventListener('submit', saveUser);
 
-        var role;
-        if (field('role-admin').checked) role = 'ADMIN';
-        else if (field('role-staff').checked && field('dept-hostel').checked) role = 'STAFF_HOSTEL';
-        else if (field('role-staff').checked && field('dept-canteen').checked) role = 'STAFF_CANTEEN';
-        else {
-            error.textContent = field('role-staff').checked ? 'Choose Hostel Staff or Canteen Staff for a staff account.' : 'Choose a system role.';
-            error.hidden = false;
-            return;
-        }
-
-        var body = {
-            firstName: field('first').value.trim(),
-            lastName: field('last').value.trim(),
-            phone: field('contact').value.trim(),
-            email: field('email').value.trim(),
-            role: role,
-        };
-        if (editingId === null) {
-            body.username = field('username').value.trim();
-            body.password = field('password').value;
-        } else {
-            var editing = users.find(function (x) { return x.id === editingId; });
-            if (editing.role !== role) body.department = '';
-            if (field('password').value) body.newPassword = field('password').value;
-        }
-
-        saveBtn.disabled = true;
-        try {
-            if (editingId === null) await api('users.php', 'POST', body);
-            else await api('users.php?id=' + editingId, 'PUT', body);
-            closePopup();
-            load();
-        } catch (err) {
-            error.textContent = err.message;
-            error.hidden = false;
-        }
-        saveBtn.disabled = false;
-    });
-
-    popupForm.querySelector('.actions a.button').addEventListener('click', function (e) {
-        e.preventDefault();
+    userForm.querySelector('.actions a.button').addEventListener('click', function (event) {
+        event.preventDefault();
         closePopup();
     });
 
-    filter.addEventListener('submit', function (e) {
-        e.preventDefault();
-        load();
+    filterForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        loadUsers();
     });
-    field('sort').addEventListener('change', load);
+    field('sort').addEventListener('change', loadUsers);
+
     var timer;
     field('search').addEventListener('input', function () {
         clearTimeout(timer);
-        timer = setTimeout(load, 300);
+        timer = setTimeout(loadUsers, 300);
     });
 
-    load();
-})();
+    loadUsers();
+}
+
+setupUsersPage();

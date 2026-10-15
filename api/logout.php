@@ -6,7 +6,12 @@ input();
 
 if (!empty($_SESSION['user_id'])) {
     $user = query_one('SELECT username FROM users WHERE user_id = ?', [$_SESSION['user_id']]);
-    audit('LOGOUT', 'AUTH', $_SESSION['user_id'], 'User ' . ($user['username'] ?? '?') . ' logged out');
+
+    $username = '?';
+    if ($user !== null) {
+        $username = $user['username'];
+    }
+    audit('LOGOUT', 'AUTH', $_SESSION['user_id'], 'User ' . $username . ' logged out');
 }
 
 $_SESSION = [];

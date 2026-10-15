@@ -1,114 +1,135 @@
-(async function () {
+var detailsForm;
+var detailsError;
+var passwordForm;
+var passwordError;
+
+function field(id) {
+    return document.getElementById(id);
+}
+
+function detailRow(label, value) {
+    return '<tr><td class="label">' + label + '</td><td>' + esc(value) + '</td></tr>';
+}
+
+async function loadAccount() {
+    var data;
     try {
-        await startPage();
-    } catch (err) {
+        data = await api('account.php');
+    } catch (error) {
+        showError(field('details'), error);
+        return;
+    }
+    var user = data.user;
+
+    field('photo').textContent = (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
+    field('name').textContent = user.fullName;
+    document.querySelector('#person p.small').textContent = user.email;
+
+    field('details').innerHTML =
+        detailRow('Username', user.username) +
+        detailRow('Role', user.roleName) +
+        detailRow('Department', user.department || '-') +
+        detailRow('Contact', user.phone || '-') +
+        detailRow('Account created', dateTime(user.createdAt)) +
+        detailRow('Last sign-in', dateTime(user.lastLoginAt));
+
+    var permissions = '';
+    for (var name in data.permissions) {
+        permissions += '<tr><td>' + esc(name) + '</td><td class="num">' + esc(data.permissions[name]) + '</td></tr>';
+    }
+    field('perms').innerHTML = permissions;
+
+    var activity = '';
+    for (var i = 0; i < data.recentActivity.length; i++) {
+        var item = data.recentActivity[i];
+        var failed = '';
+        if (item.failed) {
+            failed = ' <span class="tag red">Failed</span>';
+        }
+        activity += '<tr><td>' + esc(item.description) + failed + '</td><td class="num small">' + dateTime(item.time) + '</td></tr>';
+    }
+    if (activity === '') {
+        activity = '<tr><td>No activity yet.</td></tr>';
+    }
+    field('activity').innerHTML = activity;
+
+    var seeAll = document.querySelector('a.more[href="audit-trail.html"]');
+    if (seeAll && user.role !== 'ADMIN') {
+        seeAll.style.display = 'none';
+    }
+
+    field('first').value = user.firstName;
+    field('last').value = user.lastName;
+    field('contact').value = user.phone || '';
+    field('email').value = user.email;
+}
+
+async function saveDetails(event) {
+    event.preventDefault();
+    detailsError.hidden = true;
+
+    var saveButton = detailsForm.querySelector('button[type=submit]');
+    saveButton.disabled = true;
+    try {
+        await api('account.php', 'PUT', {
+            firstName: field('first').value.trim(),
+            lastName: field('last').value.trim(),
+            phone: field('contact').value.trim(),
+            email: field('email').value.trim()
+        });
+        closePopup();
+
+        var me = await api('me.php');
+        document.querySelector('.dropbtn').innerHTML = 'Hi, ' + esc(me.user.fullName.split(' ')[0]) + ' &#9662;';
+        field('who').innerHTML = esc(me.user.fullName) + '<br><span>' + esc(me.user.roleName) + '</span>';
+        loadAccount();
+    } catch (error) {
+        showFormError(detailsError, error.message);
+    }
+    saveButton.disabled = false;
+}
+
+async function changePassword(event) {
+    event.preventDefault();
+    passwordError.hidden = true;
+
+    if (field('new-pass').value !== field('again').value) {
+        showFormError(passwordError, 'The new passwords do not match.');
         return;
     }
 
-    var popup = document.getElementById('edit-details');
-    var form = popup.querySelector('form');
-    form.removeAttribute('action');
-    var saveBtn = form.querySelector('button[type=submit]');
-    var error = document.createElement('p');
-    error.style.color = '#c0392b';
-    error.hidden = true;
-    form.insertBefore(error, form.querySelector('.actions'));
+    try {
+        await api('account.php', 'POST', {
+            currentPassword: field('current').value,
+            newPassword: field('new-pass').value
+        });
+        passwordForm.reset();
+        closePopup();
+        alert('Password changed.');
+        loadAccount();
+    } catch (error) {
+        showFormError(passwordError, error.message);
+    }
+}
 
-    function field(id) {
-        return document.getElementById(id);
+async function setupAccountPage() {
+    try {
+        await startPage();
+    } catch (error) {
+        return;
     }
 
-    async function load() {
-        try {
-            var data = await api('account.php');
-        } catch (err) {
-            showError(document.getElementById('details'), err);
-            return;
-        }
-        var u = data.user;
+    detailsForm = document.querySelector('#edit-details form');
+    detailsForm.removeAttribute('action');
+    detailsError = addErrorLine(detailsForm);
+    detailsForm.addEventListener('submit', saveDetails);
 
-        document.getElementById('photo').textContent = (u.firstName.charAt(0) + u.lastName.charAt(0)).toUpperCase();
-        document.getElementById('name').textContent = u.fullName;
-        document.querySelector('#person p.small').textContent = u.email;
+    passwordForm = document.querySelector('#change-password form');
+    passwordForm.removeAttribute('action');
+    passwordError = addErrorLine(passwordForm);
+    passwordForm.addEventListener('submit', changePassword);
 
-        document.getElementById('details').innerHTML = [
-            ['Username', u.username],
-            ['Role', u.roleName],
-            ['Department', u.department || '-'],
-            ['Contact', u.phone || '-'],
-            ['Account created', dateTime(u.createdAt)],
-            ['Last sign-in', dateTime(u.lastLoginAt)],
-        ].map(function (r) {
-            return '<tr><td class="label">' + r[0] + '</td><td>' + esc(r[1]) + '</td></tr>';
-        }).join('');
+    loadAccount();
+}
 
-        document.getElementById('perms').innerHTML = Object.keys(data.permissions).map(function (k) {
-            return '<tr><td>' + esc(k) + '</td><td class="num">' + esc(data.permissions[k]) + '</td></tr>';
-        }).join('');
-
-        document.getElementById('activity').innerHTML = data.recentActivity.length ? data.recentActivity.map(function (a) {
-            return '<tr><td>' + esc(a.description) + (a.failed ? ' <span class="tag red">Failed</span>' : '') +
-                '</td><td class="num small">' + dateTime(a.time) + '</td></tr>';
-        }).join('') : '<tr><td>No activity yet.</td></tr>';
-
-        var seeAll = document.querySelector('a.more[href="audit-trail.html"]');
-        if (seeAll && u.role !== 'ADMIN') seeAll.style.display = 'none';
-
-        field('first').value = u.firstName;
-        field('last').value = u.lastName;
-        field('contact').value = u.phone || '';
-        field('email').value = u.email;
-    }
-
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        error.hidden = true;
-        saveBtn.disabled = true;
-        try {
-            await api('account.php', 'PUT', {
-                firstName: field('first').value.trim(),
-                lastName: field('last').value.trim(),
-                phone: field('contact').value.trim(),
-                email: field('email').value.trim(),
-            });
-            window.location.hash = '';
-            var fresh = (await api('me.php')).user;
-            document.querySelector('.dropbtn').innerHTML = 'Hi, ' + esc(fresh.fullName.split(' ')[0]) + ' &#9662;';
-            document.getElementById('who').innerHTML = esc(fresh.fullName) + '<br><span>' + esc(fresh.roleName) + '</span>';
-            load();
-        } catch (err) {
-            error.textContent = err.message;
-            error.hidden = false;
-        }
-        saveBtn.disabled = false;
-    });
-
-    var passForm = document.querySelector('#change-password form');
-    passForm.removeAttribute('action');
-    var passError = document.createElement('p');
-    passError.style.color = '#c0392b';
-    passError.hidden = true;
-    passForm.insertBefore(passError, passForm.querySelector('.actions'));
-
-    passForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        passError.hidden = true;
-        if (field('new-pass').value !== field('again').value) {
-            passError.textContent = 'The new passwords do not match.';
-            passError.hidden = false;
-            return;
-        }
-        try {
-            await api('account.php', 'POST', { currentPassword: field('current').value, newPassword: field('new-pass').value });
-            passForm.reset();
-            window.location.hash = '';
-            alert('Password changed.');
-            load();
-        } catch (err) {
-            passError.textContent = err.message;
-            passError.hidden = false;
-        }
-    });
-
-    load();
-})();
+setupAccountPage();
