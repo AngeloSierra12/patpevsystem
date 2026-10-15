@@ -290,7 +290,7 @@ table {
     margin-top: 18px;
 }
 
-#btn {
+#btn, #btn2 {
     height: 36px;
     padding: 0 18px;
     border: none;
@@ -302,7 +302,7 @@ table {
     transition: 0.3s;
 }
 
-#btn:hover {
+#btn:hover, #btn2:hover {
     opacity: 0.7;
 }
 

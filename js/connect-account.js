@@ -14,10 +14,6 @@
     error.hidden = true;
     form.insertBefore(error, form.querySelector('.actions'));
 
-    var passwordBtn = Array.prototype.find.call(document.querySelectorAll('.actions a.button'), function (a) {
-        return a.textContent.trim() === 'Change password';
-    });
-
     function field(id) {
         return document.getElementById(id);
     }
@@ -87,27 +83,32 @@
         saveBtn.disabled = false;
     });
 
-    if (passwordBtn) {
-        passwordBtn.classList.remove('off');
-        passwordBtn.href = '#';
-        passwordBtn.addEventListener('click', async function (e) {
-            e.preventDefault();
-            var current = prompt('Current password:');
-            if (current === null) return;
-            var next = prompt('New password (at least 8 characters):');
-            if (next === null) return;
-            var again = prompt('Type the new password again:');
-            if (again === null) return;
-            if (next !== again) return alert('The new passwords do not match.');
-            try {
-                await api('account.php', 'POST', { currentPassword: current, newPassword: next });
-                alert('Password changed.');
-                load();
-            } catch (err) {
-                alert(err.message);
-            }
-        });
-    }
+    var passForm = document.querySelector('#change-password form');
+    passForm.removeAttribute('action');
+    var passError = document.createElement('p');
+    passError.style.color = '#c0392b';
+    passError.hidden = true;
+    passForm.insertBefore(passError, passForm.querySelector('.actions'));
+
+    passForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        passError.hidden = true;
+        if (field('new-pass').value !== field('again').value) {
+            passError.textContent = 'The new passwords do not match.';
+            passError.hidden = false;
+            return;
+        }
+        try {
+            await api('account.php', 'POST', { currentPassword: field('current').value, newPassword: field('new-pass').value });
+            passForm.reset();
+            window.location.hash = '';
+            alert('Password changed.');
+            load();
+        } catch (err) {
+            passError.textContent = err.message;
+            passError.hidden = false;
+        }
+    });
 
     load();
 })();

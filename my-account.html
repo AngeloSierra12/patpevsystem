@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>My Account - PATVEP Inventory</title>
+    <title>My Account - PATVEP StockHub</title>
     <link rel="icon" type="image/png" href="images/bpsu-logo.png">
     <link rel="stylesheet" type="text/css" href="css/my-account.css">
 </head>
@@ -13,7 +13,7 @@
         <div id="container">
             <div id="left-div">
                 <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
-                <p>PATVEP Hostel &amp; Canteen Inventory</p>
+                <p>PATVEP StockHub</p>
             </div>
             <div id="right-div">
                 <div class="dropdown">
@@ -21,7 +21,7 @@
                     <div class="dropdown-content">
                         <p id="who">Andrew Santos<br><span>Administrator</span></p>
                         <a href="my-account.html">My Account</a>
-                        <a class="off">Change password</a>
+                        <a href="my-account.html#change-password">Change password</a>
                         <a href="index.html" id="logout">Log out</a>
                     </div>
                 </div>
@@ -29,8 +29,8 @@
         </div>
         <div id="nav-bar">
             <a class="nav" href="dashboard.html">Dashboard</a>
-            <a class="nav off">Inventory</a>
-            <a class="nav off">Suppliers</a>
+            <a class="nav" href="inventory.html">Inventory</a>
+            <a class="nav" href="suppliers.html">Suppliers</a>
             <a class="nav" href="reports.html">Reports</a>
             <a class="nav" href="audit-trail.html">Audit Trail</a>
             <a class="nav" href="users.html">Users</a>
@@ -61,7 +61,7 @@
                     <tr><td class="label">Last sign-in</td><td>2026-09-30 08:02</td></tr>
                 </table>
                 <div class="actions">
-                    <a class="button off">Change password</a>
+                    <a class="button" href="#change-password">Change password</a>
                     <a class="button" href="#edit-details">Edit my details</a>
                 </div>
             </div>
@@ -117,6 +117,26 @@
                     <div class="actions">
                         <a class="button" href="#">Cancel</a>
                         <button type="submit" id="btn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- popup opens with #change-password in the link, no js -->
+        <div class="popup" id="change-password">
+            <div class="popup-box">
+                <h2>Change password</h2>
+                <form action="my-account.html">
+                    <label for="current"><b>Current Password</b></label>
+                    <input type="password" id="current" required>
+                    <label for="new-pass"><b>New Password</b></label>
+                    <input type="password" id="new-pass" minlength="8" required>
+                    <label for="again"><b>Type the New Password Again</b></label>
+                    <input type="password" id="again" minlength="8" required>
+                    <p class="small">At least 8 characters.</p>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn2">Save</button>
                     </div>
                 </form>
             </div>

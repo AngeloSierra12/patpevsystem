@@ -46,6 +46,12 @@ async function startPage() {
             var href = a.getAttribute('href') || '';
             if (href === 'reports.html' || href === 'audit-trail.html' || href === 'users.html') a.style.display = 'none';
         });
+    } else {
+        // admins can't open inventory or suppliers (use case)
+        document.querySelectorAll('#nav-bar a').forEach(function (a) {
+            var href = a.getAttribute('href') || '';
+            if (href === 'inventory.html' || href === 'suppliers.html') a.style.display = 'none';
+        });
     }
     return currentUser;
 }
