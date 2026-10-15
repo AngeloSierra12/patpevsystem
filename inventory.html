@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory - PATVEP Inventory</title>
+    <link rel="icon" type="image/png" href="images/bpsu-logo.png">
+    <link rel="stylesheet" type="text/css" href="css/inventory.css">
+</head>
+<body>
+
+    <header>
+        <div id="container">
+            <div id="left-div">
+                <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
+                <p>PATVEP Hostel &amp; Canteen Inventory</p>
+            </div>
+            <div id="right-div">
+                <div class="dropdown">
+                    <button class="dropbtn">Hi, Darren &#9662;</button>
+                    <div class="dropdown-content">
+                        <p id="who">Darren Tamayo<br><span>Canteen Staff</span></p>
+                        <a href="my-account.html">My Account</a>
+                        <a class="off">Change password</a>
+                        <a href="index.html" id="logout">Log out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="nav-bar">
+            <a class="nav" href="dashboard.html">Dashboard</a>
+            <a class="nav" id="active" href="inventory.html">Inventory</a>
+            <a class="nav" href="suppliers.html">Suppliers</a>
+            <a class="nav" href="my-account.html">My Account</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Inventory</h1>
+        <p id="date">Wednesday, September 30, 2026</p>
+
+        <div class="box">
+            <div class="top-buttons">
+                <a class="button" href="#add-item">Add item</a>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Item Code</th>
+                    <th>Item Name</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Current Stock</th>
+                    <th>Unit</th>
+                    <th>Reorder Level</th>
+                    <th>Status</th>
+                    <th>Quick Actions</th>
+                </tr>
+                <tr>
+                    <td>C-STP-001</td>
+                    <td>Jasmine Premium Rice (50kg Sack)</td>
+                    <td>Food Staples</td>
+                    <td>Canteen</td>
+                    <td>5.5</td>
+                    <td>sacks</td>
+                    <td>3</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-MEA-002</td>
+                    <td>Fresh Dressed Chicken (Cut)</td>
+                    <td>Meat &amp; Poultry</td>
+                    <td>Canteen</td>
+                    <td>19.5</td>
+                    <td>kg</td>
+                    <td>10</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-MEA-003</td>
+                    <td>Fresh Pork Liempo (Sliced)</td>
+                    <td>Meat &amp; Poultry</td>
+                    <td>Canteen</td>
+                    <td>13.5</td>
+                    <td>kg</td>
+                    <td>8</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-ING-004</td>
+                    <td>Pure Palm Cooking Oil (20L Tin)</td>
+                    <td>Ingredients</td>
+                    <td>Canteen</td>
+                    <td>5</td>
+                    <td>tins</td>
+                    <td>2</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-ING-005</td>
+                    <td>Refined White Sugar (25kg Bag)</td>
+                    <td>Ingredients</td>
+                    <td>Canteen</td>
+                    <td>1</td>
+                    <td>bags</td>
+                    <td>2</td>
+                    <td><span class="tag red">Critical</span></td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-ING-006</td>
+                    <td>Iodized Fine Salt (1kg Pack)</td>
+                    <td>Ingredients</td>
+                    <td>Canteen</td>
+                    <td>20</td>
+                    <td>packs</td>
+                    <td>5</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-BEV-007</td>
+                    <td>Ground Barako Coffee (1kg)</td>
+                    <td>Beverages</td>
+                    <td>Canteen</td>
+                    <td>8</td>
+                    <td>packs</td>
+                    <td>5</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-BEV-008</td>
+                    <td>Evaporated Filled Milk (370ml Can)</td>
+                    <td>Beverages</td>
+                    <td>Canteen</td>
+                    <td>42</td>
+                    <td>cans</td>
+                    <td>24</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-BEV-009</td>
+                    <td>Purified Bottled Water (500ml)</td>
+                    <td>Beverages</td>
+                    <td>Canteen</td>
+                    <td>180</td>
+                    <td>bottles</td>
+                    <td>48</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-STP-010</td>
+                    <td>Canned Corned Beef (260g)</td>
+                    <td>Food Staples</td>
+                    <td>Canteen</td>
+                    <td>48</td>
+                    <td>cans</td>
+                    <td>20</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-PKG-011</td>
+                    <td>Biodegradable Bento Box 3-Div</td>
+                    <td>Supplies &amp; Packaging</td>
+                    <td>Canteen</td>
+                    <td>380</td>
+                    <td>pcs</td>
+                    <td>100</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+                <tr>
+                    <td>C-CLN-012</td>
+                    <td>Commercial Dishwashing Liquid (1 Gal)</td>
+                    <td>Cleaning</td>
+                    <td>Canteen</td>
+                    <td>4</td>
+                    <td>gallons</td>
+                    <td>1</td>
+                    <td>OK</td>
+                    <td><a href="#use-item">Use</a> - <a href="#edit-item">Edit</a> - <a href="#count-item">Count</a> - <a href="#item-details">Details</a></td>
+                </tr>
+            </table>
+
+            <form id="filter" action="inventory.html">
+                <p class="small">Filter by:</p>
+                <div class="filters">
+                    <select id="location">
+                        <option>Canteen</option>
+                    </select>
+                    <select id="category">
+                        <option>All categories</option>
+                        <option>Food Staples</option>
+                        <option>Meat &amp; Poultry</option>
+                        <option>Ingredients</option>
+                        <option>Beverages</option>
+                        <option>Supplies &amp; Packaging</option>
+                        <option>Cleaning</option>
+                    </select>
+                    <select id="status">
+                        <option>All statuses</option>
+                        <option>OK</option>
+                        <option>Low stock</option>
+                        <option>Critical</option>
+                    </select>
+                </div>
+                <div class="filters">
+                    <input type="text" id="search" placeholder="Name or code">
+                    <input type="checkbox" id="inactive">
+                    <label class="inline" for="inactive">Show inactive items</label>
+                </div>
+            </form>
+
+            <div class="pages">
+                <a href="#">&larr;</a>
+                <a href="#">&rarr;</a>
+                <p class="small">Page 1 of 1</p>
+            </div>
+        </div>
+
+        <!-- popups open with the #id in the link, no js. they show the first item for now -->
+        <div class="popup" id="add-item">
+            <div class="popup-box">
+                <h2>Add Item</h2>
+                <form action="inventory.html">
+                    <div class="row">
+                        <div>
+                            <label for="add-name"><b>Item Name *</b></label>
+                            <input type="text" id="add-name" required>
+                        </div>
+                        <div>
+                            <label for="add-code"><b>Item Code *</b></label>
+                            <input type="text" id="add-code" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="add-category"><b>Category *</b></label>
+                            <select id="add-category">
+                            <option>Food Staples</option>
+                            <option>Meat &amp; Poultry</option>
+                            <option>Ingredients</option>
+                            <option>Beverages</option>
+                            <option>Supplies &amp; Packaging</option>
+                            <option>Cleaning</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="add-location"><b>Location *</b></label>
+                            <select id="add-location">
+                                <option>Canteen</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="add-reorder"><b>Reorder Level *</b></label>
+                            <input type="text" id="add-reorder" required>
+                        </div>
+                        <div>
+                            <label for="add-unit"><b>Unit *</b></label>
+                            <input type="text" id="add-unit" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="add-critical"><b>Critical Level *</b></label>
+                            <input type="text" id="add-critical" required>
+                        </div>
+                        <div>
+                            <label for="add-cost"><b>Unit Cost</b></label>
+                            <input type="text" id="add-cost">
+                        </div>
+                    </div>
+                    <label for="add-supplier"><b>Preferred Supplier</b></label>
+                    <select id="add-supplier">
+                        <option>Bataan Fresh Farms &amp; Meat Trading</option>
+                        <option>BPSU Agricultural Cooperative &amp; Canteen Supply</option>
+                        <option>Balanga Wholesale Grocery &amp; Packaging Center</option>
+                        <option>Central Luzon Beverage &amp; Refreshment Corp.</option>
+                        <option>Bataan Linen &amp; Hotel Supply Co.</option>
+                    </select>
+                    <label for="add-description"><b>Description</b></label>
+                    <textarea id="add-description"></textarea>
+                    <p class="small">New items start at 0. Stock goes up when a delivery is recorded.</p>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="popup" id="edit-item">
+            <div class="popup-box">
+                <h2>Edit Jasmine Premium Rice (50kg Sack) (C-STP-001)</h2>
+                <form action="inventory.html">
+                    <div class="row">
+                        <div>
+                            <label for="edit-name"><b>Item Name *</b></label>
+                            <input type="text" id="edit-name" value="Jasmine Premium Rice (50kg Sack)" required>
+                        </div>
+                        <div>
+                            <label for="edit-code"><b>Item Code *</b></label>
+                            <input type="text" id="edit-code" value="C-STP-001" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="edit-category"><b>Category *</b></label>
+                            <select id="edit-category">
+                            <option>Food Staples</option>
+                            <option>Meat &amp; Poultry</option>
+                            <option>Ingredients</option>
+                            <option>Beverages</option>
+                            <option>Supplies &amp; Packaging</option>
+                            <option>Cleaning</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="edit-location"><b>Location *</b></label>
+                            <select id="edit-location">
+                                <option>Canteen</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="edit-reorder"><b>Reorder Level *</b></label>
+                            <input type="text" id="edit-reorder" value="3" required>
+                        </div>
+                        <div>
+                            <label for="edit-unit"><b>Unit *</b></label>
+                            <input type="text" id="edit-unit" value="sacks" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="edit-critical"><b>Critical Level *</b></label>
+                            <input type="text" id="edit-critical" value="1" required>
+                        </div>
+                        <div>
+                            <label for="edit-cost"><b>Unit Cost</b></label>
+                            <input type="text" id="edit-cost" value="2350.00">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="edit-supplier"><b>Preferred Supplier</b></label>
+                            <select id="edit-supplier">
+                            <option>Bataan Fresh Farms &amp; Meat Trading</option>
+                            <option>BPSU Agricultural Cooperative &amp; Canteen Supply</option>
+                            <option>Balanga Wholesale Grocery &amp; Packaging Center</option>
+                            <option>Central Luzon Beverage &amp; Refreshment Corp.</option>
+                            <option>Bataan Linen &amp; Hotel Supply Co.</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p><b>Active</b></p>
+                            <input type="checkbox" id="edit-active" checked>
+                            <label class="inline" for="edit-active">Item is still in use</label>
+                        </div>
+                    </div>
+                    <label for="edit-description"><b>Description</b></label>
+                    <textarea id="edit-description">Premium jasmine rice, 50kg per sack</textarea>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="popup" id="use-item">
+            <div class="popup-box">
+                <h2>Use Jasmine Premium Rice (50kg Sack) (C-STP-001)</h2>
+                <form action="inventory.html">
+                    <div class="row">
+                        <div>
+                            <label for="use-quantity"><b>Quantity *</b></label>
+                            <input type="text" id="use-quantity" required>
+                        </div>
+                        <div>
+                            <p class="stock-note">Available stock: 5.5 sacks</p>
+                        </div>
+                    </div>
+                    <label for="use-purpose"><b>Purpose *</b></label>
+                    <input type="text" id="use-purpose" placeholder="Kitchen usage, canteen sales, damaged" required>
+                    <label for="use-notes"><b>Notes</b></label>
+                    <textarea id="use-notes"></textarea>
+                    <p class="small">You can't use more than the available stock.</p>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="popup" id="count-item">
+            <div class="popup-box">
+                <h2>Count Jasmine Premium Rice (50kg Sack) (C-STP-001)</h2>
+                <form action="inventory.html">
+                    <div class="row">
+                        <div>
+                            <label for="count-quantity"><b>Counted Quantity *</b></label>
+                            <input type="text" id="count-quantity" required>
+                        </div>
+                        <div>
+                            <p class="stock-note">Recorded stock: 5.5 sacks</p>
+                        </div>
+                    </div>
+                    <label for="count-reason"><b>Reason *</b></label>
+                    <textarea id="count-reason" placeholder="Why the count is different, e.g. spoiled, damaged, miscounted" required></textarea>
+                    <p class="small">A reason is required whenever the count is different from the recorded stock.</p>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="popup" id="item-details">
+            <div class="popup-box">
+                <h2>Details Jasmine Premium Rice (50kg Sack) (C-STP-001)</h2>
+                <p class="label">Description</p>
+                <p>Premium jasmine rice, 50kg per sack</p>
+                <table class="details">
+                    <tr><td class="label">Unit Cost</td><td>Php 2,350.00</td></tr>
+                    <tr><td class="label">Preferred Supplier</td><td>BPSU Agricultural Cooperative &amp; Canteen Supply</td></tr>
+                    <tr><td class="label">Current Stock</td><td>5.5 sacks</td></tr>
+                    <tr><td class="label">Critical Level</td><td>1 sack</td></tr>
+                    <tr><td class="label">Last Restocked</td><td>2026-09-09 08:00</td></tr>
+                </table>
+                <div class="actions">
+                    <a class="button" href="#">Close</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Bataan Peninsula State University - Main Campus</p>
+    </footer>
+
+    <script src="js/inventory.js"></script>
+
+</body>
+</html>

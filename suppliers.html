@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Suppliers - PATVEP Inventory</title>
+    <link rel="icon" type="image/png" href="images/bpsu-logo.png">
+    <link rel="stylesheet" type="text/css" href="css/suppliers.css">
+</head>
+<body>
+
+    <header>
+        <div id="container">
+            <div id="left-div">
+                <img id="logo" src="images/bpsu-logo.png" alt="BPSU logo">
+                <p>PATVEP Hostel &amp; Canteen Inventory</p>
+            </div>
+            <div id="right-div">
+                <div class="dropdown">
+                    <button class="dropbtn">Hi, Darren &#9662;</button>
+                    <div class="dropdown-content">
+                        <p id="who">Darren Tamayo<br><span>Canteen Staff</span></p>
+                        <a href="my-account.html">My Account</a>
+                        <a class="off">Change password</a>
+                        <a href="index.html" id="logout">Log out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="nav-bar">
+            <a class="nav" href="dashboard.html">Dashboard</a>
+            <a class="nav" href="inventory.html">Inventory</a>
+            <a class="nav" id="active" href="suppliers.html">Suppliers</a>
+            <a class="nav" href="my-account.html">My Account</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Suppliers</h1>
+        <p id="date">Wednesday, September 30, 2026</p>
+
+        <div class="box">
+            <div class="top-buttons">
+                <a class="button" href="#add-supplier">Add supplier</a>
+                <a class="button" href="#add-delivery">Add delivery</a>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Supplier Name</th>
+                    <th>Contact Person</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Supplied Categories</th>
+                    <th>Status</th>
+                    <th>Quick Actions</th>
+                </tr>
+                <tr>
+                    <td>Bataan Fresh Farms &amp; Meat Trading</td>
+                    <td>Ramon Bautista</td>
+                    <td>+63 917 888 1234</td>
+                    <td>ramon@bataanfreshfarms.ph</td>
+                    <td>Meat &amp; Poultry, Food Staples</td>
+                    <td>Active</td>
+                    <td><a href="#edit-supplier">Edit</a> - <a href="#supplier-details">Details</a> - <a href="#recent-deliveries">Recent Deliveries</a></td>
+                </tr>
+                <tr>
+                    <td>BPSU Agricultural Cooperative &amp; Canteen Supply</td>
+                    <td>Maria Elena Ramos</td>
+                    <td>+63 918 777 5678</td>
+                    <td>coop@bpsu.edu.ph</td>
+                    <td>Food Staples, Ingredients</td>
+                    <td>Active</td>
+                    <td><a href="#edit-supplier">Edit</a> - <a href="#supplier-details">Details</a> - <a href="#recent-deliveries">Recent Deliveries</a></td>
+                </tr>
+                <tr>
+                    <td>Balanga Wholesale Grocery &amp; Packaging Center</td>
+                    <td>Kenneth Tan</td>
+                    <td>+63 919 666 9012</td>
+                    <td>sales@balangawholesale.com</td>
+                    <td>Ingredients, Packaging, Cleaning, Toiletries, Room Supplies</td>
+                    <td>Active</td>
+                    <td><a href="#edit-supplier">Edit</a> - <a href="#supplier-details">Details</a> - <a href="#recent-deliveries">Recent Deliveries</a></td>
+                </tr>
+                <tr>
+                    <td>Central Luzon Beverage &amp; Refreshment Corp.</td>
+                    <td>Jennifer Cruz</td>
+                    <td>+63 920 555 3456</td>
+                    <td>jcruz@clbeverage.com.ph</td>
+                    <td>Beverages</td>
+                    <td>Active</td>
+                    <td><a href="#edit-supplier">Edit</a> - <a href="#supplier-details">Details</a> - <a href="#recent-deliveries">Recent Deliveries</a></td>
+                </tr>
+                <tr>
+                    <td>Bataan Linen &amp; Hotel Supply Co.</td>
+                    <td>Grace Villanueva</td>
+                    <td>+63 921 444 7890</td>
+                    <td>orders@bataanlinen.ph</td>
+                    <td>Linens &amp; Bedding</td>
+                    <td>Active</td>
+                    <td><a href="#edit-supplier">Edit</a> - <a href="#supplier-details">Details</a> - <a href="#recent-deliveries">Recent Deliveries</a></td>
+                </tr>
+            </table>
+
+            <form id="filter" action="suppliers.html">
+                <p class="small">Filter by:</p>
+                <div class="filters">
+                    <select id="category">
+                        <option>All categories</option>
+                        <option>Food Staples</option>
+                        <option>Meat &amp; Poultry</option>
+                        <option>Ingredients</option>
+                        <option>Beverages</option>
+                        <option>Packaging</option>
+                        <option>Cleaning</option>
+                        <option>Toiletries</option>
+                        <option>Room Supplies</option>
+                        <option>Linens &amp; Bedding</option>
+                    </select>
+                    <select id="status">
+                        <option>All statuses</option>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                    </select>
+                </div>
+                <div class="filters">
+                    <input type="text" id="search" placeholder="Name">
+                </div>
+            </form>
+
+            <div class="pages">
+                <a href="#">&larr;</a>
+                <a href="#">&rarr;</a>
+                <p class="small">Page 1 of 1</p>
+            </div>
+        </div>
+
+        <!-- popups open with the #id in the link, no js. they show the first supplier for now -->
+        <div class="popup" id="add-supplier">
+            <div class="popup-box">
+                <h2>Add Supplier</h2>
+                <form action="suppliers.html">
+                    <div class="row">
+                        <div>
+                            <label for="add-name"><b>Supplier Name *</b></label>
+                            <input type="text" id="add-name" required>
+                        </div>
+                        <div>
+                            <label for="add-person"><b>Contact Person *</b></label>
+                            <input type="text" id="add-person" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="add-phone"><b>Phone *</b></label>
+                            <input type="text" id="add-phone" required>
+                        </div>
+                        <div>
+                            <label for="add-email"><b>Email</b></label>
+                            <input type="email" id="add-email">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="add-address"><b>Address *</b></label>
+                            <input type="text" id="add-address" required>
+                        </div>
+                        <div>
+                            <label for="add-categories"><b>Supplied Categories</b></label>
+                            <select id="add-categories">
+                            <option>Food Staples</option>
+                            <option>Meat &amp; Poultry</option>
+                            <option>Ingredients</option>
+                            <option>Beverages</option>
+                            <option>Packaging</option>
+                            <option>Cleaning</option>
+                            <option>Toiletries</option>
+                            <option>Room Supplies</option>
+                            <option>Linens &amp; Bedding</option>
+                            </select>
+                        </div>
+                    </div>
+                    <label for="add-notes"><b>Notes</b></label>
+                    <textarea id="add-notes"></textarea>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="popup" id="edit-supplier">
+            <div class="popup-box">
+                <h2>Edit Bataan Fresh Farms &amp; Meat Trading</h2>
+                <form action="suppliers.html">
+                    <div class="row">
+                        <div>
+                            <label for="edit-name"><b>Supplier Name *</b></label>
+                            <input type="text" id="edit-name" value="Bataan Fresh Farms &amp; Meat Trading" required>
+                        </div>
+                        <div>
+                            <label for="edit-person"><b>Contact Person *</b></label>
+                            <input type="text" id="edit-person" value="Ramon Bautista" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="edit-phone"><b>Phone *</b></label>
+                            <input type="text" id="edit-phone" value="+63 917 888 1234" required>
+                        </div>
+                        <div>
+                            <label for="edit-email"><b>Email</b></label>
+                            <input type="email" id="edit-email" value="ramon@bataanfreshfarms.ph">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="edit-address"><b>Address *</b></label>
+                            <input type="text" id="edit-address" value="Capitol Drive, Balanga City, Bataan" required>
+                        </div>
+                        <div>
+                            <label for="edit-categories"><b>Supplied Categories</b></label>
+                            <select id="edit-categories">
+                            <option>Food Staples</option>
+                            <option>Meat &amp; Poultry</option>
+                            <option>Ingredients</option>
+                            <option>Beverages</option>
+                            <option>Packaging</option>
+                            <option>Cleaning</option>
+                            <option>Toiletries</option>
+                            <option>Room Supplies</option>
+                            <option>Linens &amp; Bedding</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="edit-active" checked>
+                    <label class="inline" for="edit-active">Active</label>
+                    <label for="edit-notes"><b>Notes</b></label>
+                    <textarea id="edit-notes"></textarea>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="popup" id="supplier-details">
+            <div class="popup-box">
+                <h2>Details Bataan Fresh Farms &amp; Meat Trading</h2>
+                <table class="details">
+                    <tr><td class="label">Contact Person</td><td>Ramon Bautista</td></tr>
+                    <tr><td class="label">Address</td><td>Capitol Drive, Balanga City, Bataan</td></tr>
+                    <tr><td class="label">Phone</td><td>+63 917 888 1234</td></tr>
+                    <tr><td class="label">Email</td><td>ramon@bataanfreshfarms.ph</td></tr>
+                    <tr><td class="label">Supplied Categories</td><td>Meat &amp; Poultry, Food Staples</td></tr>
+                    <tr><td class="label">Status</td><td>Active</td></tr>
+                    <tr><td class="label">Notes</td><td>-</td></tr>
+                </table>
+                <div class="actions">
+                    <a class="button" href="#">Close</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup" id="recent-deliveries">
+            <div class="popup-box">
+                <h2>Recent Deliveries Bataan Fresh Farms &amp; Meat Trading</h2>
+                <table class="lines">
+                    <tr>
+                        <th>Receipt No.</th>
+                        <th>Status</th>
+                        <th>Date Received</th>
+                        <th>Total Amount</th>
+                    </tr>
+                    <tr>
+                        <td>DR-2026-046</td>
+                        <td><span class="tag red">Rejected</span></td>
+                        <td>2026-09-15</td>
+                        <td>Php 0.00</td>
+                    </tr>
+                    <tr>
+                        <td>DR-2026-045</td>
+                        <td>Received</td>
+                        <td>2026-09-13</td>
+                        <td>Php 9,990.00</td>
+                    </tr>
+                </table>
+                <div class="actions">
+                    <a class="button" href="#">Close</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup" id="add-delivery">
+            <div class="popup-box">
+                <h2>Add Delivery</h2>
+                <form action="suppliers.html">
+                    <div class="row">
+                        <div>
+                            <label for="del-supplier"><b>Supplier *</b></label>
+                            <select id="del-supplier">
+                                <option>Bataan Fresh Farms &amp; Meat Trading</option>
+                                <option>BPSU Agricultural Cooperative &amp; Canteen Supply</option>
+                                <option>Balanga Wholesale Grocery &amp; Packaging Center</option>
+                                <option>Central Luzon Beverage &amp; Refreshment Corp.</option>
+                                <option>Bataan Linen &amp; Hotel Supply Co.</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="del-receipt"><b>Receipt No. *</b></label>
+                            <input type="text" id="del-receipt" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="del-location"><b>Location *</b></label>
+                            <select id="del-location">
+                                <option>Canteen</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="del-date"><b>Date Received *</b></label>
+                            <input type="date" id="del-date" required>
+                        </div>
+                    </div>
+                    <label for="del-status"><b>Status</b></label>
+                    <select id="del-status">
+                        <option>Received</option>
+                        <option>Rejected</option>
+                    </select>
+                    <table class="lines">
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Unit Cost</th>
+                            <th>Line Total</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>Refined White Sugar (25kg Bag)</td>
+                            <td>2 bags</td>
+                            <td>Php 1,800.00</td>
+                            <td>Php 3,600.00</td>
+                            <td><a href="#">Remove</a></td>
+                        </tr>
+                    </table>
+                    <p class="total">Total: <b>Php 3,600.00</b></p>
+                    <a class="add-line" href="#add-line">Add another item</a>
+                    <label for="del-notes"><b>Notes</b></label>
+                    <textarea id="del-notes"></textarea>
+                    <div class="actions">
+                        <a class="button" href="#">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="popup" id="add-line">
+            <div class="popup-box">
+                <h2>Add Another Item</h2>
+                <form action="suppliers.html#add-delivery">
+                    <div class="row">
+                        <div>
+                            <label for="line-item"><b>Item *</b></label>
+                            <select id="line-item">
+                                <option>Jasmine Premium Rice (50kg Sack)</option>
+                                <option>Fresh Dressed Chicken (Cut)</option>
+                                <option>Fresh Pork Liempo (Sliced)</option>
+                                <option>Pure Palm Cooking Oil (20L Tin)</option>
+                                <option>Refined White Sugar (25kg Bag)</option>
+                                <option>Iodized Fine Salt (1kg Pack)</option>
+                                <option>Ground Barako Coffee (1kg)</option>
+                                <option>Evaporated Filled Milk (370ml Can)</option>
+                                <option>Purified Bottled Water (500ml)</option>
+                                <option>Canned Corned Beef (260g)</option>
+                                <option>Biodegradable Bento Box 3-Div</option>
+                                <option>Commercial Dishwashing Liquid (1 Gal)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="line-quantity"><b>Quantity *</b></label>
+                            <input type="text" id="line-quantity" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="line-cost"><b>Unit Cost</b></label>
+                            <input type="text" id="line-cost">
+                        </div>
+                        <div>
+                            <p class="stock-note">Line total: Php 0.00</p>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <a class="button" href="#add-delivery">Cancel</a>
+                        <button type="submit" id="btn">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Bataan Peninsula State University - Main Campus</p>
+    </footer>
+
+    <script src="js/suppliers.js"></script>
+
+</body>
+</html>
