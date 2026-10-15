@@ -1,4 +1,4 @@
-# Hotel Inventory System for IGP PATVEP Hostel and University Canteen — Database
+# Hotel Inventory System for IGP PATVEP Hostel and University Canteen - Database
 
 **Database:** `bpsu_patvep_inventory` (MariaDB 10.4 / XAMPP)
 **Owner:** Darren Jude S. Tamayo, Database Specialist, BSIT-NW3A

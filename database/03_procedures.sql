@@ -4,9 +4,9 @@
 -- Purpose: Stored procedures used by triggers and by the PHP backend
 -- Run AFTER: 02_tables.sql
 --
---   sp_log                 — write one audit_logs row (resolves username/role)
---   sp_adjust_stock        — physical count correction, reason required
---   sp_archive_audit_logs  — move old audit rows into audit_logs_archive
+--   sp_log                 - write one audit_logs row (resolves username/role)
+--   sp_adjust_stock        - physical count correction, reason required
+--   sp_archive_audit_logs  - move old audit rows into audit_logs_archive
 --
 -- SESSION VARIABLES the backend should set right after connecting/login:
 --   SET @app_user_id = <logged-in user_id>;   -- actor for item edits
@@ -62,7 +62,7 @@ END $$
 -- This is the ONLY way to change stock outside deliveries and consumption
 -- (opening balances, weekly counts, spoilage found during a count).
 --
---   CALL sp_adjust_stock(item_id, counted_qty, 'Weekly count — 0.5kg spoiled', user_id);
+--   CALL sp_adjust_stock(item_id, counted_qty, 'Weekly count - 0.5kg spoiled', user_id);
 --
 -- • Count equals system stock → logs STOCK_COUNT_MATCHED, no ledger row.
 -- • Count differs            → updates stock, writes an ADJUSTMENT ledger row,

@@ -123,7 +123,7 @@ CREATE TABLE inventory_items (
 
 -- =============================================================================
 -- 4. DELIVERIES (header)
--- total_amount is computed by trigger from delivery_items — never typed in.
+-- total_amount is computed by trigger from delivery_items - never typed in.
 -- REJECTED deliveries are recorded for supplier history but cannot hold items
 -- (rejected goods never enter stock).
 -- =============================================================================

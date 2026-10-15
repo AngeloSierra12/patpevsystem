@@ -7,7 +7,7 @@
 
 Project bpsu_patvep_inventory {
   database_type: 'MySQL'
-  Note: 'Hotel Inventory System for IGP PATVEP Hostel and University Canteen — BPSU Main Campus (MariaDB 10.4)'
+  Note: 'Hotel Inventory System for IGP PATVEP Hostel and University Canteen - BPSU Main Campus (MariaDB 10.4)'
 }
 
 Enum user_role {

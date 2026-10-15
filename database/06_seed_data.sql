@@ -2,10 +2,10 @@
 -- HOTEL INVENTORY SYSTEM FOR IGP PATVEP HOSTEL AND UNIVERSITY CANTEEN
 -- File: 06_seed_data.sql
 -- Purpose: Demo data for both locations (fictional)
--- Run AFTER: 05_views.sql   (triggers must exist — they compute stock)
+-- Run AFTER: 05_views.sql   (triggers must exist - they compute stock)
 --
 -- Items start at 0 stock. Deliveries push stock up, consumption pulls it down,
--- and sp_adjust_stock shows a weekly-count correction — all through triggers,
+-- and sp_adjust_stock shows a weekly-count correction - all through triggers,
 -- so the ledger and audit log fill themselves.
 -- Final expected stock levels are checked by 07_selftest.sql.
 -- =============================================================================
@@ -15,7 +15,7 @@ SET time_zone = '+08:00';
 SET @app_ip = '127.0.0.1';
 
 -- =============================================================================
--- 1. USERS — all demo passwords are "password" (bcrypt, DEMO ONLY)
+-- 1. USERS - all demo passwords are "password" (bcrypt, DEMO ONLY)
 -- =============================================================================
 INSERT INTO users
     (user_id, username, password_hash, full_name, email, phone, role, department, created_at)
@@ -75,7 +75,7 @@ VALUES
 (20, 'H-CLN-008', 'Laundry Detergent Powder (1kg)',        'HOSTEL',  'CLEANING',           'packs',    6.000,  2.000,   98.00, 3, 'For linen laundry');
 
 -- =============================================================================
--- 4. DELIVERIES (headers — total_amount is filled in by trigger)
+-- 4. DELIVERIES (headers - total_amount is filled in by trigger)
 -- =============================================================================
 INSERT INTO deliveries
     (delivery_id, delivery_receipt_no, supplier_id, location, status, received_at, received_by, notes)
@@ -87,7 +87,7 @@ VALUES
 (5, 'DR-2026-045', 1, 'CANTEEN', 'RECEIVED', '2026-09-13 06:30:00', 3, 'Meat & poultry restocking'),
 (6, 'DR-2026-101', 5, 'HOSTEL',  'RECEIVED', '2026-09-10 09:00:00', 2, 'Linen batch for room turnover'),
 (7, 'DR-2026-102', 3, 'HOSTEL',  'RECEIVED', '2026-09-12 10:00:00', 2, 'Toiletries and room supplies'),
-(8, 'DR-2026-046', 1, 'CANTEEN', 'REJECTED', '2026-09-15 06:45:00', 3, 'Chicken failed temperature check on arrival — returned to supplier');
+(8, 'DR-2026-046', 1, 'CANTEEN', 'REJECTED', '2026-09-15 06:45:00', 3, 'Chicken failed temperature check on arrival - returned to supplier');
 
 -- =============================================================================
 -- 5. DELIVERY ITEMS → stock in
@@ -125,10 +125,10 @@ INSERT INTO delivery_items (delivery_id, item_id, quantity, unit_cost) VALUES
 -- =============================================================================
 INSERT INTO inventory_consumption (item_id, quantity, purpose, notes, recorded_by, consumption_date) VALUES
 -- Canteen
-(2,   3.000, 'KITCHEN_USAGE', 'Morning prep — chicken adobo',        3, '2026-09-10 07:30:00'),
+(2,   3.000, 'KITCHEN_USAGE', 'Morning prep - chicken adobo',        3, '2026-09-10 07:30:00'),
 (9,   8.000, 'CANTEEN_SALES', 'Water sold at canteen counter',        3, '2026-09-10 12:00:00'),
 (1,   0.500, 'KITCHEN_USAGE', 'Half sack used for day meals',         3, '2026-09-11 06:30:00'),
-(2,   2.000, 'KITCHEN_USAGE', 'Lunch prep — chicken tinola',          3, '2026-09-13 08:00:00'),
+(2,   2.000, 'KITCHEN_USAGE', 'Lunch prep - chicken tinola',          3, '2026-09-13 08:00:00'),
 (3,   2.000, 'KITCHEN_USAGE', 'Pork liempo grilled for lunch',        3, '2026-09-13 09:45:00'),
 (9,  12.000, 'CANTEEN_SALES', 'Water sold across two meal periods',   3, '2026-09-12 12:00:00'),
 (8,   6.000, 'CANTEEN_SALES', 'Evap milk for coffee orders',          3, '2026-09-13 07:00:00'),
@@ -145,7 +145,7 @@ INSERT INTO inventory_consumption (item_id, quantity, purpose, notes, recorded_b
 -- =============================================================================
 -- 7. WEEKLY COUNT (charter metric: physical stock matches records)
 -- =============================================================================
-CALL sp_adjust_stock(2, 19.500, 'Weekly count — 0.5 kg chicken spoiled (freezer door left open)', 3);
+CALL sp_adjust_stock(2, 19.500, 'Weekly count - 0.5 kg chicken spoiled (freezer door left open)', 3);
 CALL sp_adjust_stock(1,  5.500, 'Weekly count', 3);
 
 -- =============================================================================
