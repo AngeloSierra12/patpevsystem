@@ -41,6 +41,14 @@
     <main>
         <h1>User Management</h1>
 
+        <!-- shows only when someone used "Forgot your password?" on the login page -->
+        <div class="box" id="resets" hidden>
+            <h2>Password reset requests</h2>
+            <ul id="reset-list">
+                <li><b>Grace Manalo</b> (gmanalo) asked on 2026-10-17 09:12 <a href="#">Reset password</a></li>
+            </ul>
+        </div>
+
         <div class="box">
             <form id="filter" action="users.html">
                 <input type="text" id="search" placeholder="Search name, email, or role">

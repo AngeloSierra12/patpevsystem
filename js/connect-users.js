@@ -1,4 +1,5 @@
 var userList = [];
+var resetRequests = [];
 var editingUserId = null;
 var loggedInUser = null;
 var userTable;
@@ -80,6 +81,42 @@ async function loadUsers() {
         html += userRow(userList[i]);
     }
     userTable.innerHTML = html;
+
+    showResetRequests(data.resetRequests || []);
+}
+
+function showResetRequests(requests) {
+    resetRequests = requests;
+    var box = field('resets');
+    if (requests.length === 0) {
+        box.hidden = true;
+        return;
+    }
+
+    var html = '';
+    for (var i = 0; i < requests.length; i++) {
+        var request = requests[i];
+        var asked = 'asked on ' + dateTime(request.requestedAt);
+        if (request.times > 1) {
+            asked += ' (' + request.times + ' times)';
+        }
+        html += '<li><b>' + esc(request.user.fullName) + '</b> (' + esc(request.user.username) + ') ' + asked +
+            ' <a href="#" data-reset="' + i + '">Reset password</a>';
+        if (request.note) {
+            html += '<span class="small">"' + esc(request.note) + '"</span>';
+        }
+        html += '</li>';
+    }
+    field('reset-list').innerHTML = html;
+    box.hidden = false;
+}
+
+function openResetForm(user) {
+    openUserForm(user);
+    var passwordLabel = userForm.querySelector('label[for=password]');
+    passwordLabel.innerHTML = '<b>New Password (give this to ' + esc(user.fullName.split(' ')[0]) + ')</b>';
+    field('password').required = true;
+    field('password').focus();
 }
 
 function openUserForm(user) {
@@ -234,6 +271,14 @@ async function setupUsersPage() {
         } else if (toggleId) {
             event.preventDefault();
             toggleUser(findUser(Number(toggleId)));
+        }
+    });
+
+    field('reset-list').addEventListener('click', function (event) {
+        var index = event.target.getAttribute('data-reset');
+        if (index !== null) {
+            event.preventDefault();
+            openResetForm(resetRequests[Number(index)].user);
         }
     });
 

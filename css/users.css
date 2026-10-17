@@ -355,6 +355,35 @@ td a {
     color: #ae0404;
 }
 
+#resets {
+    border-left: 4px solid khaki;
+}
+
+#reset-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#reset-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+#reset-list li:last-child {
+    border-bottom: none;
+}
+
+#reset-list a {
+    color: #ae0404;
+    margin-left: 6px;
+}
+
+#reset-list .small {
+    display: block;
+}
+
 @media screen and (max-width: 600px) {
     #container {
         padding: 10px 15px;

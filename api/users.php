@@ -11,6 +11,43 @@ function find_user($id)
     return query_one('SELECT ' . USER_COLUMNS . ' FROM users WHERE user_id = ?', [$id]);
 }
 
+// Forgot-password requests that the admin has not handled yet:
+// a request stays open until that user's password is reset.
+function reset_requests()
+{
+    $rows = query(
+        "SELECT r.target_id AS user_id, MAX(r.logged_at) AS requested_at, COUNT(*) AS times
+         FROM audit_logs r
+         WHERE r.action_type = 'PASSWORD_RESET_REQUEST' AND r.target_entity = 'USERS'
+           AND r.logged_at > COALESCE((SELECT MAX(p.logged_at) FROM audit_logs p
+                                       WHERE p.action_type = 'PASSWORD_RESET' AND p.target_entity = 'USERS'
+                                         AND p.target_id = r.target_id), '2000-01-01')
+         GROUP BY r.target_id
+         ORDER BY requested_at"
+    );
+
+    $requests = [];
+    foreach ($rows as $row) {
+        $user = find_user((int) $row['user_id']);
+        if ($user === null || !$user['is_active']) {
+            continue;
+        }
+        $latest = query_one(
+            "SELECT new_value FROM audit_logs
+             WHERE action_type = 'PASSWORD_RESET_REQUEST' AND target_entity = 'USERS' AND target_id = ?
+             ORDER BY logged_at DESC LIMIT 1",
+            [$row['user_id']]
+        );
+        $requests[] = [
+            'user' => public_user($user),
+            'requestedAt' => $row['requested_at'],
+            'times' => (int) $row['times'],
+            'note' => $latest['new_value'],
+        ];
+    }
+    return $requests;
+}
+
 function user_fields($data, $adding)
 {
     $fields = [];
@@ -108,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     foreach ($rows as $row) {
         $users[] = public_user($row);
     }
-    respond(['total' => (int) $count['total'], 'users' => $users]);
+    respond(['total' => (int) $count['total'], 'users' => $users, 'resetRequests' => reset_requests()]);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

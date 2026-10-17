@@ -11,7 +11,7 @@ const ACTION_GROUPS = [
     'counts' => ['STOCK_ADJUSTED', 'STOCK_COUNT_MATCHED'],
     'items' => ['ITEM_CREATED', 'ITEM_UPDATED', 'ITEM_DEACTIVATED'],
     'suppliers' => ['SUPPLIER_CREATED', 'SUPPLIER_UPDATED', 'SUPPLIER_DEACTIVATED', 'SUPPLIER_ACTIVATED'],
-    'users' => ['USER_CREATE', 'USER_UPDATED', 'USER_DEACTIVATED', 'USER_ACTIVATED', 'PASSWORD_RESET'],
+    'users' => ['USER_CREATE', 'USER_UPDATED', 'USER_DEACTIVATED', 'USER_ACTIVATED', 'PASSWORD_RESET', 'PASSWORD_RESET_REQUEST'],
 ];
 
 const ACTION_LABELS = [
@@ -36,6 +36,7 @@ const ACTION_LABELS = [
     'USER_DEACTIVATED' => 'Deactivated an account',
     'USER_ACTIVATED' => 'Reactivated an account',
     'PASSWORD_RESET' => "Reset a user's password",
+    'PASSWORD_RESET_REQUEST' => 'Asked for a password reset',
     'ACCOUNT_UPDATED' => 'Edited own details',
     'AUDIT_ARCHIVED' => 'Archived old audit entries',
     'SYSTEM_INIT' => 'System set up',

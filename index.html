@@ -34,8 +34,28 @@
 
         </div>
 
-        <p id="forgot">Forgot your password? Ask the admin.</p>
+        <p id="forgot"><a href="#forgot-password">Forgot your password?</a></p>
 
+    </div>
+
+    <!-- popup opens with #forgot-password in the link. there is no email, so the request goes to the admin -->
+    <div class="popup" id="forgot-password">
+        <div class="popup-box">
+            <h2>Forgot your password?</h2>
+            <p class="note">Send a request to the admin. The admin will reset your password and give you the new one.</p>
+            <form id="forgot-form" action="index.html">
+                <label for="forgot-user"><b>Username</b></label>
+                <input type="text" id="forgot-user" required>
+                <br><br>
+                <label for="forgot-note"><b>Message for the admin (optional)</b></label>
+                <textarea id="forgot-note" maxlength="200" placeholder="Example: I am at the canteen today"></textarea>
+                <p class="sent" id="forgot-sent" hidden></p>
+                <div class="actions">
+                    <a class="button" href="#">Cancel</a>
+                    <button type="submit" id="send-btn">Send request</button>
+                </div>
+            </form>
+        </div>
     </div>
     <script src="js/api.js"></script>
     <script src="js/connect-login.js"></script>

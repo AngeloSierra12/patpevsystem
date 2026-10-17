@@ -29,6 +29,8 @@ async function setupLoginPage() {
         }
     });
 
+    setupForgotPassword();
+
     try {
         var check = await fetch(API + 'me.php');
         if (check.ok) {
@@ -36,6 +38,41 @@ async function setupLoginPage() {
         }
     } catch (error) {
     }
+}
+
+function setupForgotPassword() {
+    var form = document.getElementById('forgot-form');
+    var button = document.getElementById('send-btn');
+    var sent = document.getElementById('forgot-sent');
+    form.removeAttribute('action');
+    var errorLine = addErrorLine(form);
+
+    // fill in the username from the login box when the pop-up opens
+    document.querySelector('#forgot a').addEventListener('click', function () {
+        document.getElementById('forgot-user').value = document.getElementById('Uname').value.trim();
+        document.getElementById('forgot-note').value = '';
+        errorLine.hidden = true;
+        sent.hidden = true;
+        button.disabled = false;
+    });
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        errorLine.hidden = true;
+        sent.hidden = true;
+        button.disabled = true;
+        try {
+            var data = await api('forgot.php', 'POST', {
+                username: document.getElementById('forgot-user').value.trim(),
+                note: document.getElementById('forgot-note').value.trim()
+            });
+            sent.textContent = data.message;
+            sent.hidden = false;
+        } catch (error) {
+            showFormError(errorLine, error.message);
+            button.disabled = false;
+        }
+    });
 }
 
 setupLoginPage();
