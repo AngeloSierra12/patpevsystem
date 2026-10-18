@@ -132,24 +132,16 @@
                     <input type="text" id="username" required>
                     <label for="password"><b>Default Password</b></label>
                     <input type="password" id="password" required>
-                    <div class="row">
-                        <div>
-                            <p><b>System Role</b></p>
-                            <input type="radio" id="role-admin" name="role">
-                            <label class="inline" for="role-admin">Administrator</label>
-                            <br>
-                            <input type="radio" id="role-staff" name="role">
-                            <label class="inline" for="role-staff">Staff</label>
-                        </div>
-                        <div>
-                            <p><b>Department (for Staff)</b></p>
-                            <input type="radio" id="dept-hostel" name="dept">
-                            <label class="inline" for="dept-hostel">Hostel Staff</label>
-                            <br>
-                            <input type="radio" id="dept-canteen" name="dept">
-                            <label class="inline" for="dept-canteen">Canteen Staff</label>
-                        </div>
+                    <!-- there is only one admin account, so new users can only be hostel or canteen staff -->
+                    <div id="role-choice">
+                        <p><b>Role</b></p>
+                        <input type="radio" id="role-hostel" name="role">
+                        <label class="inline" for="role-hostel">Hostel Staff</label>
+                        <br>
+                        <input type="radio" id="role-canteen" name="role">
+                        <label class="inline" for="role-canteen">Canteen Staff</label>
                     </div>
+                    <p class="small" id="admin-note" hidden>This is the administrator account. There is only one, so its role can't be changed.</p>
                     <div class="actions">
                         <a class="button" href="#">Cancel</a>
                         <button type="submit" id="btn">Save User</button>

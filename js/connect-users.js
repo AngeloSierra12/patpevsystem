@@ -127,6 +127,11 @@ function openUserForm(user) {
     var saveButton = userForm.querySelector('button[type=submit]');
     var title = document.querySelector('#add-user h2');
 
+    // the admin account keeps its role, so the role choice is hidden for it
+    var isAdmin = user !== null && user.role === 'ADMIN';
+    field('role-choice').hidden = isAdmin;
+    field('admin-note').hidden = !isAdmin;
+
     if (user === null) {
         editingUserId = null;
         title.textContent = 'Add User';
@@ -148,23 +153,21 @@ function openUserForm(user) {
         field('contact').value = user.phone || '';
         field('email').value = user.email;
         field('username').value = user.username;
-        field('role-admin').checked = user.role === 'ADMIN';
-        field('role-staff').checked = user.role !== 'ADMIN';
-        field('dept-hostel').checked = user.role === 'STAFF_HOSTEL';
-        field('dept-canteen').checked = user.role === 'STAFF_CANTEEN';
+        field('role-hostel').checked = user.role === 'STAFF_HOSTEL';
+        field('role-canteen').checked = user.role === 'STAFF_CANTEEN';
     }
 
     openPopup('add-user');
 }
 
 function chosenRole() {
-    if (field('role-admin').checked) {
+    if (editingUserId !== null && findUser(editingUserId).role === 'ADMIN') {
         return 'ADMIN';
     }
-    if (field('role-staff').checked && field('dept-hostel').checked) {
+    if (field('role-hostel').checked) {
         return 'STAFF_HOSTEL';
     }
-    if (field('role-staff').checked && field('dept-canteen').checked) {
+    if (field('role-canteen').checked) {
         return 'STAFF_CANTEEN';
     }
     return null;
@@ -176,11 +179,7 @@ async function saveUser(event) {
 
     var role = chosenRole();
     if (role === null) {
-        if (field('role-staff').checked) {
-            showFormError(userFormError, 'Choose Hostel Staff or Canteen Staff for a staff account.');
-        } else {
-            showFormError(userFormError, 'Choose a system role.');
-        }
+        showFormError(userFormError, 'Choose Hostel Staff or Canteen Staff.');
         return;
     }
 
