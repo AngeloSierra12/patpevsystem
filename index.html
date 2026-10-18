@@ -18,7 +18,6 @@
         <div class="login">
             <h2>Log in</h2>
 
-            <!-- no database yet, so any username and password just goes to the dashboard -->
             <form id="login" action="dashboard.html">
                 <label for="Uname"><b>Username</b></label>
                 <input type="text" id="Uname" required>
@@ -27,7 +26,7 @@
                 <input type="password" id="Pass" required>
                 <br><br>
                 <input type="checkbox" id="check">
-                <span>Remember me</span>
+                <label class="inline" for="check">Remember me</label>
                 <br><br>
                 <button type="submit" id="btn">Log in</button>
             </form>
@@ -35,6 +34,7 @@
         </div>
 
         <p id="forgot"><a href="#forgot-password">Forgot your password?</a></p>
+        <p id="privacy">Your name, email and contact number are only used to run this system and are only seen by the administrator, following the Data Privacy Act of 2012.</p>
 
     </div>
 

@@ -419,3 +419,7 @@ td a {
         gap: 0;
     }
 }
+
+.tag.grey {
+    background-color: gainsboro;
+}

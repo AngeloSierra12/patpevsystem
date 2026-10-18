@@ -198,3 +198,15 @@ span {
         margin: 30px 15px;
     }
 }
+
+label.inline {
+    display: inline;
+    margin-bottom: 0;
+}
+
+#privacy {
+    font-size: 12px;
+    color: gray;
+    margin: 10px 0 0;
+    line-height: 1.4;
+}

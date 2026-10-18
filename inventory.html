@@ -226,7 +226,7 @@
             </div>
         </div>
 
-        <!-- popups open with the #id in the link, no js. they show the first item for now -->
+        <!-- popups open with the #id in the link (css :target). the connect script fills them with the clicked item first -->
         <div class="popup" id="add-item">
             <div class="popup-box">
                 <h2>Add Item</h2>
@@ -263,7 +263,7 @@
                     <div class="row">
                         <div>
                             <label for="add-reorder"><b>Reorder Level *</b></label>
-                            <input type="text" id="add-reorder" required>
+                            <input type="number" id="add-reorder" min="0" step="any" required>
                         </div>
                         <div>
                             <label for="add-unit"><b>Unit *</b></label>
@@ -273,11 +273,11 @@
                     <div class="row">
                         <div>
                             <label for="add-critical"><b>Critical Level *</b></label>
-                            <input type="text" id="add-critical" required>
+                            <input type="number" id="add-critical" min="0" step="any" required>
                         </div>
                         <div>
                             <label for="add-cost"><b>Unit Cost</b></label>
-                            <input type="text" id="add-cost">
+                            <input type="number" id="add-cost" min="0" step="0.01">
                         </div>
                     </div>
                     <label for="add-supplier"><b>Preferred Supplier</b></label>
@@ -335,7 +335,7 @@
                     <div class="row">
                         <div>
                             <label for="edit-reorder"><b>Reorder Level *</b></label>
-                            <input type="text" id="edit-reorder" value="3" required>
+                            <input type="number" id="edit-reorder" value="3" min="0" step="any" required>
                         </div>
                         <div>
                             <label for="edit-unit"><b>Unit *</b></label>
@@ -345,11 +345,11 @@
                     <div class="row">
                         <div>
                             <label for="edit-critical"><b>Critical Level *</b></label>
-                            <input type="text" id="edit-critical" value="1" required>
+                            <input type="number" id="edit-critical" value="1" min="0" step="any" required>
                         </div>
                         <div>
                             <label for="edit-cost"><b>Unit Cost</b></label>
-                            <input type="text" id="edit-cost" value="2350.00">
+                            <input type="number" id="edit-cost" value="2350.00" min="0" step="0.01">
                         </div>
                     </div>
                     <div class="row">
@@ -386,7 +386,7 @@
                     <div class="row">
                         <div>
                             <label for="use-quantity"><b>Quantity *</b></label>
-                            <input type="text" id="use-quantity" required>
+                            <input type="number" id="use-quantity" min="0" step="any" required>
                         </div>
                         <div>
                             <p class="stock-note">Available stock: 5.5 sacks</p>
@@ -412,7 +412,7 @@
                     <div class="row">
                         <div>
                             <label for="count-quantity"><b>Counted Quantity *</b></label>
-                            <input type="text" id="count-quantity" required>
+                            <input type="number" id="count-quantity" min="0" step="any" required>
                         </div>
                         <div>
                             <p class="stock-note">Recorded stock: 5.5 sacks</p>

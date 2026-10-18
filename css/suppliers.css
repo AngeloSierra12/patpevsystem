@@ -263,6 +263,7 @@ table {
 }
 
 .popup-box input[type=text],
+.popup-box input[type=number],
 .popup-box input[type=email],
 .popup-box input[type=password] {
     width: 100%;
@@ -513,4 +514,8 @@ label.inline {
     .stock-note {
         margin-top: 10px;
     }
+}
+
+.tag.grey {
+    background-color: gainsboro;
 }

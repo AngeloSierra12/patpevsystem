@@ -135,7 +135,7 @@
             </div>
         </div>
 
-        <!-- popups open with the #id in the link, no js. they show the first supplier for now -->
+        <!-- popups open with the #id in the link (css :target). the connect script fills them with the clicked supplier first -->
         <div class="popup" id="add-supplier">
             <div class="popup-box">
                 <h2>Add Supplier</h2>
@@ -382,13 +382,13 @@
                         </div>
                         <div>
                             <label for="line-quantity"><b>Quantity *</b></label>
-                            <input type="text" id="line-quantity" required>
+                            <input type="number" id="line-quantity" min="0" step="any" required>
                         </div>
                     </div>
                     <div class="row">
                         <div>
                             <label for="line-cost"><b>Unit Cost</b></label>
-                            <input type="text" id="line-cost">
+                            <input type="number" id="line-cost" min="0" step="0.01">
                         </div>
                         <div>
                             <p class="stock-note">Line total: Php 0.00</p>

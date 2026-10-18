@@ -327,3 +327,33 @@ footer {
         overflow-x: auto;
     }
 }
+
+th {
+    text-align: left;
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 13px;
+    color: gray;
+}
+
+.tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    color: black;
+    white-space: nowrap;
+}
+
+.tag.yellow {
+    background-color: khaki;
+}
+
+.tag.red {
+    background-color: lightpink;
+}
+
+.tag.grey {
+    background-color: gainsboro;
+}

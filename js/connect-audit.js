@@ -5,6 +5,7 @@ var AUDIT_TYPES = {
     'Stock out': 'stockout',
     'Item counts': 'counts',
     'Items': 'items',
+    'Suppliers': 'suppliers',
     'User accounts': 'users'
 };
 
@@ -146,7 +147,32 @@ async function setupAuditPage() {
         }, 400);
     });
 
+    setupArchive();
     loadAudit();
+}
+
+// moves entries older than 90 days into audit_logs_archive (they stay searchable)
+function setupArchive() {
+    var button = document.getElementById('archive-btn');
+    var text = document.getElementById('archive-text');
+    button.addEventListener('click', async function (event) {
+        event.preventDefault();
+        if (!confirm('Move audit entries older than 90 days to the archive? They will still show up in searches.')) {
+            return;
+        }
+        try {
+            var data = await api('audit.php', 'POST', { action: 'archive', days: 90 });
+            if (data.archived === 0) {
+                text.textContent = 'Nothing to archive: there are no entries older than 90 days yet.';
+            } else {
+                text.textContent = 'Moved ' + data.archived + ' entries to the archive. They are still searchable.';
+            }
+            auditPageNumber = 1;
+            loadAudit();
+        } catch (error) {
+            text.textContent = error.message;
+        }
+    });
 }
 
 setupAuditPage();
