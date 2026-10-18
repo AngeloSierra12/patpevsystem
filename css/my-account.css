@@ -4,6 +4,9 @@ body {
     font-family: Arial, sans-serif;
     background-color: whitesmoke;
     font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 #container {
@@ -147,9 +150,11 @@ body {
 }
 
 main {
-    max-width: 1100px;
+    width: 100%;
+    max-width: 1160px;
     margin: 0 auto;
     padding: 20px 30px;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -307,10 +312,19 @@ table {
 }
 
 footer {
-    text-align: center;
-    color: gray;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-top: auto;
+    background-color: #7d0606;
+    color: white;
     font-size: 13px;
-    padding: 10px;
+    padding: 14px 30px;
+}
+
+footer p {
+    margin: 0;
 }
 
 #columns {
@@ -406,5 +420,14 @@ h3 {
     .row {
         flex-direction: column;
         gap: 0;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 12px 15px;
     }
 }
