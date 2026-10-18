@@ -20,10 +20,10 @@ SET @app_ip = '127.0.0.1';
 INSERT INTO users
     (user_id, username, password_hash, full_name, email, phone, role, department, created_at)
 VALUES
-(1, 'admin',         '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oI1Lb7e6ZMOLEf3lG.lU8Qk8IXnFoO', 'Andrew Jacob E. Santos',    'andrew.santos@bpsu.edu.ph',   '+63 917 111 2233', 'ADMIN',         'System Administration',       '2026-09-01 08:00:00'),
-(2, 'hostel_staff',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oI1Lb7e6ZMOLEf3lG.lU8Qk8IXnFoO', 'John Carlos R. Capuli',     'jc.capuli@bpsu.edu.ph',       '+63 918 222 3344', 'STAFF_HOSTEL',  'IGP PATVEP Hostel Housekeeping','2026-09-01 08:05:00'),
-(3, 'canteen_staff', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oI1Lb7e6ZMOLEf3lG.lU8Qk8IXnFoO', 'Darren Jude S. Tamayo',     'darren.tamayo@bpsu.edu.ph',   '+63 919 333 4455', 'STAFF_CANTEEN', 'University Canteen',          '2026-09-01 08:10:00'),
-(4, 'qa_staff',      '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oI1Lb7e6ZMOLEf3lG.lU8Qk8IXnFoO', 'Fritz Edrick B. Sarmiento', 'fritz.sarmiento@bpsu.edu.ph', '+63 920 444 5566', 'STAFF_CANTEEN', 'Quality Assurance',           '2026-09-01 08:15:00');
+(1, 'admin',         '$2y$10$x4jajSmhnzT8n9R.NkD97.OoGQNMnIwB2dqNIaHW0xat99Ce8N1H.', 'Andrew Jacob E. Santos',    'andrew.santos@bpsu.edu.ph',   '+63 917 111 2233', 'ADMIN',         'System Administration',       '2026-09-01 08:00:00'),
+(2, 'hostel_staff',  '$2y$10$x4jajSmhnzT8n9R.NkD97.OoGQNMnIwB2dqNIaHW0xat99Ce8N1H.', 'John Carlos R. Capuli',     'jc.capuli@bpsu.edu.ph',       '+63 918 222 3344', 'STAFF_HOSTEL',  'IGP PATVEP Hostel Housekeeping','2026-09-01 08:05:00'),
+(3, 'canteen_staff', '$2y$10$x4jajSmhnzT8n9R.NkD97.OoGQNMnIwB2dqNIaHW0xat99Ce8N1H.', 'Darren Jude S. Tamayo',     'darren.tamayo@bpsu.edu.ph',   '+63 919 333 4455', 'STAFF_CANTEEN', 'University Canteen',          '2026-09-01 08:10:00'),
+(4, 'qa_staff',      '$2y$10$x4jajSmhnzT8n9R.NkD97.OoGQNMnIwB2dqNIaHW0xat99Ce8N1H.', 'Fritz Edrick B. Sarmiento', 'fritz.sarmiento@bpsu.edu.ph', '+63 920 444 5566', 'STAFF_CANTEEN', 'Quality Assurance',           '2026-09-01 08:15:00');
 
 CALL sp_log(1, 'SYSTEM_INIT', 'SYSTEM', NULL, 'Inventory database initialised for PATVEP Hostel and University Canteen', NULL, NULL, '2026-09-01 08:00:00');
 CALL sp_log(1, 'USER_CREATE', 'USERS', 2, 'Created user hostel_staff (John Carlos R. Capuli)',     NULL, NULL, '2026-09-01 08:05:00');
