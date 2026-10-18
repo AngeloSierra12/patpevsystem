@@ -47,7 +47,6 @@ function setupForgotPassword() {
     form.removeAttribute('action');
     var errorLine = addErrorLine(form);
 
-    // fill in the username from the login box when the pop-up opens
     document.querySelector('#forgot a').addEventListener('click', function () {
         document.getElementById('forgot-user').value = document.getElementById('Uname').value.trim();
         document.getElementById('forgot-note').value = '';

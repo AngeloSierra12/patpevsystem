@@ -127,7 +127,6 @@ function openUserForm(user) {
     var saveButton = userForm.querySelector('button[type=submit]');
     var title = document.querySelector('#add-user h2');
 
-    // the admin account keeps its role, so the role choice is hidden for it
     var isAdmin = user !== null && user.role === 'ADMIN';
     field('role-choice').hidden = isAdmin;
     field('admin-note').hidden = !isAdmin;

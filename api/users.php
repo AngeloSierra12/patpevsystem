@@ -11,8 +11,6 @@ function find_user($id)
     return query_one('SELECT ' . USER_COLUMNS . ' FROM users WHERE user_id = ?', [$id]);
 }
 
-// Forgot-password requests that the admin has not handled yet:
-// a request stays open until that user's password is reset.
 function reset_requests()
 {
     $rows = query(
@@ -152,7 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = input();
     $fields = user_fields($data, true);
 
-    // the system has only one admin account (the system owner), so new accounts are always staff
     if ($fields['role'] === 'ADMIN') {
         fail('There can only be one administrator. New accounts must be Hostel Staff or Canteen Staff');
     }

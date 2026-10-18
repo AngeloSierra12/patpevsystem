@@ -151,7 +151,6 @@ async function setupAuditPage() {
     loadAudit();
 }
 
-// moves entries older than 90 days into audit_logs_archive (they stay searchable)
 function setupArchive() {
     var button = document.getElementById('archive-btn');
     var text = document.getElementById('archive-text');

@@ -41,7 +41,6 @@
     <main>
         <h1>User Management</h1>
 
-        <!-- shows only when someone used "Forgot your password?" on the login page -->
         <div class="box" id="resets" hidden>
             <h2>Password reset requests</h2>
             <ul id="reset-list">
@@ -103,7 +102,6 @@
             </table>
         </div>
 
-        <!-- popup opens with #add-user in the link (css :target). edit reuses it -->
         <div class="popup" id="add-user">
             <div class="popup-box">
                 <h2>Add User</h2>
@@ -132,7 +130,6 @@
                     <input type="text" id="username" required>
                     <label for="password"><b>Default Password</b></label>
                     <input type="password" id="password" required>
-                    <!-- there is only one admin account, so new users can only be hostel or canteen staff -->
                     <div id="role-choice">
                         <p><b>Role</b></p>
                         <input type="radio" id="role-hostel" name="role">

@@ -1,4 +1,3 @@
-// search only looks at the rows already on this page, no database yet
 
 var form = document.getElementById("filter");
 var search = document.getElementById("search");
