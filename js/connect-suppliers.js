@@ -201,7 +201,7 @@ async function openRecentDeliveries(supplier) {
     if (data.deliveries.length === 0) {
         html += '<p class="small">No deliveries from this supplier for the ' + place(supplierUser.location).toLowerCase() + ' yet.</p>';
     } else {
-        html += '<table class="lines"><tr><th>Receipt No.</th><th>Status</th><th>Date Received</th><th>Items</th><th>Total Amount</th></tr>';
+        html += '<table class="lines"><tr><th>Receipt No.</th><th>Status</th><th>Date Received</th><th>Items</th><th>Total Amount</th><th>Notes</th></tr>';
         for (var i = 0; i < data.deliveries.length; i++) {
             var delivery = data.deliveries[i];
             var status = 'Received';
@@ -209,7 +209,7 @@ async function openRecentDeliveries(supplier) {
                 status = '<span class="tag red">Rejected</span>';
             }
             html += '<tr><td>' + esc(delivery.receiptNo) + '</td><td>' + status + '</td>' +
-                '<td>' + delivery.date.slice(0, 10) + '</td><td>' + delivery.items + '</td><td>' + money(delivery.total) + '</td></tr>';
+                '<td>' + delivery.date.slice(0, 10) + '</td><td>' + delivery.items + '</td><td>' + money(delivery.total) + '</td><td>' + esc(delivery.notes || '-') + '</td></tr>';
         }
         html += '</table>';
     }
@@ -300,9 +300,9 @@ function addDeliveryLine(event) {
 
     var itemId = Number(field('line-item').value);
     var quantity = Number(field('line-quantity').value);
-    var cost = 0;
-    if (field('line-cost').value.trim() !== '') {
-        cost = Number(field('line-cost').value);
+    var cost = Number(field('line-cost').value);
+    if (field('line-cost').value.trim() === '' && findStockItem(itemId)) {
+        cost = findStockItem(itemId).unitCost;
     }
 
     var alreadyAdded = false;

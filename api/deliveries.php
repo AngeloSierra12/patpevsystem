@@ -121,7 +121,7 @@ if ($status === 'RECEIVED') {
         }
 
         $item = query_one(
-            'SELECT item_id, item_name, is_active FROM inventory_items WHERE item_id = ? AND location = ?',
+            'SELECT item_id, item_name, is_active, unit_cost FROM inventory_items WHERE item_id = ? AND location = ?',
             [$itemId, $location]
         );
         if ($item === null) {
@@ -137,7 +137,7 @@ if ($status === 'RECEIVED') {
 
         $quantity = number_param($line, 'quantity', "$label quantity", false);
 
-        $unitCost = 0;
+        $unitCost = (float) $item['unit_cost'];
         if (isset($line['unitCost']) && $line['unitCost'] !== '') {
             $unitCost = money_param($line, 'unitCost', "$label unit cost");
         }

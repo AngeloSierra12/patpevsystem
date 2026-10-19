@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id']) && !empty($_GET['
     $supplier = find_supplier((int) $_GET['id']);
 
     $rows = query(
-        'SELECT delivery_id, delivery_receipt_no, status, received_at, total_amount, line_item_count, received_by_name
+        'SELECT delivery_id, delivery_receipt_no, status, received_at, total_amount, line_item_count, received_by_name, notes
          FROM vw_delivery_summary WHERE supplier_id = ? AND location = ?
          ORDER BY received_at DESC LIMIT 10',
         [$supplier['supplier_id'], $location]
@@ -88,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id']) && !empty($_GET['
             'total' => (float) $row['total_amount'],
             'items' => (int) $row['line_item_count'],
             'receivedBy' => $row['received_by_name'],
+            'notes' => $row['notes'],
         ];
     }
 
