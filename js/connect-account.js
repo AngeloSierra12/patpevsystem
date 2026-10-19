@@ -60,7 +60,7 @@ async function loadAccount() {
 
     field('first').value = user.firstName;
     field('last').value = user.lastName;
-    field('contact').value = user.phone || '';
+    field('contact').value = (user.phone || '').replace(/^\+63\s*/, '');
     field('email').value = user.email;
 }
 

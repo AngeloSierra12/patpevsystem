@@ -72,11 +72,7 @@ function user_fields($data, $adding)
     }
 
     if ($adding || isset($data['phone'])) {
-        $phone = text($data, 'phone', 'Contact number', 25);
-        if ($phone === '') {
-            $phone = null;
-        }
-        $fields['phone'] = $phone;
+        $fields['phone'] = phone_param($data, 'phone', 'Contact number');
     }
 
     if ($adding || isset($data['role'])) {

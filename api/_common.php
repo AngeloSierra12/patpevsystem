@@ -106,6 +106,26 @@ function text($data, $key, $label = null, $max = null)
     return $value;
 }
 
+function phone_param($data, $key, $label)
+{
+    $phone = text($data, $key, $label, 25);
+    if ($phone === '') {
+        return null;
+    }
+
+    $digits = preg_replace('/\D/', '', $phone);
+    if (strlen($digits) === 12 && substr($digits, 0, 2) === '63') {
+        $digits = substr($digits, 2);
+    } elseif (strlen($digits) === 11 && substr($digits, 0, 1) === '0') {
+        $digits = substr($digits, 1);
+    }
+    if (!preg_match('/^9\d{9}$/', $digits)) {
+        fail("$label must be a mobile number like 917 123 4567");
+    }
+
+    return '+63 ' . substr($digits, 0, 3) . ' ' . substr($digits, 3, 3) . ' ' . substr($digits, 6);
+}
+
 function password_param($data, $key, $label)
 {
     $value = '';

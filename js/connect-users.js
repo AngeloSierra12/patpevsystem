@@ -149,9 +149,10 @@ function openUserForm(user) {
         var nameParts = user.fullName.split(' ');
         field('last').value = nameParts.pop();
         field('first').value = nameParts.join(' ');
-        field('contact').value = user.phone || '';
+        field('contact').value = (user.phone || '').replace(/^\+63\s*/, '');
         field('email').value = user.email;
         field('username').value = user.username;
+        field('department').value = user.department || '';
         field('role-hostel').checked = user.role === 'STAFF_HOSTEL';
         field('role-canteen').checked = user.role === 'STAFF_CANTEEN';
     }
@@ -187,7 +188,8 @@ async function saveUser(event) {
         lastName: field('last').value.trim(),
         phone: field('contact').value.trim(),
         email: field('email').value.trim(),
-        role: role
+        role: role,
+        department: field('department').value.trim()
     };
 
     if (editingUserId === null) {
@@ -195,7 +197,7 @@ async function saveUser(event) {
         body.password = field('password').value;
     } else {
         var editing = findUser(editingUserId);
-        if (editing.role !== role) {
+        if (editing.role !== role && body.department === editing.roleName) {
             body.department = '';
         }
         if (field('password').value) {

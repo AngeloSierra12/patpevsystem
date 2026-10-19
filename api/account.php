@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $first = text($data, 'firstName', 'First name');
     $last = text($data, 'lastName', 'Last name');
     $email = text($data, 'email', 'Email', 120);
-    $phone = text($data, 'phone', 'Contact number', 25);
+    $phone = phone_param($data, 'phone', 'Contact number');
 
     if ($first === '' || $last === '') {
         fail('First name and last name are required');
@@ -80,9 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         fail('Enter a valid email address');
-    }
-    if ($phone === '') {
-        $phone = null;
     }
 
     query('UPDATE users SET full_name = ?, email = ?, phone = ? WHERE user_id = ?', [$fullName, $email, $phone, $id]);

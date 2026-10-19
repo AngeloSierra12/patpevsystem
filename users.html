@@ -56,7 +56,6 @@
                     <option>Sort by role</option>
                     <option>Sort by status</option>
                 </select>
-                <a class="button off">Permissions</a>
                 <a class="button" href="#add-user">Add user</a>
             </form>
 
@@ -74,7 +73,7 @@
                 </tr>
                 <tr>
                     <td>Andrew Santos</td>
-                    <td>0917 000 0001</td>
+                    <td>+63 917 000 0001</td>
                     <td>asantos@bpsu.edu.ph</td>
                     <td>Administrator</td>
                     <td>System Administrator</td>
@@ -83,7 +82,7 @@
                 </tr>
                 <tr>
                     <td>Grace Manalo</td>
-                    <td>0917 000 0002</td>
+                    <td>+63 917 000 0002</td>
                     <td>gmanalo@bpsu.edu.ph</td>
                     <td>Staff</td>
                     <td>Hostel Staff</td>
@@ -92,7 +91,7 @@
                 </tr>
                 <tr>
                     <td>Ramil Dizon</td>
-                    <td>0917 000 0003</td>
+                    <td>+63 917 000 0003</td>
                     <td>rdizon@bpsu.edu.ph</td>
                     <td>Staff</td>
                     <td>Canteen Staff</td>
@@ -119,7 +118,10 @@
                     <div class="row">
                         <div>
                             <label for="contact"><b>Contact Number</b></label>
-                            <input type="text" id="contact">
+                            <div class="phone">
+                                <span>+63</span>
+                                <input type="tel" id="contact" placeholder="917 123 4567">
+                            </div>
                         </div>
                         <div>
                             <label for="email"><b>Email Address</b></label>
@@ -139,6 +141,8 @@
                         <label class="inline" for="role-canteen">Canteen Staff</label>
                     </div>
                     <p class="small" id="admin-note" hidden>This is the administrator account. There is only one, so its role can't be changed.</p>
+                    <label for="department"><b>Department / Office (optional)</b></label>
+                    <input type="text" id="department" maxlength="120" placeholder="Example: IGP PATVEP Hostel Housekeeping">
                     <div class="actions">
                         <a class="button" href="#">Cancel</a>
                         <button type="submit" id="btn">Save User</button>
