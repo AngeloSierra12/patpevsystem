@@ -138,6 +138,14 @@ async function setupAuditPage() {
         loadAudit();
     });
 
+    var filters = ['type', 'from', 'to'];
+    for (var i = 0; i < filters.length; i++) {
+        document.getElementById(filters[i]).addEventListener('change', function () {
+            auditPageNumber = 1;
+            loadAudit();
+        });
+    }
+
     var timer;
     document.getElementById('search').addEventListener('input', function () {
         clearTimeout(timer);

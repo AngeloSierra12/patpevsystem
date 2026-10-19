@@ -7,8 +7,8 @@ $admin = require_admin();
 const ACTION_GROUPS = [
     'signins' => ['LOGIN', 'LOGIN_FAILED', 'LOGOUT', 'PASSWORD_CHANGED'],
     'deliveries' => ['DELIVERY_RECORDED', 'DELIVERY_REJECTED'],
-    'stockout' => ['CONSUMPTION_RECORDED'],
-    'counts' => ['STOCK_ADJUSTED', 'STOCK_COUNT_MATCHED'],
+    'stockout' => ['CONSUMPTION_RECORDED', 'STOCK_OUT_FAILED'],
+    'counts' => ['STOCK_ADJUSTED', 'STOCK_COUNT_MATCHED', 'STOCK_COUNT_FAILED'],
     'items' => ['ITEM_CREATED', 'ITEM_UPDATED', 'ITEM_DEACTIVATED'],
     'suppliers' => ['SUPPLIER_CREATED', 'SUPPLIER_UPDATED', 'SUPPLIER_DEACTIVATED', 'SUPPLIER_ACTIVATED'],
     'users' => ['USER_CREATE', 'USER_UPDATED', 'USER_DEACTIVATED', 'USER_ACTIVATED', 'PASSWORD_RESET', 'PASSWORD_RESET_REQUEST'],
@@ -22,8 +22,10 @@ const ACTION_LABELS = [
     'DELIVERY_RECORDED' => 'Recorded a delivery',
     'DELIVERY_REJECTED' => 'Rejected a delivery',
     'CONSUMPTION_RECORDED' => 'Took stock out',
+    'STOCK_OUT_FAILED' => 'Tried to take stock out',
     'STOCK_ADJUSTED' => 'Counted an item',
     'STOCK_COUNT_MATCHED' => 'Counted an item',
+    'STOCK_COUNT_FAILED' => 'Tried to count an item',
     'ITEM_CREATED' => 'Added an item',
     'ITEM_UPDATED' => 'Edited an item',
     'ITEM_DEACTIVATED' => 'Deactivated an item',
@@ -141,7 +143,7 @@ foreach ($rows as $row) {
     }
 
     $result = 'OK';
-    if ($row['action_type'] === 'LOGIN_FAILED') {
+    if (substr($row['action_type'], -7) === '_FAILED') {
         $result = 'FAILED';
     }
 
@@ -155,7 +157,7 @@ foreach ($rows as $row) {
         'actionLabel' => $actionLabel,
         'record' => $row['target_entity'],
         'recordId' => $recordId,
-        'description' => $row['description'],
+        'description' => clean_log_text($row['description']),
         'oldValue' => $row['old_value'],
         'newValue' => $row['new_value'],
         'result' => $result,

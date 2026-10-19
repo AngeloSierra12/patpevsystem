@@ -59,6 +59,9 @@ function supplier_fields($data)
     if ($fields['phone'] === '') {
         fail('Phone is required');
     }
+    if (mobile_number($fields['phone']) !== null) {
+        $fields['phone'] = mobile_number($fields['phone']);
+    }
     if ($fields['address'] === '') {
         fail('Address is required');
     }

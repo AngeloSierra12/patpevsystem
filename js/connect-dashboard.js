@@ -13,9 +13,9 @@ function locationCard(card, user) {
         lastDelivery = 'Last delivery ' + shortDate(card.lastDelivery.date) + ' from ' + esc(card.lastDelivery.supplier);
     }
 
-    var stockLink = '<a class="more off">';
+    var stockLink = '';
     if (user.location) {
-        stockLink = '<a class="more" href="inventory.html">';
+        stockLink = '<a class="more" href="inventory.html">See ' + place(card.location).toLowerCase() + ' stock</a>';
     }
 
     return '<div class="card-top"><h2>' + place(card.location) + '</h2><span class="small">' + card.items + ' items</span></div>' +
@@ -24,7 +24,7 @@ function locationCard(card, user) {
         '<div class="count' + criticalClass + '"><b>' + card.critical + '</b><span>Critical</span></div>' +
         '</div>' +
         '<p class="small">' + lastDelivery + '</p>' +
-        stockLink + 'See ' + place(card.location).toLowerCase() + ' stock</a>';
+        stockLink;
 }
 
 function weekTable(week) {
@@ -84,7 +84,7 @@ function attentionBox(items, user) {
         return html + '<p class="small">Nothing needs attention right now.</p>';
     }
 
-    var stockLink = '<a class="off">See stock</a>';
+    var stockLink = '';
     if (user.location) {
         stockLink = '<a href="inventory.html">See stock</a>';
     }
@@ -97,7 +97,7 @@ function attentionBox(items, user) {
         }
         html += '<div class="alert">' + tag +
             '<p><b>' + esc(item.name) + '</b> - ' + place(item.location).toLowerCase() + ', ' +
-            qty(item.stock) + ' ' + esc(item.unit) + ' left.</p>' + stockLink + '</div>';
+            qty(item.stock) + ' ' + esc(unitName(item.stock, item.unit)) + ' left.</p>' + stockLink + '</div>';
     }
     return html;
 }

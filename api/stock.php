@@ -36,7 +36,9 @@ if ($action === 'use') {
     }
 
     if ($quantity > $stock) {
-        fail('Only ' . $stock . ' ' . $item['unit'] . " available. You can't use more than the available stock.");
+        audit('STOCK_OUT_FAILED', 'INVENTORY_CONSUMPTION', $itemId, 'Tried to use ' . $quantity . ' ' . unit_name($quantity, $item['unit']) .
+            ' of ' . $item['item_code'] . ' but only ' . $stock . ' ' . unit_name($stock, $item['unit']) . ' were available');
+        fail('Only ' . $stock . ' ' . unit_name($stock, $item['unit']) . " available. You can't use more than the available stock.");
     }
 
     $notes = text($data, 'notes', 'Notes', 2000);
@@ -54,6 +56,8 @@ if ($action === 'use') {
 
     $reason = text($data, 'reason', 'Reason', 200);
     if ($counted !== $stock && $reason === '') {
+        audit('STOCK_COUNT_FAILED', 'INVENTORY_ITEM', $itemId, 'Counted ' . $counted . ' ' . unit_name($counted, $item['unit']) . ' of ' .
+            $item['item_code'] . ' but the system had ' . $stock . ', and no reason was given');
         fail('A reason is required because the count is different from the recorded stock');
     }
     if ($reason === '') {

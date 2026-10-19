@@ -43,9 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     foreach ($rows as $row) {
         $activity[] = [
             'action' => $row['action_type'],
-            'description' => $row['description'],
+            'description' => clean_log_text($row['description']),
             'time' => $row['logged_at'],
-            'failed' => $row['action_type'] === 'LOGIN_FAILED',
+            'failed' => substr($row['action_type'], -7) === '_FAILED',
         ];
     }
 

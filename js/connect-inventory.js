@@ -149,13 +149,13 @@ function openItemForm(id) {
 function openUse(item) {
     openItemForm('use-item');
     document.querySelector('#use-item h2').textContent = itemTitle('Use', item);
-    document.querySelector('#use-item .stock-note').textContent = 'Available stock: ' + qty(item.stock) + ' ' + item.unit;
+    document.querySelector('#use-item .stock-note').textContent = 'Available stock: ' + qty(item.stock) + ' ' + unitName(item.stock, item.unit);
 }
 
 function openCount(item) {
     openItemForm('count-item');
     document.querySelector('#count-item h2').textContent = itemTitle('Count', item);
-    document.querySelector('#count-item .stock-note').textContent = 'Recorded stock: ' + qty(item.stock) + ' ' + item.unit;
+    document.querySelector('#count-item .stock-note').textContent = 'Recorded stock: ' + qty(item.stock) + ' ' + unitName(item.stock, item.unit);
     field('count-reason').required = false;
 }
 
@@ -202,9 +202,9 @@ async function openDetails(item) {
         '<tr><td class="label">Category</td><td>' + esc(details.categoryName) + '</td></tr>' +
         '<tr><td class="label">Unit Cost</td><td>' + money(details.unitCost) + '</td></tr>' +
         '<tr><td class="label">Preferred Supplier</td><td>' + esc(details.supplierName || '-') + '</td></tr>' +
-        '<tr><td class="label">Current Stock</td><td>' + qty(details.stock) + ' ' + esc(details.unit) + '</td></tr>' +
-        '<tr><td class="label">Reorder Level</td><td>' + qty(details.reorderLevel) + ' ' + esc(details.unit) + '</td></tr>' +
-        '<tr><td class="label">Critical Level</td><td>' + qty(details.criticalLevel) + ' ' + esc(details.unit) + '</td></tr>' +
+        '<tr><td class="label">Current Stock</td><td>' + qty(details.stock) + ' ' + esc(unitName(details.stock, details.unit)) + '</td></tr>' +
+        '<tr><td class="label">Reorder Level</td><td>' + qty(details.reorderLevel) + ' ' + esc(unitName(details.reorderLevel, details.unit)) + '</td></tr>' +
+        '<tr><td class="label">Critical Level</td><td>' + qty(details.criticalLevel) + ' ' + esc(unitName(details.criticalLevel, details.unit)) + '</td></tr>' +
         '<tr><td class="label">Last Restocked</td><td>' + dateTime(details.lastRestockedAt) + '</td></tr>' +
         '<tr><td class="label">Status</td><td>' + itemStatus(details) + '</td></tr>' +
         '</table>';

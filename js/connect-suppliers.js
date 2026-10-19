@@ -260,7 +260,7 @@ function drawDeliveryLines() {
         var lineTotal = line.quantity * line.unitCost;
         total += lineTotal;
         html += '<tr><td>' + esc(line.name) + '</td>' +
-            '<td>' + qty(line.quantity) + ' ' + esc(line.unit) + '</td>' +
+            '<td>' + qty(line.quantity) + ' ' + esc(unitName(line.quantity, line.unit)) + '</td>' +
             '<td>' + money(line.unitCost) + '</td>' +
             '<td>' + money(lineTotal) + '</td>' +
             '<td><a href="#" data-remove="' + i + '">Remove</a></td></tr>';
@@ -292,6 +292,10 @@ function drawDeliveryLines() {
 function updateLineTotal() {
     var quantity = Number(field('line-quantity').value) || 0;
     var cost = Number(field('line-cost').value) || 0;
+    var item = findStockItem(Number(field('line-item').value));
+    if (field('line-cost').value.trim() === '' && item) {
+        cost = item.unitCost;
+    }
     document.querySelector('#add-line .stock-note').textContent = 'Line total: ' + money(quantity * cost);
 }
 
@@ -363,6 +367,7 @@ function setupSupplierForms() {
         form.removeAttribute('action');
         formErrors[ids[i]] = addErrorLine(form);
     }
+    drawDeliveryLines();
 
     var categorySelects = ['add-categories', 'edit-categories'];
     for (var c = 0; c < categorySelects.length; c++) {
@@ -431,6 +436,7 @@ function setupDeliveryForm() {
     });
 
     field('del-status').addEventListener('change', drawDeliveryLines);
+    field('line-item').addEventListener('change', updateLineTotal);
     field('line-quantity').addEventListener('input', updateLineTotal);
     field('line-cost').addEventListener('input', updateLineTotal);
     field('line-item').addEventListener('change', function () {

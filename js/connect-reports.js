@@ -111,11 +111,11 @@ function reportRows(report) {
         var row = report.rows[i];
 
         if (report.type === 'stock-levels') {
-            rows.push([esc(row.item_name), place(row.location), qty(row.current_stock) + ' ' + esc(row.unit),
+            rows.push([esc(row.item_name), place(row.location), qty(row.current_stock) + ' ' + esc(unitName(row.current_stock, row.unit)),
                 qty(row.reorder_level), money(row.stock_value), reportStatusTag(row.stock_status)]);
 
         } else if (report.type === 'low-stock') {
-            rows.push([esc(row.item_name), place(row.location), qty(row.current_stock) + ' ' + esc(row.unit),
+            rows.push([esc(row.item_name), place(row.location), qty(row.current_stock) + ' ' + esc(unitName(row.current_stock, row.unit)),
                 qty(row.reorder_level), reportStatusTag(row.stock_status), esc(row.preferred_supplier || '-')]);
 
         } else if (report.type === 'stock-movement') {
@@ -126,7 +126,7 @@ function reportRows(report) {
                 sign = '+';
             }
             rows.push([shortDate(row.transaction_date), esc(row.item_name), types[row.transaction_type] || row.transaction_type,
-                sign + qty(change) + ' ' + esc(row.unit), qty(row.stock_after), esc(row.performed_by_name || '-')]);
+                sign + qty(change) + ' ' + esc(unitName(change, row.unit)), qty(row.stock_after), esc(row.performed_by_name || '-')]);
 
         } else if (report.type === 'item-counts') {
             var systemStock = '-';

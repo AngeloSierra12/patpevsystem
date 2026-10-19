@@ -162,6 +162,13 @@ function qty(value) {
     return Number(value).toLocaleString('en-PH', { maximumFractionDigits: 3 });
 }
 
+function unitName(value, unit) {
+    if (Math.abs(Number(value)) === 1 && /s$/.test(unit)) {
+        return unit.slice(0, -1);
+    }
+    return unit;
+}
+
 function place(location) {
     if (location === 'HOSTEL') {
         return 'Hostel';

@@ -106,13 +106,8 @@ function text($data, $key, $label = null, $max = null)
     return $value;
 }
 
-function phone_param($data, $key, $label)
+function mobile_number($phone)
 {
-    $phone = text($data, $key, $label, 25);
-    if ($phone === '') {
-        return null;
-    }
-
     $digits = preg_replace('/\D/', '', $phone);
     if (strlen($digits) === 12 && substr($digits, 0, 2) === '63') {
         $digits = substr($digits, 2);
@@ -120,10 +115,46 @@ function phone_param($data, $key, $label)
         $digits = substr($digits, 1);
     }
     if (!preg_match('/^9\d{9}$/', $digits)) {
-        fail("$label must be a mobile number like 917 123 4567");
+        return null;
     }
 
     return '+63 ' . substr($digits, 0, 3) . ' ' . substr($digits, 3, 3) . ' ' . substr($digits, 6);
+}
+
+function phone_param($data, $key, $label)
+{
+    $phone = text($data, $key, $label, 25);
+    if ($phone === '') {
+        return null;
+    }
+
+    $mobile = mobile_number($phone);
+    if ($mobile === null) {
+        fail("$label must be a mobile number like 917 123 4567");
+    }
+    return $mobile;
+}
+
+function unit_name($quantity, $unit)
+{
+    if (abs((float) $quantity) == 1 && substr($unit, -1) === 's') {
+        return substr($unit, 0, -1);
+    }
+    return $unit;
+}
+
+function clean_log_text($text)
+{
+    if ($text === null) {
+        return null;
+    }
+    $text = preg_replace('/(?<![\d.])(\d+)\.0+(?!\d|\.\d)/', '$1', $text);
+    $text = preg_replace('/(?<![\d.])(\d+\.\d*[1-9])0+(?!\d|\.\d)/', '$1', $text);
+    $text = preg_replace('/(?<![\d.])1 ([a-z]+)s\b/', '1 $1', $text);
+    $text = preg_replace_callback('/\(([A-Z]+(_[A-Z]+)+|[A-Z]{4,})\)/', function ($match) {
+        return '(' . strtolower(str_replace('_', ' ', $match[1])) . ')';
+    }, $text);
+    return str_replace(['for HOSTEL', 'for CANTEEN'], ['for the hostel', 'for the canteen'], $text);
 }
 
 function password_param($data, $key, $label)
