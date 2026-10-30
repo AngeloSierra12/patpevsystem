@@ -1,36 +1,3 @@
--- =============================================================================
--- HOTEL INVENTORY SYSTEM FOR IGP PATVEP HOSTEL AND UNIVERSITY CANTEEN
--- File: 04_triggers.sql
--- Purpose: Stock automation, data-integrity guards, audit automation (WBS 7.2)
--- Run AFTER: 03_procedures.sql
---
--- STOCK FLOW
---   trg_delivery_item_after_insert   stock +qty, header total +line, STOCK_IN row
---   trg_consumption_after_insert     stock −qty, STOCK_OUT row, audit row
---   (sp_adjust_stock)                count correction, ADJUSTMENT row, audit row
---
--- GUARDS (raise an error instead of silently corrupting stock)
---   trg_item_before_insert           new items must start at 0 stock
---   trg_item_before_update           stock can't be edited directly; location
---                                    can't change once the item has history
---   trg_delivery_before_update       total is computed; status/location locked
---                                    once lines exist
---   trg_delivery_item_before_update  lines are append-only
---   trg_delivery_item_before_delete  lines are append-only
---   trg_consumption_before_update    consumption is append-only
---   trg_consumption_before_delete    consumption is append-only
---   trg_txn_before_update            ledger is append-only
---   trg_txn_before_delete            ledger is append-only
---
--- AUDIT
---   trg_item_after_update            item detail edits (name, levels, etc.)
---   trg_delivery_after_insert        delivery received / rejected
---   trg_consumption_after_insert     consumption recorded
---
--- Mistakes are corrected with sp_adjust_stock (with a reason), never by
--- editing or deleting history.
--- =============================================================================
-
 USE bpsu_patvep_inventory;
 
 DROP TRIGGER IF EXISTS trg_item_before_insert;
@@ -49,10 +16,6 @@ DROP TRIGGER IF EXISTS trg_txn_before_delete;
 
 DELIMITER $$
 
--- ═════════════════════════════════════════════════════════════════════════════
--- INVENTORY ITEMS
--- ═════════════════════════════════════════════════════════════════════════════
-
 CREATE TRIGGER trg_item_before_insert
 BEFORE INSERT ON inventory_items
 FOR EACH ROW
@@ -62,7 +25,6 @@ BEGIN
             SET MESSAGE_TEXT = 'New items start at 0 stock. Record a delivery or CALL sp_adjust_stock() for the opening balance.';
     END IF;
 END $$
-
 
 CREATE TRIGGER trg_item_before_update
 BEFORE UPDATE ON inventory_items
@@ -80,9 +42,6 @@ BEGIN
     END IF;
 END $$
 
-
--- Logs edits to item details. Stock/cost changes are NOT logged here because
--- they already appear in inventory_transactions and their own audit rows.
 CREATE TRIGGER trg_item_after_update
 AFTER UPDATE ON inventory_items
 FOR EACH ROW
@@ -109,11 +68,6 @@ BEGIN
     END IF;
 END $$
 
-
--- ═════════════════════════════════════════════════════════════════════════════
--- DELIVERIES
--- ═════════════════════════════════════════════════════════════════════════════
-
 CREATE TRIGGER trg_delivery_after_insert
 AFTER INSERT ON deliveries
 FOR EACH ROW
@@ -129,7 +83,6 @@ BEGIN
                        ' for ', NEW.location),
                 NULL, NULL, NEW.received_at);
 END $$
-
 
 CREATE TRIGGER trg_delivery_before_update
 BEFORE UPDATE ON deliveries
@@ -147,11 +100,6 @@ BEGIN
     END IF;
 END $$
 
-
--- ═════════════════════════════════════════════════════════════════════════════
--- DELIVERY ITEMS  (stock in)
--- ═════════════════════════════════════════════════════════════════════════════
-
 CREATE TRIGGER trg_delivery_item_after_insert
 AFTER INSERT ON delivery_items
 FOR EACH ROW
@@ -167,8 +115,6 @@ BEGIN
     INTO v_del_location, v_del_status, v_received_at, v_received_by
     FROM deliveries WHERE delivery_id = NEW.delivery_id;
 
-    -- FOR UPDATE locks the item row so two simultaneous deliveries/consumptions
-    -- can't both read the same stock_before.
     SELECT location, current_stock
     INTO v_item_location, v_stock_before
     FROM inventory_items WHERE item_id = NEW.item_id
@@ -207,7 +153,6 @@ BEGIN
          'DELIVERY', NEW.delivery_id, 'SUPPLIER_DELIVERY', v_received_by, v_received_at);
 END $$
 
-
 CREATE TRIGGER trg_delivery_item_before_update
 BEFORE UPDATE ON delivery_items
 FOR EACH ROW
@@ -216,7 +161,6 @@ BEGIN
         SET MESSAGE_TEXT = 'Delivery lines cannot be edited. Correct stock with sp_adjust_stock (reason required).';
 END $$
 
-
 CREATE TRIGGER trg_delivery_item_before_delete
 BEFORE DELETE ON delivery_items
 FOR EACH ROW
@@ -224,11 +168,6 @@ BEGIN
     SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Delivery lines cannot be deleted. Correct stock with sp_adjust_stock (reason required).';
 END $$
-
-
--- ═════════════════════════════════════════════════════════════════════════════
--- CONSUMPTION  (stock out)
--- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TRIGGER trg_consumption_after_insert
 AFTER INSERT ON inventory_consumption
@@ -269,7 +208,6 @@ BEGIN
                 NULL, NULL, NEW.consumption_date);
 END $$
 
-
 CREATE TRIGGER trg_consumption_before_update
 BEFORE UPDATE ON inventory_consumption
 FOR EACH ROW
@@ -277,7 +215,6 @@ BEGIN
     SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Consumption records cannot be edited. Correct stock with sp_adjust_stock (reason required).';
 END $$
-
 
 CREATE TRIGGER trg_consumption_before_delete
 BEFORE DELETE ON inventory_consumption
@@ -287,11 +224,6 @@ BEGIN
         SET MESSAGE_TEXT = 'Consumption records cannot be deleted. Correct stock with sp_adjust_stock (reason required).';
 END $$
 
-
--- ═════════════════════════════════════════════════════════════════════════════
--- STOCK LEDGER
--- ═════════════════════════════════════════════════════════════════════════════
-
 CREATE TRIGGER trg_txn_before_update
 BEFORE UPDATE ON inventory_transactions
 FOR EACH ROW
@@ -299,7 +231,6 @@ BEGIN
     SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The stock ledger is append-only.';
 END $$
-
 
 CREATE TRIGGER trg_txn_before_delete
 BEFORE DELETE ON inventory_transactions

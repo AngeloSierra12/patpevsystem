@@ -1,19 +1,8 @@
--- =============================================================================
--- HOTEL INVENTORY SYSTEM FOR IGP PATVEP HOSTEL AND UNIVERSITY CANTEEN
--- File: 07_selftest.sql
--- Purpose: Prove the seed + triggers + guards work. Changes NO data.
--- Run AFTER: 06_seed_data.sql
---
--- Output: one row per check with PASS / FAIL. Everything should say PASS.
--- Guard checks try forbidden writes; each must be rejected with an error.
--- =============================================================================
-
 USE bpsu_patvep_inventory;
 
 DROP TEMPORARY TABLE IF EXISTS selftest;
 CREATE TEMPORARY TABLE selftest (check_name VARCHAR(120), result VARCHAR(4));
 
--- ── Expected stock after seed ────────────────────────────────────────────────
 INSERT INTO selftest
 SELECT CONCAT('stock ', i.item_code, ' = ', e.qty),
        IF(i.current_stock = e.qty, 'PASS', 'FAIL')
@@ -31,7 +20,6 @@ UNION ALL SELECT 'H-TOI-005', 152.000 UNION ALL SELECT 'H-TOI-006',  56.000
 UNION ALL SELECT 'H-RMS-007',   5.000 UNION ALL SELECT 'H-CLN-008',   7.000
 ) e ON e.code = i.item_code;
 
--- ── Ledger agrees with stock for every item ──────────────────────────────────
 INSERT INTO selftest
 SELECT 'ledger net change = current_stock (all items)',
        IF(COUNT(*) = 0, 'PASS', 'FAIL')
@@ -40,7 +28,6 @@ LEFT JOIN (SELECT item_id, SUM(stock_after - stock_before) net
            FROM inventory_transactions GROUP BY item_id) t ON t.item_id = i.item_id
 WHERE IFNULL(t.net, 0) <> i.current_stock;
 
--- ── Delivery totals computed from lines ──────────────────────────────────────
 INSERT INTO selftest
 SELECT 'delivery totals = sum of lines',
        IF(COUNT(*) = 0, 'PASS', 'FAIL')
@@ -53,14 +40,12 @@ INSERT INTO selftest
 SELECT 'DR-2026-043 total = 17342.00', IF(total_amount = 17342.00, 'PASS', 'FAIL')
 FROM deliveries WHERE delivery_receipt_no = 'DR-2026-043';
 
--- ── Low stock alerts ─────────────────────────────────────────────────────────
 INSERT INTO selftest
 SELECT 'low stock = sugar CRITICAL, toilet paper LOW, bulb LOW',
        IF(GROUP_CONCAT(CONCAT(item_code, ':', stock_status) ORDER BY item_code)
           = 'C-ING-005:CRITICAL,H-RMS-007:LOW,H-TOI-006:LOW', 'PASS', 'FAIL')
 FROM vw_low_stock_items;
 
--- ── Audit rows written by triggers/procedures ────────────────────────────────
 INSERT INTO selftest
 SELECT 'audit: 8 deliveries, 15 consumptions, 1 adjust, 1 count match, 1 item edit',
        IF(SUM(action_type IN ('DELIVERY_RECORDED','DELIVERY_REJECTED')) = 8
@@ -70,7 +55,6 @@ SELECT 'audit: 8 deliveries, 15 consumptions, 1 adjust, 1 count match, 1 item ed
       AND SUM(action_type = 'ITEM_UPDATED' AND user_id = 1) = 1, 'PASS', 'FAIL')
 FROM audit_logs;
 
--- ── Guards: each forbidden write must raise an error ─────────────────────────
 DROP PROCEDURE IF EXISTS tmp_expect_error;
 DELIMITER $$
 CREATE PROCEDURE tmp_expect_error(IN p_name VARCHAR(120), IN p_sql TEXT)
@@ -104,7 +88,6 @@ CALL tmp_expect_error('critical above reorder blocked',       'UPDATE inventory_
 
 DROP PROCEDURE tmp_expect_error;
 
--- ── Result ───────────────────────────────────────────────────────────────────
 SELECT * FROM selftest;
 SELECT IF(SUM(result = 'FAIL') = 0, 'ALL PASS', CONCAT(SUM(result = 'FAIL'), ' FAILED')) AS summary,
        COUNT(*) AS checks
