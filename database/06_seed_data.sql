@@ -1,22 +1,7 @@
--- =============================================================================
--- HOTEL INVENTORY SYSTEM FOR IGP PATVEP HOSTEL AND UNIVERSITY CANTEEN
--- File: 06_seed_data.sql
--- Purpose: Demo data for both locations (fictional)
--- Run AFTER: 05_views.sql   (triggers must exist - they compute stock)
---
--- Items start at 0 stock. Deliveries push stock up, consumption pulls it down,
--- and sp_adjust_stock shows a weekly-count correction - all through triggers,
--- so the ledger and audit log fill themselves.
--- Final expected stock levels are checked by 07_selftest.sql.
--- =============================================================================
-
 USE bpsu_patvep_inventory;
 SET time_zone = '+08:00';
 SET @app_ip = '127.0.0.1';
 
--- =============================================================================
--- 1. USERS - all demo passwords are "password" (bcrypt, DEMO ONLY)
--- =============================================================================
 INSERT INTO users
     (user_id, username, password_hash, full_name, email, phone, role, department, created_at)
 VALUES
@@ -32,9 +17,6 @@ CALL sp_log(1, 'USER_CREATE', 'USERS', 4, 'Created user qa_staff (Fritz Edrick B
 CALL sp_log(3, 'LOGIN',       'AUTH',  NULL, 'User canteen_staff logged in', NULL, NULL, '2026-09-09 07:55:00');
 CALL sp_log(2, 'LOGIN',       'AUTH',  NULL, 'User hostel_staff logged in',  NULL, NULL, '2026-09-10 08:50:00');
 
--- =============================================================================
--- 2. SUPPLIERS
--- =============================================================================
 INSERT INTO suppliers
     (supplier_id, supplier_name, contact_person, phone, email, address, supplied_categories)
 VALUES
@@ -44,14 +26,11 @@ VALUES
 (4, 'Central Luzon Beverage & Refreshment Corp.',    'Jennifer Cruz',     '+63 920 555 3456', 'jcruz@clbeverage.com.ph',    'Roman Superhighway, Balanga City',     'Beverages'),
 (5, 'Bataan Linen & Hotel Supply Co.',               'Grace Villanueva',  '+63 921 444 7890', 'orders@bataanlinen.ph',      'Tuyo, Balanga City, Bataan',           'Linens & Bedding');
 
--- =============================================================================
--- 3. INVENTORY ITEMS (all at 0 stock)
--- =============================================================================
 INSERT INTO inventory_items
     (item_id, item_code, item_name, location, category, unit,
      reorder_level, critical_level, unit_cost, preferred_supplier_id, description)
 VALUES
--- Canteen
+
 (1,  'C-STP-001', 'Jasmine Premium Rice (50kg Sack)',      'CANTEEN', 'FOOD_STAPLES',       'sacks',    3.000,  1.000, 2350.00, 2, 'Premium jasmine rice, 50kg per sack'),
 (2,  'C-MEA-002', 'Fresh Dressed Chicken (Cut)',           'CANTEEN', 'MEAT_POULTRY',       'kg',      10.000,  3.000,  195.00, 1, 'Fresh dressed chicken, per kg'),
 (3,  'C-MEA-003', 'Fresh Pork Liempo (Sliced)',            'CANTEEN', 'MEAT_POULTRY',       'kg',       8.000,  2.000,  330.00, 1, 'Sliced pork belly, per kg'),
@@ -64,7 +43,7 @@ VALUES
 (10, 'C-STP-010', 'Canned Corned Beef (260g)',             'CANTEEN', 'FOOD_STAPLES',       'cans',    20.000,  5.000,   64.00, 3, '260g cans'),
 (11, 'C-PKG-011', 'Biodegradable Bento Box 3-Div',         'CANTEEN', 'SUPPLIES_PACKAGING', 'pcs',    100.000, 30.000,    4.25, 3, '3-division meal boxes'),
 (12, 'C-CLN-012', 'Commercial Dishwashing Liquid (1 Gal)', 'CANTEEN', 'CLEANING',           'gallons',  1.000,  0.000,  290.00, 3, 'Dishwashing liquid, 1 gallon'),
--- Hostel
+
 (13, 'H-LIN-001', 'Bath Towel (White, 27x54)',             'HOSTEL',  'LINENS_BEDDING',     'pcs',     20.000,  8.000,  185.00, 5, 'Cotton bath towel'),
 (14, 'H-LIN-002', 'Bed Sheet Set (Single)',                'HOSTEL',  'LINENS_BEDDING',     'sets',    10.000,  4.000,  650.00, 5, 'Fitted + flat sheet, single'),
 (15, 'H-LIN-003', 'Pillowcase (Standard)',                 'HOSTEL',  'LINENS_BEDDING',     'pcs',     20.000,  8.000,   95.00, 5, 'Standard pillowcase'),
@@ -74,9 +53,6 @@ VALUES
 (19, 'H-RMS-007', 'LED Bulb (9W)',                         'HOSTEL',  'ROOM_SUPPLIES',      'pcs',      6.000,  2.000,  120.00, 3, 'Replacement room bulb'),
 (20, 'H-CLN-008', 'Laundry Detergent Powder (1kg)',        'HOSTEL',  'CLEANING',           'packs',    6.000,  2.000,   98.00, 3, 'For linen laundry');
 
--- =============================================================================
--- 4. DELIVERIES (headers - total_amount is filled in by trigger)
--- =============================================================================
 INSERT INTO deliveries
     (delivery_id, delivery_receipt_no, supplier_id, location, status, received_at, received_by, notes)
 VALUES
@@ -89,15 +65,6 @@ VALUES
 (7, 'DR-2026-102', 3, 'HOSTEL',  'RECEIVED', '2026-09-12 10:00:00', 2, 'Toiletries and room supplies'),
 (8, 'DR-2026-046', 1, 'CANTEEN', 'REJECTED', '2026-09-15 06:45:00', 3, 'Chicken failed temperature check on arrival - returned to supplier');
 
--- =============================================================================
--- 5. DELIVERY ITEMS → stock in
--- Expected header totals after triggers:
---   DR-2026-041  14,100.00   DR-2026-101  15,630.00
---   DR-2026-042   2,300.00   DR-2026-102   6,292.00
---   DR-2026-043  17,342.00   DR-2026-046       0.00 (rejected)
---   DR-2026-044   5,816.00
---   DR-2026-045   9,990.00
--- =============================================================================
 INSERT INTO delivery_items (delivery_id, item_id, quantity, unit_cost) VALUES
 (1, 1,    6.000, 2350.00),
 (2, 9,  200.000,   11.50),
@@ -120,11 +87,8 @@ INSERT INTO delivery_items (delivery_id, item_id, quantity, unit_cost) VALUES
 (7, 19,   6.000,  120.00),
 (7, 20,  10.000,   98.00);
 
--- =============================================================================
--- 6. CONSUMPTION → stock out
--- =============================================================================
 INSERT INTO inventory_consumption (item_id, quantity, purpose, notes, recorded_by, consumption_date) VALUES
--- Canteen
+
 (2,   3.000, 'KITCHEN_USAGE', 'Morning prep - chicken adobo',        3, '2026-09-10 07:30:00'),
 (9,   8.000, 'CANTEEN_SALES', 'Water sold at canteen counter',        3, '2026-09-10 12:00:00'),
 (1,   0.500, 'KITCHEN_USAGE', 'Half sack used for day meals',         3, '2026-09-11 06:30:00'),
@@ -134,7 +98,7 @@ INSERT INTO inventory_consumption (item_id, quantity, purpose, notes, recorded_b
 (8,   6.000, 'CANTEEN_SALES', 'Evap milk for coffee orders',          3, '2026-09-13 07:00:00'),
 (11, 20.000, 'CANTEEN_SALES', 'Bento boxes for packed lunch orders',  3, '2026-09-13 11:30:00'),
 (5,   1.000, 'KITCHEN_USAGE', 'Sugar for desserts and drinks',        3, '2026-09-14 07:00:00'),
--- Hostel
+
 (16, 24.000, 'ROOM_RESTOCK',  'Restocked 12 rooms after checkout',    2, '2026-09-13 10:00:00'),
 (17, 48.000, 'ROOM_RESTOCK',  'Restocked 12 rooms after checkout',    2, '2026-09-13 10:00:00'),
 (18, 40.000, 'ROOM_RESTOCK',  'Weekly toilet paper restock',          2, '2026-09-13 10:30:00'),
@@ -142,15 +106,9 @@ INSERT INTO inventory_consumption (item_id, quantity, purpose, notes, recorded_b
 (13,  2.000, 'DAMAGED',       'Two towels stained beyond cleaning',   2, '2026-09-14 08:30:00'),
 (19,  1.000, 'MAINTENANCE',   'Replaced bulb in room 204',            2, '2026-09-14 15:00:00');
 
--- =============================================================================
--- 7. WEEKLY COUNT (charter metric: physical stock matches records)
--- =============================================================================
 CALL sp_adjust_stock(2, 19.500, 'Weekly count - 0.5 kg chicken spoiled (freezer door left open)', 3);
 CALL sp_adjust_stock(1,  5.500, 'Weekly count', 3);
 
--- =============================================================================
--- 8. ITEM EDIT (shows trg_item_after_update logging with @app_user_id)
--- =============================================================================
 SET @app_user_id = 1;
 UPDATE inventory_items SET reorder_level = 60.000 WHERE item_code = 'H-TOI-006';
 SET @app_user_id = NULL;

@@ -1,23 +1,3 @@
--- =============================================================================
--- HOTEL INVENTORY SYSTEM FOR IGP PATVEP HOSTEL AND UNIVERSITY CANTEEN
--- File: 08_app_user.sql
--- Purpose: Least-privilege MariaDB account for the PHP backend
--- Run AFTER: 01-06. Safe to re-run (recreates the account).
---
--- The password is NOT stored in this file. Pass it in when running:
---   mysql -uroot -e "SET @app_pw='your-password'; SOURCE 08_app_user.sql;"
---
--- What patvep_app CAN do (only inside bpsu_patvep_inventory):
---   SELECT, INSERT, UPDATE, EXECUTE (call sp_log / sp_adjust_stock)
--- What it CANNOT do:
---   DELETE, DROP, ALTER, CREATE, disable triggers, touch other databases.
---   (Records are deactivated with is_active = 0, never deleted.)
---
--- Triggers and procedures still work: they run with their definer's (root)
--- privileges, so e.g. a stock update fired by an INSERT succeeds even though
--- patvep_app itself cannot write current_stock directly.
--- =============================================================================
-
 USE bpsu_patvep_inventory;
 
 DELIMITER $$
@@ -28,8 +8,6 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Set @app_pw to a password of at least 12 characters first.';
     END IF;
 
-    -- PHP connects to 127.0.0.1; MariaDB may see that as 'localhost' or
-    -- '127.0.0.1' depending on name resolution, so create both.
     DROP USER IF EXISTS 'patvep_app'@'localhost';
     DROP USER IF EXISTS 'patvep_app'@'127.0.0.1';
 

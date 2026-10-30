@@ -1,19 +1,3 @@
--- =============================================================================
--- HOTEL INVENTORY SYSTEM FOR IGP PATVEP HOSTEL AND UNIVERSITY CANTEEN
--- File: 03_procedures.sql
--- Purpose: Stored procedures used by triggers and by the PHP backend
--- Run AFTER: 02_tables.sql
---
---   sp_log                 - write one audit_logs row (resolves username/role)
---   sp_adjust_stock        - physical count correction, reason required
---   sp_archive_audit_logs  - move old audit rows into audit_logs_archive
---
--- SESSION VARIABLES the backend should set right after connecting/login:
---   SET @app_user_id = <logged-in user_id>;   -- actor for item edits
---   SET @app_ip      = '<client ip>';         -- stored on every audit row
--- Both are optional; when NULL the actor is logged as SYSTEM.
--- =============================================================================
-
 USE bpsu_patvep_inventory;
 
 DROP PROCEDURE IF EXISTS sp_log;
@@ -22,11 +6,6 @@ DROP PROCEDURE IF EXISTS sp_archive_audit_logs;
 
 DELIMITER $$
 
--- ─────────────────────────────────────────────────────────────────────────────
--- sp_log: single place that writes audit_logs.
--- Backend usage (replaces any hand-written INSERT INTO audit_logs):
---   CALL sp_log(@app_user_id, 'LOGIN', 'AUTH', NULL, 'User admin logged in', NULL, NULL, NOW());
--- ─────────────────────────────────────────────────────────────────────────────
 CREATE PROCEDURE sp_log(
     IN p_user_id     INT UNSIGNED,
     IN p_action      VARCHAR(60),
@@ -56,20 +35,6 @@ BEGIN
          @app_ip, IFNULL(p_logged_at, NOW()));
 END $$
 
-
--- ─────────────────────────────────────────────────────────────────────────────
--- sp_adjust_stock: set an item's stock to a physically counted quantity.
--- This is the ONLY way to change stock outside deliveries and consumption
--- (opening balances, weekly counts, spoilage found during a count).
---
---   CALL sp_adjust_stock(item_id, counted_qty, 'Weekly count - 0.5kg spoiled', user_id);
---
--- • Count equals system stock → logs STOCK_COUNT_MATCHED, no ledger row.
--- • Count differs            → updates stock, writes an ADJUSTMENT ledger row,
---                              logs STOCK_ADJUSTED with old/new values.
--- The charter's "manual override requires a logged reason" rule is enforced
--- here: a blank reason is rejected.
--- ─────────────────────────────────────────────────────────────────────────────
 CREATE PROCEDURE sp_adjust_stock(
     IN p_item_id     INT UNSIGNED,
     IN p_counted_qty DECIMAL(12,3),
@@ -102,10 +67,7 @@ BEGIN
                     CONCAT('Physical count of ', v_code, ' matches system stock (', v_stock, '). ', p_reason),
                     NULL, NULL, NOW());
     ELSE
-        -- ponytail: @ledger_write is a session flag that lets the item guard
-        -- trigger allow this one update. If a statement fails between set and
-        -- reset the flag stays 1 for that connection; acceptable for a
-        -- single-site prototype.
+
         SET @ledger_write = 1;
         UPDATE inventory_items SET current_stock = p_counted_qty WHERE item_id = p_item_id;
         SET @ledger_write = NULL;
@@ -123,12 +85,6 @@ BEGIN
     END IF;
 END $$
 
-
--- ─────────────────────────────────────────────────────────────────────────────
--- sp_archive_audit_logs: MOVE audit rows older than N days to the archive.
---   CALL sp_archive_audit_logs(90);
--- Runs in its own transaction, so do not call it inside another transaction.
--- ─────────────────────────────────────────────────────────────────────────────
 CREATE PROCEDURE sp_archive_audit_logs(IN p_days_to_keep INT)
 BEGIN
     DECLARE v_cutoff   DATETIME;

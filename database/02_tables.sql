@@ -1,18 +1,3 @@
--- =============================================================================
--- HOTEL INVENTORY SYSTEM FOR IGP PATVEP HOSTEL AND UNIVERSITY CANTEEN
--- File: 02_tables.sql
--- Purpose: All tables, constraints and indexes (9 tables)
--- Run AFTER: 01_database.sql
---
--- Hostel vs Canteen:
---   Every inventory item belongs to exactly one LOCATION ('HOSTEL' or
---   'CANTEEN'). Deliveries also carry a location, and a trigger makes sure a
---   delivery only contains items from its own location. Consumption and
---   transactions inherit the location through item_id.
---   An item stocked by both sides (e.g. bleach) is two rows, one per location,
---   so each side keeps its own stock count and reorder levels.
--- =============================================================================
-
 USE bpsu_patvep_inventory;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -27,15 +12,10 @@ DROP TABLE IF EXISTS suppliers;
 DROP TABLE IF EXISTS users;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- =============================================================================
--- 1. USERS
--- ADMIN sees both locations. STAFF_HOSTEL / STAFF_CANTEEN are limited to their
--- own location by the backend (role → location: STAFF_HOSTEL → 'HOSTEL').
--- =============================================================================
 CREATE TABLE users (
     user_id       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username      VARCHAR(50)  NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,               -- bcrypt (PHP password_hash)
+    password_hash VARCHAR(255) NOT NULL,
     full_name     VARCHAR(120) NOT NULL,
     email         VARCHAR(120) NOT NULL UNIQUE,
     phone         VARCHAR(25),
@@ -50,10 +30,6 @@ CREATE TABLE users (
     INDEX idx_users_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 2. SUPPLIERS
--- Shared by both locations (one supplier can deliver to hostel and canteen).
--- =============================================================================
 CREATE TABLE suppliers (
     supplier_id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     supplier_name       VARCHAR(120) NOT NULL UNIQUE,
@@ -61,7 +37,7 @@ CREATE TABLE suppliers (
     phone               VARCHAR(25),
     email               VARCHAR(120),
     address             TEXT,
-    supplied_categories TEXT,                          -- free text, e.g. "Linens, Toiletries"
+    supplied_categories TEXT,
     notes               TEXT,
     is_active           TINYINT(1) NOT NULL DEFAULT 1,
     created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -70,38 +46,30 @@ CREATE TABLE suppliers (
     INDEX idx_suppliers_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 3. INVENTORY_ITEMS
--- current_stock is NEVER edited directly. It only moves through:
---   • delivery_items           (stock in)
---   • inventory_consumption    (stock out)
---   • CALL sp_adjust_stock()   (physical count correction, reason required)
--- Triggers in 04_triggers.sql enforce this.
--- =============================================================================
 CREATE TABLE inventory_items (
     item_id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    item_code             VARCHAR(25)  NOT NULL UNIQUE,    -- e.g. C-STP-001, H-LIN-001
+    item_code             VARCHAR(25)  NOT NULL UNIQUE,
     item_name             VARCHAR(120) NOT NULL,
     location              ENUM('HOSTEL','CANTEEN') NOT NULL,
     category              ENUM(
-                              -- canteen
+
                               'FOOD_STAPLES',
                               'MEAT_POULTRY',
                               'BEVERAGES',
                               'INGREDIENTS',
                               'SUPPLIES_PACKAGING',
-                              -- hostel
+
                               'LINENS_BEDDING',
                               'TOILETRIES',
                               'ROOM_SUPPLIES',
-                              -- both
+
                               'CLEANING'
                           ) NOT NULL,
-    unit                  VARCHAR(30)   NOT NULL,          -- sacks, kg, pcs, rolls…
+    unit                  VARCHAR(30)   NOT NULL,
     current_stock         DECIMAL(12,3) NOT NULL DEFAULT 0.000,
-    reorder_level         DECIMAL(12,3) NOT NULL DEFAULT 10.000,  -- LOW alert
-    critical_level        DECIMAL(12,3) NOT NULL DEFAULT 0.000,   -- CRITICAL alert
-    unit_cost             DECIMAL(10,2) NOT NULL DEFAULT 0.00,    -- last delivery cost
+    reorder_level         DECIMAL(12,3) NOT NULL DEFAULT 10.000,
+    critical_level        DECIMAL(12,3) NOT NULL DEFAULT 0.000,
+    unit_cost             DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     preferred_supplier_id INT UNSIGNED NULL,
     description           TEXT,
     is_active             TINYINT(1) NOT NULL DEFAULT 1,
@@ -121,15 +89,9 @@ CREATE TABLE inventory_items (
     INDEX idx_items_supplier     (preferred_supplier_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 4. DELIVERIES (header)
--- total_amount is computed by trigger from delivery_items - never typed in.
--- REJECTED deliveries are recorded for supplier history but cannot hold items
--- (rejected goods never enter stock).
--- =============================================================================
 CREATE TABLE deliveries (
     delivery_id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    delivery_receipt_no VARCHAR(60)  NOT NULL UNIQUE,      -- supplier DR number
+    delivery_receipt_no VARCHAR(60)  NOT NULL UNIQUE,
     supplier_id         INT UNSIGNED NOT NULL,
     location            ENUM('HOSTEL','CANTEEN') NOT NULL,
     status              ENUM('RECEIVED','REJECTED') NOT NULL DEFAULT 'RECEIVED',
@@ -150,12 +112,6 @@ CREATE TABLE deliveries (
     INDEX idx_del_supplier_date (supplier_id, received_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 5. DELIVERY_ITEMS (lines)
--- Append-only. Inserting a line raises stock, adds to the header total and
--- writes a STOCK_IN ledger row. FK is RESTRICT (not CASCADE) because cascaded
--- deletes do not fire triggers and would leave stock wrong.
--- =============================================================================
 CREATE TABLE delivery_items (
     delivery_item_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     delivery_id      INT UNSIGNED  NOT NULL,
@@ -178,14 +134,6 @@ CREATE TABLE delivery_items (
     INDEX idx_di_item     (item_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 6. INVENTORY_TRANSACTIONS (stock ledger)
--- One row per stock change, written only by triggers / sp_adjust_stock.
---   STOCK_IN   ← delivery_items       (ref_type 'DELIVERY',    ref_id delivery_id)
---   STOCK_OUT  ← inventory_consumption (ref_type 'CONSUMPTION', ref_id consumption_id)
---   ADJUSTMENT ← sp_adjust_stock       (ref_type 'COUNT')
--- quantity is always positive; direction is stock_before → stock_after.
--- =============================================================================
 CREATE TABLE inventory_transactions (
     txn_id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     item_id          INT UNSIGNED  NOT NULL,
@@ -215,12 +163,6 @@ CREATE TABLE inventory_transactions (
     INDEX idx_txn_user      (performed_by)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 7. INVENTORY_CONSUMPTION
--- Append-only usage records. purpose examples:
---   canteen: KITCHEN_USAGE, CANTEEN_SALES, SPOILAGE
---   hostel : ROOM_RESTOCK, HOUSEKEEPING, LAUNDRY, DAMAGED
--- =============================================================================
 CREATE TABLE inventory_consumption (
     consumption_id   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     item_id          INT UNSIGNED  NOT NULL,
@@ -242,18 +184,13 @@ CREATE TABLE inventory_consumption (
     INDEX idx_con_user      (recorded_by)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 8. AUDIT_LOGS
--- username/role snapshots keep the log readable after a user is deleted.
--- Write to it with CALL sp_log(...) (see 03_procedures.sql).
--- =============================================================================
 CREATE TABLE audit_logs (
     log_id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id           INT UNSIGNED NULL,
     username_snapshot VARCHAR(50)  NOT NULL,
     role_snapshot     VARCHAR(30)  NOT NULL DEFAULT 'SYSTEM',
-    action_type       VARCHAR(60)  NOT NULL,      -- LOGIN, DELIVERY_RECORDED, STOCK_ADJUSTED…
-    target_entity     VARCHAR(60)  NOT NULL,      -- table / module name
+    action_type       VARCHAR(60)  NOT NULL,
+    target_entity     VARCHAR(60)  NOT NULL,
     target_id         INT UNSIGNED NULL,
     description       TEXT,
     old_value         TEXT NULL,
@@ -271,13 +208,8 @@ CREATE TABLE audit_logs (
     INDEX idx_log_target      (target_entity, target_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =============================================================================
--- 9. AUDIT_LOGS_ARCHIVE
--- Same shape as audit_logs; old rows are MOVED here by sp_archive_audit_logs.
--- No FK to users on purpose: archived rows must outlive user accounts.
--- =============================================================================
 CREATE TABLE audit_logs_archive (
-    log_id            INT UNSIGNED PRIMARY KEY,    -- original id preserved
+    log_id            INT UNSIGNED PRIMARY KEY,
     user_id           INT UNSIGNED NULL,
     username_snapshot VARCHAR(50)  NOT NULL,
     role_snapshot     VARCHAR(30)  NOT NULL DEFAULT 'SYSTEM',
